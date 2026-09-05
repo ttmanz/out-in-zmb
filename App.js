@@ -15,7 +15,7 @@ import { addNotificationResponseListener, resolvePostDeepLink } from './src/lib/
 const navigationRef = createNavigationContainerRef();
 
 // Shared-post links (outandaround://post/:type/:id, opened from the
-// find-mee.com/p/:type/:id web fallback) can arrive before the navigator
+// out-in-zmb.com/p/:type/:id web fallback) can arrive before the navigator
 // has mounted, and their route resolution (e.g. resolveEventRoute) queries
 // tables gated by RLS on auth.uid() — which is only reliably set once the
 // restored session has actually been attached to the Supabase client. A

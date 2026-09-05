@@ -223,8 +223,8 @@ const ClubDetailScreen = ({ navigation, route }) => {
   };
 
   const handleShare = async (post) => {
-    const shareUrl = `https://find-mee.com/p/club_post/${post.id}`;
-    const message = [post.text || 'Check out this post on Find-Mee!', post.link_url, shareUrl].filter(Boolean).join('\n\n');
+    const shareUrl = `https://out-in-zmb.com/p/club_post/${post.id}`;
+    const message = [post.text || 'Check out this post on Out-in-Zmb!', post.link_url, shareUrl].filter(Boolean).join('\n\n');
     try {
       await Share.share({ message, url: shareUrl });
     } catch {

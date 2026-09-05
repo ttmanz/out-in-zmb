@@ -197,7 +197,7 @@ const AdminAccessControlScreen = ({ navigation }) => {
             </View>
             {f.is_paid && (
               <View style={styles.priceRow}>
-                <Text style={styles.priceCurrency}>€</Text>
+                <Text style={styles.priceCurrency}>K</Text>
                 <TextInput
                   style={styles.priceInput}
                   value={f.one_off_price_draft}

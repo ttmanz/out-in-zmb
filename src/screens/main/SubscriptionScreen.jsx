@@ -179,11 +179,11 @@ const SubscriptionScreen = ({ navigation, standalone = false }) => {
         <Text style={styles.footerNote}>{t('subscription.footerNote')}</Text>
         <Text style={styles.legalNote}>
           {t('subscription.legalNote')}{' '}
-          <Text style={styles.legalLink} onPress={() => Linking.openURL('https://find-mee.com/terms-of-service.html')}>
+          <Text style={styles.legalLink} onPress={() => Linking.openURL('https://out-in-zmb.com/terms-of-service.html')}>
             {t('subscription.termsOfService')}
           </Text>
           {' '}{t('common.and')}{' '}
-          <Text style={styles.legalLink} onPress={() => Linking.openURL('https://find-mee.com/privacy-policy.html')}>
+          <Text style={styles.legalLink} onPress={() => Linking.openURL('https://out-in-zmb.com/privacy-policy.html')}>
             {t('subscription.privacyPolicy')}
           </Text>
         </Text>

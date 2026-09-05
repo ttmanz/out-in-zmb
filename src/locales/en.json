@@ -1,6 +1,6 @@
 {
   "common": {
-    "appName": "Find - Mee",
+    "appName": "Out-in-Zmb",
     "error": "Something went wrong",
     "or": "or",
     "and": "and",
@@ -14,7 +14,7 @@
     "liveVideo": "Video",
     "cameraPermissionNeeded": "Allow camera access to capture a live photo or video.",
     "featureUnavailable": "This feature isn't available right now.",
-    "shareFallback": "Check out this post on Find-Mee!",
+    "shareFallback": "Check out this post on Out-in-Zmb!",
     "noSavedItems": "You haven't saved anything here yet — tap the bookmark on a post to keep it.",
     "delete": "Delete",
     "deletePostTitle": "Delete post?",
@@ -48,7 +48,7 @@
     "footerNote": "Manage or cancel your subscription anytime in your App Store or Google Play account settings.",
     "requiredTitle": "Subscription Required",
     "requiredBody": "Subscribe to post content and connect with other members.",
-    "requiredBodyPriced": "Posting here costs €{{price}}, or subscribe for unlimited posting.",
+    "requiredBodyPriced": "Posting here costs K{{price}}, or subscribe for unlimited posting.",
     "notAvailable": "This plan isn't available for purchase yet.",
     "restorePurchases": "Restore Purchases",
     "restoreDoneTitle": "Restored",
@@ -162,7 +162,7 @@
     "labelMessage": "What's on your mind?",
     "labelVenue": "At a venue? (optional)",
     "placeholderMessage": "e.g. Going for ice cream, anyone coming?",
-    "placeholderVenue": "e.g. Finos Bar, Limassol",
+    "placeholderVenue": "e.g. Ocean Bar, Lusaka",
     "post": "New Post",
     "submitPost": "Post",
     "viewReplies": "View replies",
@@ -254,7 +254,7 @@
     "deleteAccountConfirm": "Delete",
     "deleteAccountFinalWarning": "Are you absolutely sure? Your account and all your data will be gone forever.",
     "deleteAccountFinalConfirm": "Yes, delete everything",
-    "deleteAccountFailed": "Could not delete your account. Please try again or contact support@find-mee.com."
+    "deleteAccountFailed": "Could not delete your account. Please try again or contact support@out-in-zmb.com."
   },
   "venues": {
     "title": "Where to Go",
@@ -342,7 +342,7 @@
     "replyPlaceholder": "Write a reply...",
     "send": "Send",
     "errorReplyFailed": "Could not send your reply. Please try again.",
-    "shareFallback": "Check out this story on Find-Mee!",
+    "shareFallback": "Check out this story on Out-in-Zmb!",
     "errors": {
       "contentRequired": "Please add some text or a photo/video",
       "mediaFailed": "Media upload failed. Post without media?",
@@ -385,7 +385,7 @@
     "nameLabel": "Venue Name",
     "namePlaceholder": "e.g. Guaba Beach Bar",
     "addressLabel": "Address (optional)",
-    "addressPlaceholder": "e.g. Limassol Seafront",
+    "addressPlaceholder": "e.g. Manda Hill, Lusaka",
     "descLabel": "Description (optional)",
     "descPlaceholder": "A short description...",
     "rankLabel": "Rank",
@@ -416,7 +416,7 @@
     "labelWhen": "When?",
     "labelDescription": "More details",
     "placeholderTitle": "e.g. Drinks at Finos Bar",
-    "placeholderVenue": "e.g. Finos Bar, Limassol",
+    "placeholderVenue": "e.g. Ocean Bar, Lusaka",
     "placeholderDescription": "Optional note for your friends",
     "locationNote": "Your location will be tagged to this post",
     "submitPost": "Post",
@@ -521,7 +521,7 @@
     "detailsPlaceholder": "Add details (optional)",
     "submit": "Submit report",
     "thanksTitle": "Report received",
-    "thanksBody": "Thank you for helping keep Find-Mee safe. Our team will review this report within 24 hours.",
+    "thanksBody": "Thank you for helping keep Out-in-Zmb safe. Our team will review this report within 24 hours.",
     "reportPost": "Report post",
     "reportMember": "Report member"
   }

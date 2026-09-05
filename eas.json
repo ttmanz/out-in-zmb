@@ -13,11 +13,11 @@
     "preview": {
       "distribution": "internal",
       "env": {
-        "EXPO_PUBLIC_SUPABASE_URL": "https://mwvtciffmvxjvdphezka.supabase.co",
-        "EXPO_PUBLIC_SUPABASE_ANON_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im13dnRjaWZmbXZ4anZkcGhlemthIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE0MzQ2NTIsImV4cCI6MjA5NzAxMDY1Mn0.3v93k36--BMYUxxsN_DKOf4nLFw28XX2FCAtLv55xc0",
-        "GOOGLE_MAPS_API_KEY": "AIzaSyCYZnZoP137iDKTHUK2zFZIHfAT9unrvjw",
-        "EXPO_PUBLIC_REVENUECAT_IOS_KEY": "appl_QnuUwmhVqEsaWITtPFuXkSEAagj",
-        "EXPO_PUBLIC_REVENUECAT_ANDROID_KEY": "goog_AklkUzcmVwzCUIfoCguxBDNHhjv"
+        "EXPO_PUBLIC_SUPABASE_URL": "https://xomypskslmgibqaulyks.supabase.co",
+        "EXPO_PUBLIC_SUPABASE_ANON_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhvbXlwc2tzbG1naWJxYXVseWtzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg2MDE5MzYsImV4cCI6MjEwNDE3NzkzNn0.yBIEBri-XGZGkvhg5ngJ4GKowli3bWdDzLuu0DmlG6E",
+        "GOOGLE_MAPS_API_KEY": "",
+        "EXPO_PUBLIC_REVENUECAT_IOS_KEY": "",
+        "EXPO_PUBLIC_REVENUECAT_ANDROID_KEY": ""
       },
       "ios": { "simulator": false },
       "android": { "buildType": "apk" }
@@ -25,11 +25,11 @@
     "production": {
       "autoIncrement": true,
       "env": {
-        "EXPO_PUBLIC_SUPABASE_URL": "https://mwvtciffmvxjvdphezka.supabase.co",
-        "EXPO_PUBLIC_SUPABASE_ANON_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im13dnRjaWZmbXZ4anZkcGhlemthIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE0MzQ2NTIsImV4cCI6MjA5NzAxMDY1Mn0.3v93k36--BMYUxxsN_DKOf4nLFw28XX2FCAtLv55xc0",
-        "GOOGLE_MAPS_API_KEY": "AIzaSyCYZnZoP137iDKTHUK2zFZIHfAT9unrvjw",
-        "EXPO_PUBLIC_REVENUECAT_IOS_KEY": "appl_QnuUwmhVqEsaWITtPFuXkSEAagj",
-        "EXPO_PUBLIC_REVENUECAT_ANDROID_KEY": "goog_AklkUzcmVwzCUIfoCguxBDNHhjv"
+        "EXPO_PUBLIC_SUPABASE_URL": "https://xomypskslmgibqaulyks.supabase.co",
+        "EXPO_PUBLIC_SUPABASE_ANON_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhvbXlwc2tzbG1naWJxYXVseWtzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg2MDE5MzYsImV4cCI6MjEwNDE3NzkzNn0.yBIEBri-XGZGkvhg5ngJ4GKowli3bWdDzLuu0DmlG6E",
+        "GOOGLE_MAPS_API_KEY": "",
+        "EXPO_PUBLIC_REVENUECAT_IOS_KEY": "",
+        "EXPO_PUBLIC_REVENUECAT_ANDROID_KEY": ""
       },
       "ios": {
         "buildConfiguration": "Release",
@@ -48,10 +48,10 @@
         "track": "alpha"
       },
       "ios": {
-        "ascApiKeyPath": "./AuthKey_S3PD4GYBFR.p8",
-        "ascApiKeyIssuerId": "3deac7de-69b5-4cf0-a1d3-f129d7be9712",
-        "ascApiKeyId": "S3PD4GYBFR",
-        "ascAppId": "6790799218"
+        "ascApiKeyPath": "",
+        "ascApiKeyIssuerId": "",
+        "ascApiKeyId": "",
+        "ascAppId": ""
       }
     }
   }

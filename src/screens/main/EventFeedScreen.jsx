@@ -237,7 +237,7 @@ const EventFeedScreen = ({ navigation, route }) => {
   };
 
   const handleShare = async (event) => {
-    const shareUrl = `https://find-mee.com/p/event/${event.id}`;
+    const shareUrl = `https://out-in-zmb.com/p/event/${event.id}`;
     const message = [event.name || t('common.shareFallback'), event.link_url, shareUrl].filter(Boolean).join('\n\n');
     try {
       await Share.share({ message, url: shareUrl });

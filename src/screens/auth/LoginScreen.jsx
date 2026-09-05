@@ -9,7 +9,6 @@ import AuthInput from '../../components/auth/AuthInput';
 import SocialButton from '../../components/auth/SocialButton';
 import PrimaryButton from '../../components/common/PrimaryButton';
 import Divider from '../../components/common/Divider';
-import LanguagePicker from '../../components/common/LanguagePicker';
 
 const validateLogin = (email, password, t) => {
   if (!email || !/\S+@\S+\.\S+/.test(email)) return t('auth.errors.invalidEmail');
@@ -51,7 +50,6 @@ const LoginScreen = ({ navigation }) => {
 
   return (
     <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
-      <LanguagePicker />
       <Text style={styles.title}>{t('common.appName')}</Text>
       <Text style={styles.subtitle}>{t('auth.login')}</Text>
 

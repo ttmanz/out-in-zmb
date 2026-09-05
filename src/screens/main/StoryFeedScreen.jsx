@@ -289,7 +289,7 @@ const StoryFeedScreen = ({ navigation, route }) => {
   };
 
   const handleShare = async (story) => {
-    const shareUrl = `https://find-mee.com/p/story/${story.id}`;
+    const shareUrl = `https://out-in-zmb.com/p/story/${story.id}`;
     const message = [story.text || t('stories.shareFallback'), story.link_url, shareUrl].filter(Boolean).join('\n\n');
     try {
       await Share.share({ message, url: shareUrl });

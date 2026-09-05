@@ -6,7 +6,6 @@ import { COLORS } from '../../constants/colors';
 import { ROUTES } from '../../constants/routes';
 import { signOut } from '../../lib/auth';
 import { useUser } from '../../contexts/UserContext';
-import LanguagePicker from '../../components/common/LanguagePicker';
 import { GradientIconCircle } from '../../components/common/GradientIcon';
 
 const FEATURES = [
@@ -70,7 +69,6 @@ const HomeScreen = ({ navigation }) => {
       <ScrollView contentContainerStyle={[styles.scroll, { paddingTop: statusBarHeight + 16 }]} showsVerticalScrollIndicator={false}>
 
         <View style={styles.topBar}>
-          <LanguagePicker style={styles.langOverride} />
           <View style={styles.topActions}>
             {!isRestricted && (
               <TouchableOpacity
@@ -133,12 +131,11 @@ const styles = StyleSheet.create({
 
   topBar: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    justifyContent: 'flex-end',
     alignItems: 'center',
     paddingHorizontal: 20,
     paddingBottom: 8,
   },
-  langOverride: { marginBottom: 0 },
   topActions: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   iconBtn: {
     width: 38, height: 38,

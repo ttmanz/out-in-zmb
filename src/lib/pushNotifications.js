@@ -153,7 +153,7 @@ const resolveActivityEventRoute = async (eventId) => {
   };
 };
 
-// --- Shared-post deep links (find-mee.com/p/:type/:id -> outandaround://post/:type/:id) ---
+// --- Shared-post deep links (out-in-zmb.com/p/:type/:id -> outandaround://post/:type/:id) ---
 // Reuses the same per-type route resolvers as reply notifications above.
 export const resolvePostDeepLink = async (type, id) => {
   if (type === 'story') return { stack: 'HomeTab', screen: ROUTES.STORY_FEED, params: { focusItemId: id } };

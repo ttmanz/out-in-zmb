@@ -60,7 +60,7 @@ const PaywallScreen = ({ navigation, route }) => {
               ? <ActivityIndicator color={COLORS.black} size="small" />
               : (
                 <Text style={styles.unlockBtnText}>
-                  {t('subscription.unlockFor', { price: `€${feature?.one_off_price ?? ''}` })}
+                  {t('subscription.unlockFor', { price: `K${feature?.one_off_price ?? ''}` })}
                 </Text>
               )
             }
