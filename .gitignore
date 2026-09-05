@@ -56,4 +56,6 @@ google-services.json
 # supabase local temp
 supabase/.temp/
 .supabase-token
+.supabase-new-db-pass.txt
+.migration-log.txt
 AuthKey_*.p8
