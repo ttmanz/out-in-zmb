@@ -62,6 +62,15 @@ export const uploadStoryMedia = async (userId, uri) => {
   return { url, isVideo };
 };
 
+// Clip of the Day — reuses the story-media bucket (already supports video)
+// rather than provisioning a new bucket just for this.
+export const uploadClipVideo = (userId, uri) => {
+  const ext = uri.split('.').pop().split('?')[0].toLowerCase() || 'mp4';
+  const path = `${userId}/clips/${Date.now()}.${ext}`;
+  const contentType = `video/${ext === 'mov' ? 'quicktime' : ext}`;
+  return uploadToBucket('story-media', path, uri, contentType, false);
+};
+
 // Admin ad creatives — reuses the story-media bucket (already supports
 // image/video) rather than provisioning a new bucket just for this.
 export const uploadAdMedia = async (userId, uri) => {

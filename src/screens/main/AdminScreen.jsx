@@ -227,6 +227,14 @@ const AdminScreen = ({ navigation }) => {
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.navCard}
+          onPress={() => navigation.navigate(ROUTES.ADMIN_CLIPS)}
+          activeOpacity={0.75}
+        >
+          <Text style={styles.navCardEmoji}>🎬</Text>
+          <Text style={styles.navCardText}>Clips</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.navCard}
           onPress={() => navigation.navigate(ROUTES.ADMIN_FLAGGED_MEMBERS)}
           activeOpacity={0.75}
         >

@@ -38,6 +38,8 @@ export const ROUTES = {
   CREATE_EVENT: 'CreateEvent',
   STORY_FEED: 'StoryFeed',
   CREATE_STORY: 'CreateStory',
+  CLIP_OF_DAY: 'ClipOfDay',
+  ADMIN_CLIPS: 'AdminClips',
   SUBSCRIPTION: 'Subscription',
   PAYWALL: 'Paywall',
   ADMIN_SUBSCRIPTION_PLANS: 'AdminSubscriptionPlans',

@@ -53,6 +53,7 @@ import EventFeedScreen from '../screens/main/EventFeedScreen';
 import CreateEventScreen from '../screens/main/CreateEventScreen';
 import StoryFeedScreen from '../screens/main/StoryFeedScreen';
 import CreateStoryScreen from '../screens/main/CreateStoryScreen';
+import ClipOfDayScreen from '../screens/main/ClipOfDayScreen';
 import MarketScreen from '../screens/main/MarketScreen';
 import CreateMarketListingScreen from '../screens/main/CreateMarketListingScreen';
 import OpenGroupsScreen from '../screens/main/OpenGroupsScreen';
@@ -61,6 +62,7 @@ import AdminOpenGroupsScreen from '../screens/main/AdminOpenGroupsScreen';
 import AdminAdsScreen from '../screens/main/AdminAdsScreen';
 import AdminAccessControlScreen from '../screens/main/AdminAccessControlScreen';
 import AdminReportsScreen from '../screens/main/AdminReportsScreen';
+import AdminClipsScreen from '../screens/main/AdminClipsScreen';
 import AdminFlaggedMembersScreen from '../screens/main/AdminFlaggedMembersScreen';
 
 const Tab = createBottomTabNavigator();
@@ -105,6 +107,7 @@ const HomeStackNavigator = () => (
     <HomeStack.Screen name={ROUTES.CREATE_EVENT}       component={CreateEventScreen} />
     <HomeStack.Screen name={ROUTES.STORY_FEED}        component={StoryFeedScreen} />
     <HomeStack.Screen name={ROUTES.CREATE_STORY}      component={CreateStoryScreen} />
+    <HomeStack.Screen name={ROUTES.CLIP_OF_DAY}       component={ClipOfDayScreen} />
     <HomeStack.Screen name={ROUTES.SUBSCRIPTION}            component={SubscriptionScreen} />
     <HomeStack.Screen name={ROUTES.PAYWALL}                 component={PaywallScreen} />
     <HomeStack.Screen name={ROUTES.MARKET}                  component={MarketScreen} />
@@ -138,6 +141,7 @@ const AdminStackNavigator = () => (
     <AdminStack.Screen name={ROUTES.ADMIN_ADS} component={AdminAdsScreen} />
     <AdminStack.Screen name={ROUTES.ADMIN_ACCESS_CONTROL} component={AdminAccessControlScreen} />
     <AdminStack.Screen name={ROUTES.ADMIN_REPORTS} component={AdminReportsScreen} />
+    <AdminStack.Screen name={ROUTES.ADMIN_CLIPS} component={AdminClipsScreen} />
     <AdminStack.Screen name={ROUTES.ADMIN_FLAGGED_MEMBERS} component={AdminFlaggedMembersScreen} />
   </AdminStack.Navigator>
 );

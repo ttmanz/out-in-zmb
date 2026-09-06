@@ -21,6 +21,7 @@ const FEATURES = [
   { icon: 'wine',            titleKey: 'home.venue',           descKey: 'home.venueDesc',          route: ROUTES.VENUE_HUB,      featureKey: 'venue_hub' },
   { icon: 'pricetags',       titleKey: 'home.market',          descKey: 'home.marketDesc',         route: ROUTES.MARKET,         featureKey: 'market' },
   { icon: 'ticket',          titleKey: 'home.events',          descKey: 'home.eventsDesc',         route: ROUTES.EVENTS,         featureKey: 'events' },
+  { icon: 'videocam',        titleKey: 'home.clipOfDay',       descKey: 'home.clipOfDayDesc',      route: ROUTES.CLIP_OF_DAY,    featureKey: 'clip_of_day' },
 ];
 
 const RESTRICTED_ROUTES = new Set([ROUTES.WHERE_TO_GO, ROUTES.VENUE_HUB]);

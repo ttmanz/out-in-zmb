@@ -146,6 +146,8 @@
     "marketDesc": "Buy & sell with members",
     "events": "Events",
     "eventsDesc": "Launches, workshops, conferences & more",
+    "clipOfDay": "Clip of the Day",
+    "clipOfDayDesc": "Share a video clip with everyone this week",
     "tagline": "Explore. Connect. Experience.",
     "friends": "Friends",
     "friendsDesc": "Your people — list, requests & search"
@@ -485,6 +487,16 @@
     "labelPhoto": "Photo",
     "submit": "Post Event",
     "postFailed": "Could not post the event"
+  },
+  "clips": {
+    "title": "Clip of the Day",
+    "record": "Record",
+    "empty": "No clips yet — be the first to share one!",
+    "approved": "✓ Kept by admin",
+    "purgeNote": "Clips are removed every Monday unless kept by an admin — {{days}} day(s) left.",
+    "uploadFailed": "Could not upload your clip. Please try again.",
+    "removeTitle": "Remove clip?",
+    "removeConfirm": "This will permanently remove this clip."
   },
   "events": {
     "title": "Events",
