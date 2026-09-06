@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, ScrollView, StyleSheet, Alert, Platform } from 'react-native';
+import { View, Text, ScrollView, ImageBackground, StyleSheet, Alert, Platform } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import * as AppleAuthentication from 'expo-apple-authentication';
 import { COLORS } from '../../constants/colors';
@@ -55,6 +55,7 @@ const RegisterScreen = ({ navigation }) => {
   };
 
   return (
+    <ImageBackground source={require('../../../assets/brand/bg.png')} style={styles.bg} resizeMode="cover">
     <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
       <Text style={styles.title}>{t('common.appName')}</Text>
       <Text style={styles.subtitle}>{t('auth.register')}</Text>
@@ -115,11 +116,13 @@ const RegisterScreen = ({ navigation }) => {
         </Text>
       </View>
     </ScrollView>
+    </ImageBackground>
   );
 };
 
 const styles = StyleSheet.create({
-  container: { flexGrow: 1, padding: 24, backgroundColor: COLORS.background, justifyContent: 'center' },
+  bg: { flex: 1, backgroundColor: COLORS.background },
+  container: { flexGrow: 1, padding: 24, justifyContent: 'center' },
   title: { fontSize: 32, fontWeight: '800', color: COLORS.primary, textAlign: 'center', marginBottom: 4 },
   subtitle: { fontSize: 18, color: COLORS.textMuted, textAlign: 'center', marginBottom: 32 },
   appleBtn: { height: 46, marginBottom: 12 },

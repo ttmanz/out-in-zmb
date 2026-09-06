@@ -11,17 +11,18 @@ import GradientBorder from '../../components/common/GradientBorder';
 import { GradientIconCircle } from '../../components/common/GradientIcon';
 
 const EVENT_CATEGORIES = [
-  { key: 'product_launch', icon: 'rocket' },
-  { key: 'workshop',       icon: 'construct' },
+  { key: 'product_launch', icon: 'rocket',    image: require('../../../assets/brand/icon-events-product-launch.png') },
+  { key: 'workshop',       icon: 'construct', image: require('../../../assets/brand/icon-events-workshop.png') },
+  // No dedicated icon supplied yet for "conference" — falls back to the vector icon.
   { key: 'conference',     icon: 'mic' },
-  { key: 'networking',     icon: 'people' },
-  { key: 'other',          icon: 'bookmark' },
+  { key: 'networking',     icon: 'people',    image: require('../../../assets/brand/icon-events-networking.png') },
+  { key: 'other',          icon: 'bookmark',  image: require('../../../assets/brand/icon-events-other.png') },
 ];
 
-const CategoryCard = ({ icon, title, onPress }) => (
+const CategoryCard = ({ icon, image, title, onPress }) => (
   <GradientBorder radius={16} style={styles.cardOuter}>
     <TouchableOpacity style={styles.card} onPress={onPress} activeOpacity={0.75}>
-      <GradientIconCircle name={icon} size={46} iconSize={22} style={styles.icon} />
+      <GradientIconCircle name={icon} image={image} size={46} iconSize={26} style={styles.icon} />
       <Text style={styles.cardTitle}>{title}</Text>
       <Text style={styles.chevron}>›</Text>
     </TouchableOpacity>
@@ -39,10 +40,11 @@ const EventsScreen = ({ navigation }) => {
       <ScrollView contentContainerStyle={styles.scroll}>
         <AdBanner page="Events" />
         <ProfileBanner navigation={navigation} />
-        {EVENT_CATEGORIES.map(({ key, icon }) => (
+        {EVENT_CATEGORIES.map(({ key, icon, image }) => (
           <CategoryCard
             key={key}
             icon={icon}
+            image={image}
             title={t(`events.${key}`)}
             onPress={() => navigation.navigate(ROUTES.EVENT_FEED, { category: key })}
           />

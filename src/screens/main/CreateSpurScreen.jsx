@@ -138,7 +138,7 @@ const styles = StyleSheet.create({
   emojiBtn: { position: 'absolute', right: 8, bottom: 24 },
   preview: {
     fontSize: 16, fontWeight: '700', color: COLORS.text,
-    backgroundColor: 'rgba(41,93,255,0.08)',
+    backgroundColor: 'rgba(253,171,83,0.08)',
     borderRadius: 12, padding: 16, marginBottom: 24, lineHeight: 24,
     borderLeftWidth: 4, borderLeftColor: COLORS.primary,
   },

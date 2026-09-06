@@ -1,11 +1,11 @@
 import React from 'react';
-import { View, StyleSheet } from 'react-native';
+import { View, Image, StyleSheet } from 'react-native';
 import MaskedView from '@react-native-masked-view/masked-view';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 
-const ICON_GRADIENT = ['#38BDF8', '#8A3FFC']; // Active Glow → Accent Glow
-const RING_GRADIENT = ['#4FD9FF', '#295DFF', '#8A3FFC'];
+const ICON_GRADIENT = ['#fdd07d', '#fc8a03']; // light gold → deep gold
+const RING_GRADIENT = ['#fdd07d', '#fdab53', '#fc8a03']; // stroke gradient, reversed
 
 // An Ionicon filled with a linear gradient.
 export const GradientIcon = ({
@@ -27,8 +27,10 @@ export const GradientIcon = ({
   </MaskedView>
 );
 
-// Gradient-filled icon inside a gradient-stroked circle with a dark glassy well.
-export const GradientIconCircle = ({ name, size = 52, iconSize = 24, style }) => (
+// Icon inside a gradient-stroked circle with a dark glassy well. Pass `image`
+// for one of the brand's pre-made full-color icon assets, or `name` to fall
+// back to a gradient-filled Ionicon.
+export const GradientIconCircle = ({ name, image, size = 52, iconSize = 24, style }) => (
   <LinearGradient
     colors={RING_GRADIENT}
     start={{ x: 0, y: 0 }}
@@ -36,21 +38,24 @@ export const GradientIconCircle = ({ name, size = 52, iconSize = 24, style }) =>
     style={[{ width: size, height: size, borderRadius: size / 2, padding: 1.5 }, styles.glow, style]}
   >
     <View style={[styles.well, { borderRadius: size / 2 - 1.5 }]}>
-      <GradientIcon name={name} size={iconSize} />
+      {image
+        ? <Image source={image} style={{ width: iconSize * 1.5, height: iconSize * 1.5 }} resizeMode="contain" />
+        : <GradientIcon name={name} size={iconSize} />
+      }
     </View>
   </LinearGradient>
 );
 
 const styles = StyleSheet.create({
   glow: {
-    shadowColor: '#38BDF8',
+    shadowColor: '#fdab53',
     shadowOffset: { width: 0, height: 0 },
     shadowOpacity: 0.35,
     shadowRadius: 5,
   },
   well: {
     flex: 1,
-    backgroundColor: 'rgba(5,11,45,0.65)',
+    backgroundColor: 'rgba(6,35,31,0.65)',
     justifyContent: 'center',
     alignItems: 'center',
   },

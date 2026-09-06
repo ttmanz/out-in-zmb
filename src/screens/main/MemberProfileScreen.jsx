@@ -235,7 +235,7 @@ const styles = StyleSheet.create({
   },
   addFriendBtnText: { color: COLORS.black, fontWeight: '700', fontSize: 14 },
   pendingBadge: {
-    backgroundColor: 'rgba(41,93,255,0.12)',
+    backgroundColor: 'rgba(253,171,83,0.12)',
     borderWidth: 1, borderColor: COLORS.borderAccent,
     borderRadius: 10, paddingHorizontal: 16, paddingVertical: 8,
     marginBottom: 12,

@@ -359,7 +359,7 @@ const styles = StyleSheet.create({
   count: { fontSize: 13, color: COLORS.textMuted, paddingHorizontal: 20, paddingVertical: 8 },
   navCard: {
     flexBasis: '30%', flexGrow: 1,
-    backgroundColor: 'rgba(41,93,255,0.12)',
+    backgroundColor: 'rgba(253,171,83,0.12)',
     borderRadius: 14, paddingVertical: 14, paddingHorizontal: 8,
     borderWidth: 1, borderColor: COLORS.borderAccent,
     alignItems: 'center', justifyContent: 'center', gap: 6,

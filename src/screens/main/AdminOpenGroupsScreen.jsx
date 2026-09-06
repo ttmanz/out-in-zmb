@@ -213,7 +213,7 @@ const styles = StyleSheet.create({
   empty: { color: COLORS.textMuted, fontSize: 14, textAlign: 'center' },
 
   addBtn: {
-    backgroundColor: 'rgba(41,93,255,0.12)',
+    backgroundColor: 'rgba(253,171,83,0.12)',
     borderRadius: 16, paddingHorizontal: 12, paddingVertical: 6,
     borderWidth: 1, borderColor: COLORS.borderAccent,
   },
@@ -259,7 +259,7 @@ const styles = StyleSheet.create({
   thumb: { width: 44, height: 44, borderRadius: 10, marginRight: 12 },
   thumbPlaceholder: {
     width: 44, height: 44, borderRadius: 10, marginRight: 12,
-    backgroundColor: 'rgba(41,93,255,0.08)', justifyContent: 'center', alignItems: 'center',
+    backgroundColor: 'rgba(253,171,83,0.08)', justifyContent: 'center', alignItems: 'center',
   },
   cardInfo: { flex: 1 },
   groupName: { fontSize: 15, fontWeight: '800', color: COLORS.text, marginBottom: 3 },

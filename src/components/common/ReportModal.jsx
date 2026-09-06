@@ -111,7 +111,7 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.surfaceAlt, borderRadius: 12, padding: 14, marginBottom: 8,
     borderWidth: 1, borderColor: COLORS.border,
   },
-  optionSelected: { borderColor: COLORS.primary, backgroundColor: 'rgba(41,93,255,0.12)' },
+  optionSelected: { borderColor: COLORS.primary, backgroundColor: 'rgba(253,171,83,0.12)' },
   optionText: { fontSize: 14, fontWeight: '600', color: COLORS.text },
   optionTextSelected: { color: COLORS.primary },
   input: {

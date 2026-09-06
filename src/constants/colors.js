@@ -1,29 +1,29 @@
 export const COLORS = {
-  // Brand — electric blue / neon
-  primary: '#1E90FF',       // Electric Blue — primary actions, chevrons, active state
-  primaryDark: '#295DFF',   // Card Border blue — pressed / gradient edge
-  accent: '#8A3FFC',        // UEFA Violet — accent glow
-  cyan: '#4FD9FF',          // Neon Cyan
-  glow: '#38BDF8',          // Active Glow
+  // Brand — Zambian teal / gold
+  primary: '#fdab53',       // Gold — primary actions, chevrons, active state
+  primaryDark: '#fc8a03',   // Deep gold — pressed / gradient edge
+  accent: '#2f8f83',        // Bright teal — secondary accent
+  cyan: '#fdd07d',          // Light gold — repurposed accent
+  glow: '#fdab53',          // Active Glow
 
   // Backgrounds
-  background: '#070F38',    // flat mid of the background gradient (screens)
-  bgGradientFrom: '#050B2D', // Midnight Navy
-  bgGradientTo: '#0D1A55',
-  surface: '#0E1F5E',      // glass card base
-  surfaceAlt: '#14297A',   // raised rows / inputs
-  tabBar: '#060D30',       // bottom navigation bar
-  cardGradient: ['#2A2299', '#3E18B0', '#5C1EC8'], // indigo → violet (purple-weighted)
+  background: '#093430',    // flat background (screens)
+  bgGradientFrom: '#062824',
+  bgGradientTo: '#0d3d37',
+  surface: '#0f4a42',      // card base
+  surfaceAlt: '#155850',   // raised rows / inputs
+  tabBar: '#052420',       // bottom navigation bar
+  cardGradient: ['#296e67', '#0d5049'], // teal card fill, angle -75°
 
   // Borders
-  border: '#1E306E',       // subtle hairline
-  borderAccent: '#295DFF', // Card Border — the glowing blue edge
+  border: '#1c4a42',       // subtle hairline
+  borderAccent: '#fdab53', // glowing gold edge
 
   // Text
   text: '#FFFFFF',         // Heading / Pure White
-  textSecondary: '#4FD9FF', // Neon Cyan — links / accent labels
-  textLight: '#D4DAE8',    // Soft Silver — subheading / body
-  textMuted: '#A1A9C3',    // Caption / Secondary
+  textSecondary: '#fdd07d', // light gold — links / accent labels
+  textLight: '#D8E8E4',    // soft mint-white — subheading / body
+  textMuted: '#9FB8B2',    // muted teal-grey — caption / secondary
 
   // Semantic
   error: '#EF4444',
@@ -31,11 +31,11 @@ export const COLORS = {
   notification: '#FF3B8D', // Bright Pink — badges / alerts
 
   // Feature accents
-  purple: '#8A3FFC',
-  purpleBg: '#1A1250',
+  purple: '#2f8f83',
+  purpleBg: '#123834',
 
-  // Cyan ring around feature-card icons
-  cardGoldBorder: 'rgba(79,217,255,0.45)',
+  // Gold ring around feature-card icons
+  cardGoldBorder: 'rgba(253,171,83,0.45)',
 
   // Social auth
   google: '#DB4437',

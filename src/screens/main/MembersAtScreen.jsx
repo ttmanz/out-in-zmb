@@ -209,7 +209,7 @@ const styles = StyleSheet.create({
   searchBtnDisabled: { opacity: 0.4 },
   countBanner: {
     marginHorizontal: 16, marginBottom: 8,
-    backgroundColor: 'rgba(41,93,255,0.12)',
+    backgroundColor: 'rgba(253,171,83,0.12)',
     borderRadius: 12, padding: 14,
     borderWidth: 1, borderColor: COLORS.borderAccent,
   },

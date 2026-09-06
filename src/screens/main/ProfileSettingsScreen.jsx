@@ -395,7 +395,7 @@ const styles = StyleSheet.create({
   },
   optionSelected: {
     borderColor: COLORS.primary,
-    backgroundColor: 'rgba(41,93,255,0.12)',
+    backgroundColor: 'rgba(253,171,83,0.12)',
   },
   optionEmoji: { fontSize: 26, marginRight: 14 },
   optionText: { flex: 1 },
@@ -427,7 +427,7 @@ const styles = StyleSheet.create({
     width: 38, height: 38, borderRadius: 19,
     borderWidth: 1, borderColor: COLORS.borderAccent,
     justifyContent: 'center', alignItems: 'center',
-    backgroundColor: 'rgba(41,93,255,0.08)',
+    backgroundColor: 'rgba(253,171,83,0.08)',
   },
   starBtnActive: { backgroundColor: COLORS.primary, borderColor: COLORS.primary },
   starText: { fontSize: 20, color: COLORS.textMuted },
@@ -436,7 +436,7 @@ const styles = StyleSheet.create({
   unblockBtn: {
     borderWidth: 1, borderColor: COLORS.borderAccent,
     borderRadius: 10, paddingHorizontal: 14, paddingVertical: 8,
-    backgroundColor: 'rgba(41,93,255,0.08)',
+    backgroundColor: 'rgba(253,171,83,0.08)',
     minWidth: 90, alignItems: 'center',
   },
   unblockText: { color: COLORS.primary, fontWeight: '700', fontSize: 13 },

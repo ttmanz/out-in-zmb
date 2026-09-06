@@ -227,7 +227,7 @@ const styles = StyleSheet.create({
   headerTitle: { fontSize: 16, fontWeight: '700', color: COLORS.text, flexShrink: 1 },
   adminBadge: {
     alignSelf: 'flex-start', marginTop: 2,
-    backgroundColor: 'rgba(41,93,255,0.15)', borderRadius: 8,
+    backgroundColor: 'rgba(253,171,83,0.15)', borderRadius: 8,
     paddingHorizontal: 6, paddingVertical: 1,
     borderWidth: 1, borderColor: COLORS.borderAccent,
   },

@@ -237,7 +237,7 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.surface, borderRadius: 14, padding: 16, marginBottom: 10,
     borderWidth: 1, borderColor: COLORS.borderAccent,
   },
-  optionSelected: { borderColor: COLORS.primary, backgroundColor: 'rgba(41,93,255,0.12)' },
+  optionSelected: { borderColor: COLORS.primary, backgroundColor: 'rgba(253,171,83,0.12)' },
   optionText: { flex: 1 },
   optionLabel: { fontSize: 15, fontWeight: '700', color: COLORS.text, marginBottom: 2 },
   optionLabelSelected: { color: COLORS.primary },

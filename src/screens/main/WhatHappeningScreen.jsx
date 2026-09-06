@@ -11,17 +11,17 @@ import GradientBorder from '../../components/common/GradientBorder';
 import { GradientIconCircle } from '../../components/common/GradientIcon';
 
 const CATEGORIES = [
-  { key: 'myStory',     icon: 'camera',    screen: ROUTES.STORY_FEED },
-  { key: 'today',       icon: 'today' },
-  { key: 'tomorrow',    icon: 'sunny' },
-  { key: 'thisWeekend', icon: 'sparkles' },
-  { key: 'nearby',      icon: 'flash',     screen: ROUTES.ACTIVITIES },
+  { key: 'myStory',     image: require('../../../assets/brand/icon-my-story.png'),          screen: ROUTES.STORY_FEED },
+  { key: 'today',       image: require('../../../assets/brand/icon-happening-today.png') },
+  { key: 'tomorrow',    image: require('../../../assets/brand/icon-happening-tomorrow.png') },
+  { key: 'thisWeekend', image: require('../../../assets/brand/icon-happening-weekend.png') },
+  { key: 'nearby',      image: require('../../../assets/brand/icon-activities.png'),        screen: ROUTES.ACTIVITIES },
 ];
 
-const CategoryCard = ({ icon, title, onPress }) => (
+const CategoryCard = ({ image, title, onPress }) => (
   <GradientBorder radius={16} style={styles.cardOuter}>
     <TouchableOpacity style={styles.card} onPress={onPress} activeOpacity={0.75}>
-      <GradientIconCircle name={icon} size={46} iconSize={22} style={styles.icon} />
+      <GradientIconCircle image={image} size={46} iconSize={26} style={styles.icon} />
       <Text style={styles.cardTitle}>{title}</Text>
       <Text style={styles.chevron}>›</Text>
     </TouchableOpacity>
@@ -39,10 +39,10 @@ const WhatHappeningScreen = ({ navigation }) => {
       <ScrollView contentContainerStyle={styles.scroll}>
         <AdBanner page="WhatHappening" />
         <ProfileBanner navigation={navigation} />
-        {CATEGORIES.map(({ key, icon, screen }) => (
+        {CATEGORIES.map(({ key, image, screen }) => (
           <CategoryCard
             key={key}
-            icon={icon}
+            image={image}
             title={t(`happenings.${key}`).toUpperCase()}
             onPress={() => navigation.navigate(screen ?? ROUTES.HAPPENING_FEED, screen ? undefined : { filter: key })}
           />

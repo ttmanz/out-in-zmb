@@ -9,40 +9,40 @@ import { useUser } from '../../contexts/UserContext';
 import { GradientIconCircle } from '../../components/common/GradientIcon';
 
 const FEATURES = [
-  { icon: 'people',          titleKey: 'home.friends',        descKey: 'home.friendsDesc',        route: ROUTES.FRIENDS_HUB,    featureKey: 'friends' },
-  { icon: 'camera',          titleKey: 'home.myStory',        descKey: 'home.myStoryDesc',        route: ROUTES.STORY_FEED,     featureKey: 'my_story' },
-  { icon: 'sparkles',        titleKey: 'home.whatsHappening', descKey: 'home.whatsHappeningDesc', route: ROUTES.WHAT_HAPPENING, featureKey: 'whats_happening' },
-  { icon: 'map',             titleKey: 'home.whereToGo',      descKey: 'home.whereToGoDesc',      route: ROUTES.WHERE_TO_GO,    featureKey: 'where_to_go' },
-  { icon: 'flash',           titleKey: 'home.spurOfMoment',   descKey: 'home.spurOfMomentDesc',   route: ROUTES.SPUR_OF_MOMENT, featureKey: 'spur_of_moment' },
-  { icon: 'chatbubbles',     titleKey: 'home.openChat',       descKey: 'home.openChatDesc',       route: ROUTES.OPEN_CHAT,      featureKey: 'open_chat' },
-  { icon: 'location',        titleKey: 'home.atVenue',        descKey: 'home.atVenueDesc',        route: ROUTES.AT_VENUE,       featureKey: 'at_venue' },
-  { icon: 'people-circle',   titleKey: 'home.clubGroups',     descKey: 'home.clubGroupsDesc',     route: ROUTES.CLUB_GROUPS,    featureKey: 'club_groups' },
-  { icon: 'grid',            titleKey: 'home.openGroups',      descKey: 'home.openGroupsDesc',     route: ROUTES.OPEN_GROUPS,    featureKey: 'open_groups' },
-  { icon: 'wine',            titleKey: 'home.venue',           descKey: 'home.venueDesc',          route: ROUTES.VENUE_HUB,      featureKey: 'venue_hub' },
-  { icon: 'pricetags',       titleKey: 'home.market',          descKey: 'home.marketDesc',         route: ROUTES.MARKET,         featureKey: 'market' },
-  { icon: 'ticket',          titleKey: 'home.events',          descKey: 'home.eventsDesc',         route: ROUTES.EVENTS,         featureKey: 'events' },
-  { icon: 'videocam',        titleKey: 'home.clipOfDay',       descKey: 'home.clipOfDayDesc',      route: ROUTES.CLIP_OF_DAY,    featureKey: 'clip_of_day' },
+  { image: require('../../../assets/brand/icon-friends.png'),          titleKey: 'home.friends',        descKey: 'home.friendsDesc',        route: ROUTES.FRIENDS_HUB,    featureKey: 'friends' },
+  { image: require('../../../assets/brand/icon-my-story.png'),         titleKey: 'home.myStory',        descKey: 'home.myStoryDesc',        route: ROUTES.STORY_FEED,     featureKey: 'my_story' },
+  { image: require('../../../assets/brand/icon-whats-happening.png'),  titleKey: 'home.whatsHappening', descKey: 'home.whatsHappeningDesc', route: ROUTES.WHAT_HAPPENING, featureKey: 'whats_happening' },
+  { image: require('../../../assets/brand/icon-where-to-go.png'),      titleKey: 'home.whereToGo',      descKey: 'home.whereToGoDesc',      route: ROUTES.WHERE_TO_GO,    featureKey: 'where_to_go' },
+  { image: require('../../../assets/brand/icon-spur-of-moment.png'),   titleKey: 'home.spurOfMoment',   descKey: 'home.spurOfMomentDesc',   route: ROUTES.SPUR_OF_MOMENT, featureKey: 'spur_of_moment' },
+  { image: require('../../../assets/brand/icon-open-chat.png'),        titleKey: 'home.openChat',       descKey: 'home.openChatDesc',       route: ROUTES.OPEN_CHAT,      featureKey: 'open_chat' },
+  { image: require('../../../assets/brand/icon-at-venue.png'),         titleKey: 'home.atVenue',        descKey: 'home.atVenueDesc',        route: ROUTES.AT_VENUE,       featureKey: 'at_venue' },
+  { image: require('../../../assets/brand/icon-club-groups.png'),      titleKey: 'home.clubGroups',     descKey: 'home.clubGroupsDesc',     route: ROUTES.CLUB_GROUPS,    featureKey: 'club_groups' },
+  { image: require('../../../assets/brand/icon-open-groups.png'),      titleKey: 'home.openGroups',      descKey: 'home.openGroupsDesc',     route: ROUTES.OPEN_GROUPS,    featureKey: 'open_groups' },
+  { image: require('../../../assets/brand/icon-venue.png'),            titleKey: 'home.venue',           descKey: 'home.venueDesc',          route: ROUTES.VENUE_HUB,      featureKey: 'venue_hub' },
+  { image: require('../../../assets/brand/icon-market.png'),           titleKey: 'home.market',          descKey: 'home.marketDesc',         route: ROUTES.MARKET,         featureKey: 'market' },
+  { image: require('../../../assets/brand/icon-events.png'),           titleKey: 'home.events',          descKey: 'home.eventsDesc',         route: ROUTES.EVENTS,         featureKey: 'events' },
+  { image: require('../../../assets/brand/icon-clip-of-day.png'),      titleKey: 'home.clipOfDay',       descKey: 'home.clipOfDayDesc',      route: ROUTES.CLIP_OF_DAY,    featureKey: 'clip_of_day' },
 ];
 
 const RESTRICTED_ROUTES = new Set([ROUTES.WHERE_TO_GO, ROUTES.VENUE_HUB]);
 
-const FeatureCard = ({ icon, title, description, onPress }) => (
+const FeatureCard = ({ image, title, description, onPress }) => (
   <TouchableOpacity onPress={onPress} activeOpacity={0.85} style={styles.cardWrap}>
-    {/* luminous gradient stroke: cyan → blue → violet */}
+    {/* luminous gradient stroke: gold */}
     <LinearGradient
-      colors={['#4FD9FF', '#295DFF', '#8A3FFC']}
+      colors={['#fc8a03', '#fdab53', '#fdd07d']}
       start={{ x: 0, y: 0 }}
       end={{ x: 1, y: 1 }}
       style={styles.cardBorder}
     >
-      {/* glassy blue → violet fill */}
+      {/* glassy teal fill, angle -75° */}
       <LinearGradient
         colors={COLORS.cardGradient}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 1 }}
+        start={{ x: 0.37, y: 0.98 }}
+        end={{ x: 0.63, y: 0.02 }}
         style={styles.card}
       >
-        <GradientIconCircle name={icon} size={54} iconSize={24} style={styles.iconRing} />
+        <GradientIconCircle image={image} size={54} iconSize={28} style={styles.iconRing} />
         <View style={styles.textWrap}>
           <Text style={styles.cardTitle} numberOfLines={1}>{title}</Text>
           <Text style={styles.cardDesc} numberOfLines={2}>{description}</Text>
@@ -113,7 +113,7 @@ const HomeScreen = ({ navigation }) => {
           {visibleFeatures.map((f) => (
             <FeatureCard
               key={f.route}
-              icon={f.icon}
+              image={f.image}
               title={t(f.titleKey)}
               description={t(f.descKey)}
               onPress={() => navigation.navigate(f.route)}
@@ -141,7 +141,7 @@ const styles = StyleSheet.create({
   iconBtn: {
     width: 38, height: 38,
     borderRadius: 10,
-    backgroundColor: 'rgba(41,93,255,0.12)',
+    backgroundColor: 'rgba(253,171,83,0.12)',
     borderWidth: 1,
     borderColor: COLORS.borderAccent,
     justifyContent: 'center', alignItems: 'center',
@@ -153,7 +153,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 8,
     borderRadius: 20,
-    backgroundColor: 'rgba(41,93,255,0.12)',
+    backgroundColor: 'rgba(253,171,83,0.12)',
     borderWidth: 1,
     borderColor: COLORS.borderAccent,
   },
@@ -207,7 +207,7 @@ const styles = StyleSheet.create({
   profileBanner: {
     marginHorizontal: 28,
     marginBottom: 14,
-    backgroundColor: 'rgba(41,93,255,0.12)',
+    backgroundColor: 'rgba(253,171,83,0.12)',
     borderWidth: 1,
     borderColor: COLORS.borderAccent,
     borderRadius: 14,

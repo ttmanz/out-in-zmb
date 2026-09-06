@@ -145,7 +145,7 @@ const styles = StyleSheet.create({
   nameRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   partnerName: { fontSize: 16, fontWeight: '600', color: COLORS.text },
   adminBadge: {
-    backgroundColor: 'rgba(41,93,255,0.15)', borderRadius: 8,
+    backgroundColor: 'rgba(253,171,83,0.15)', borderRadius: 8,
     paddingHorizontal: 6, paddingVertical: 2,
     borderWidth: 1, borderColor: COLORS.borderAccent,
   },

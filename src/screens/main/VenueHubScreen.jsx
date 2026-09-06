@@ -11,10 +11,10 @@ import GradientBorder from '../../components/common/GradientBorder';
 import { GradientIconCircle } from '../../components/common/GradientIcon';
 
 const OPTIONS = [
-  { icon: 'search',   titleKey: 'venueHub.search',     descKey: 'venueHub.searchDesc',     route: ROUTES.VENUE_SEARCH },
-  { icon: 'people',   titleKey: 'venueHub.membersAt',  descKey: 'venueHub.membersAtDesc',  route: ROUTES.MEMBERS_AT },
-  { icon: 'trophy',   titleKey: 'venueHub.topVenues',  descKey: 'venueHub.topVenuesDesc',  route: ROUTES.TOP_VENUES },
-  { icon: 'star',     titleKey: 'venueHub.reviews',    descKey: 'venueHub.reviewsDesc',    route: ROUTES.VENUE_REVIEWS },
+  { image: require('../../../assets/brand/icon-venue-search.png'),      titleKey: 'venueHub.search',     descKey: 'venueHub.searchDesc',     route: ROUTES.VENUE_SEARCH },
+  { image: require('../../../assets/brand/icon-venue-members-at.png'),  titleKey: 'venueHub.membersAt',  descKey: 'venueHub.membersAtDesc',  route: ROUTES.MEMBERS_AT },
+  { image: require('../../../assets/brand/icon-venue-top.png'),         titleKey: 'venueHub.topVenues',  descKey: 'venueHub.topVenuesDesc',  route: ROUTES.TOP_VENUES },
+  { image: require('../../../assets/brand/icon-venue-reviews.png'),     titleKey: 'venueHub.reviews',    descKey: 'venueHub.reviewsDesc',    route: ROUTES.VENUE_REVIEWS },
 ];
 
 const VenueHubScreen = ({ navigation }) => {
@@ -35,7 +35,7 @@ const VenueHubScreen = ({ navigation }) => {
               onPress={() => navigation.navigate(opt.route)}
               activeOpacity={0.8}
             >
-              <GradientIconCircle name={opt.icon} size={54} iconSize={24} style={styles.icon} />
+              <GradientIconCircle image={opt.image} size={54} iconSize={28} style={styles.icon} />
               <View style={styles.textWrap}>
                 <Text style={styles.cardTitle}>{t(opt.titleKey)}</Text>
                 <Text style={styles.cardDesc}>{t(opt.descKey)}</Text>

@@ -372,7 +372,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12, paddingVertical: 6,
     backgroundColor: COLORS.surface,
   },
-  chipActive: { borderColor: COLORS.borderAccent, backgroundColor: 'rgba(41,93,255,0.12)' },
+  chipActive: { borderColor: COLORS.borderAccent, backgroundColor: 'rgba(253,171,83,0.12)' },
   chipText: { fontSize: 13, color: COLORS.textMuted },
   chipTextActive: { color: COLORS.primary, fontWeight: '700' },
 

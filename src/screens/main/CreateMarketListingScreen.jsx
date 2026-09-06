@@ -126,7 +126,7 @@ const styles = StyleSheet.create({
   charCount: { fontSize: 11, color: COLORS.textMuted, textAlign: 'right', marginTop: 4 },
   infoBox: {
     marginTop: 20,
-    backgroundColor: 'rgba(41,93,255,0.08)',
+    backgroundColor: 'rgba(253,171,83,0.08)',
     borderRadius: 12, padding: 14,
     borderLeftWidth: 3, borderLeftColor: COLORS.primary,
   },

@@ -11,16 +11,16 @@ import GradientBorder from '../../components/common/GradientBorder';
 import { GradientIconCircle } from '../../components/common/GradientIcon';
 
 const ACTIVITY_CATEGORIES = [
-  { key: 'theaters', icon: 'ticket' },
-  { key: 'movies',   icon: 'film' },
-  { key: 'concerts', icon: 'musical-notes' },
-  { key: 'kids',     icon: 'happy' },
+  { key: 'theaters', image: require('../../../assets/brand/icon-activities-theater.png') },
+  { key: 'movies',   image: require('../../../assets/brand/icon-activities-movies.png') },
+  { key: 'concerts', image: require('../../../assets/brand/icon-activities-concerts.png') },
+  { key: 'kids',     image: require('../../../assets/brand/icon-activities-kids.png') },
 ];
 
-const CategoryCard = ({ icon, title, onPress }) => (
+const CategoryCard = ({ image, title, onPress }) => (
   <GradientBorder radius={16} style={styles.cardOuter}>
     <TouchableOpacity style={styles.card} onPress={onPress} activeOpacity={0.75}>
-      <GradientIconCircle name={icon} size={46} iconSize={22} style={styles.icon} />
+      <GradientIconCircle image={image} size={46} iconSize={26} style={styles.icon} />
       <Text style={styles.cardTitle}>{title}</Text>
       <Text style={styles.chevron}>›</Text>
     </TouchableOpacity>
@@ -38,10 +38,10 @@ const ActivitiesScreen = ({ navigation }) => {
       <ScrollView contentContainerStyle={styles.scroll}>
         <AdBanner page="WhatHappening" />
         <ProfileBanner navigation={navigation} />
-        {ACTIVITY_CATEGORIES.map(({ key, icon }) => (
+        {ACTIVITY_CATEGORIES.map(({ key, image }) => (
           <CategoryCard
             key={key}
-            icon={icon}
+            image={image}
             title={t(`happenings.${key}`).toUpperCase()}
             onPress={() => navigation.navigate(ROUTES.ACTIVITY_EVENTS, { filter: key })}
           />

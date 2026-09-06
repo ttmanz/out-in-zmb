@@ -7,11 +7,11 @@ module.exports = () => {
     orientation: "portrait",
     icon: "./assets/icon.png",
     userInterfaceStyle: "dark",
-    primaryColor: "#c8800a",
+    primaryColor: "#fdab53",
     splash: {
       image: "./assets/splash-icon.png",
       resizeMode: "contain",
-      backgroundColor: "#0d0a03"
+      backgroundColor: "#093430"
     },
     ios: {
       supportsTablet: false,
@@ -47,7 +47,7 @@ module.exports = () => {
         foregroundImage: "./assets/android-icon-foreground.png",
         backgroundImage: "./assets/android-icon-background.png",
         monochromeImage: "./assets/android-icon-monochrome.png",
-        backgroundColor: "#0d0a03"
+        backgroundColor: "#093430"
       }
     },
     web: {
@@ -74,7 +74,7 @@ module.exports = () => {
       [
         "expo-notifications",
         {
-          color: "#c8800a",
+          color: "#fdab53",
           sounds: []
         }
       ]

@@ -257,7 +257,7 @@ const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: COLORS.background },
   center: { flex: 1, justifyContent: 'center', alignItems: 'center' },
   addBtn: {
-    backgroundColor: 'rgba(41,93,255,0.12)', borderRadius: 16,
+    backgroundColor: 'rgba(253,171,83,0.12)', borderRadius: 16,
     paddingHorizontal: 12, paddingVertical: 6,
     borderWidth: 1, borderColor: COLORS.borderAccent,
   },

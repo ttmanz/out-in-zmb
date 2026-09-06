@@ -674,7 +674,7 @@ const styles = StyleSheet.create({
   heroPhoto: { width: '100%', height: 200 },
   heroPlaceholder: {
     width: '100%', height: 120,
-    backgroundColor: 'rgba(41,93,255,0.08)',
+    backgroundColor: 'rgba(253,171,83,0.08)',
     justifyContent: 'center', alignItems: 'center',
   },
   heroEmoji: { fontSize: 52 },
@@ -699,12 +699,12 @@ const styles = StyleSheet.create({
     alignSelf: 'flex-start',
     borderWidth: 1, borderColor: COLORS.borderAccent, borderRadius: 10,
     paddingHorizontal: 12, paddingVertical: 8,
-    backgroundColor: 'rgba(41,93,255,0.08)',
+    backgroundColor: 'rgba(253,171,83,0.08)',
   },
   suspendClubBtnText: { color: COLORS.primary, fontWeight: '700', fontSize: 13 },
   suspendedBanner: {
     marginHorizontal: 16, marginBottom: 12,
-    backgroundColor: 'rgba(41,93,255,0.1)', borderRadius: 12, padding: 14,
+    backgroundColor: 'rgba(253,171,83,0.1)', borderRadius: 12, padding: 14,
     borderWidth: 1, borderColor: COLORS.borderAccent,
   },
   suspendedBannerText: { fontSize: 13, color: COLORS.primary, fontWeight: '600', textAlign: 'center' },
@@ -716,7 +716,7 @@ const styles = StyleSheet.create({
   joinBtnText: { color: COLORS.black, fontWeight: '800', fontSize: 15 },
   pendingBanner: {
     marginHorizontal: 16, marginBottom: 12,
-    backgroundColor: 'rgba(41,93,255,0.1)', borderRadius: 12, padding: 14,
+    backgroundColor: 'rgba(253,171,83,0.1)', borderRadius: 12, padding: 14,
     borderWidth: 1, borderColor: COLORS.borderAccent,
   },
   pendingBannerText: { fontSize: 14, color: COLORS.primary, fontWeight: '600', textAlign: 'center' },
@@ -740,7 +740,7 @@ const styles = StyleSheet.create({
   avatar: { marginRight: 12 },
   memberName: { flex: 1, fontSize: 14, fontWeight: '500', color: COLORS.text },
   adminBadge: {
-    backgroundColor: 'rgba(41,93,255,0.12)', borderRadius: 8,
+    backgroundColor: 'rgba(253,171,83,0.12)', borderRadius: 8,
     paddingHorizontal: 8, paddingVertical: 3,
     borderWidth: 1, borderColor: COLORS.borderAccent,
   },
@@ -754,7 +754,7 @@ const styles = StyleSheet.create({
   unblockBtn: {
     borderWidth: 1, borderColor: COLORS.borderAccent, borderRadius: 8,
     paddingHorizontal: 10, paddingVertical: 6,
-    backgroundColor: 'rgba(41,93,255,0.08)',
+    backgroundColor: 'rgba(253,171,83,0.08)',
   },
   unblockBtnText: { fontSize: 12, fontWeight: '700', color: COLORS.primary },
   approveBtn: {

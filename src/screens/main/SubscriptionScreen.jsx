@@ -196,7 +196,7 @@ const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: COLORS.background },
   scroll: { padding: 20, paddingBottom: 60 },
   trialBanner: {
-    backgroundColor: 'rgba(41,93,255,0.12)',
+    backgroundColor: 'rgba(253,171,83,0.12)',
     borderWidth: 1, borderColor: COLORS.borderAccent,
     borderRadius: 14, padding: 16, marginBottom: 24,
   },
