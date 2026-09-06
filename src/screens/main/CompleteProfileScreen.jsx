@@ -8,6 +8,7 @@ import { COLORS } from '../../constants/colors';
 import { getSession } from '../../lib/auth';
 import { getProfile, updateFullProfile } from '../../lib/profile';
 import { uploadAvatar } from '../../lib/storage';
+import { resizeForUpload } from '../../lib/imageResize';
 import { useUser } from '../../contexts/UserContext';
 
 const GENDERS = ['Male', 'Female', 'Non-binary', 'Prefer not to say'];
@@ -111,7 +112,7 @@ const CompleteProfileScreen = ({ navigation }) => {
       quality: 0.7,
     });
     if (result.canceled) return;
-    const uri = result.assets[0].uri;
+    const uri = await resizeForUpload(result.assets[0].uri);
     setUploadingPhoto(true);
     const { url, error } = await uploadAvatar(userId, uri);
     setUploadingPhoto(false);

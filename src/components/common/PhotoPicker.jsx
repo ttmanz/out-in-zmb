@@ -3,6 +3,7 @@ import { View, Text, Image, TouchableOpacity, StyleSheet, Alert, Platform } from
 import * as ImagePicker from 'expo-image-picker';
 import { useVideoPlayer, VideoView } from 'expo-video';
 import { COLORS } from '../../constants/colors';
+import { resizeForUpload } from '../../lib/imageResize';
 
 const isVideoUri = (u) => /\.(mp4|mov|m4v|avi|mkv)(\?.*)?$/i.test(u ?? '');
 
@@ -30,7 +31,9 @@ const PhotoPicker = ({ uri, onChange, aspect = [16, 9], allowVideo = false }) =>
       quality: 0.8,
     });
     if (!result.canceled && result.assets?.[0]?.uri) {
-      onChange(result.assets[0].uri, result.assets[0].type);
+      const asset = result.assets[0];
+      const uri = asset.type === 'video' ? asset.uri : await resizeForUpload(asset.uri);
+      onChange(uri, asset.type);
     }
   };
 
