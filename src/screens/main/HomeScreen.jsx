@@ -11,6 +11,7 @@ import { GradientIconCircle } from '../../components/common/GradientIcon';
 const FEATURES = [
   { image: require('../../../assets/brand/icon-friends.png'),          titleKey: 'home.friends',        descKey: 'home.friendsDesc',        route: ROUTES.FRIENDS_HUB,    featureKey: 'friends' },
   { image: require('../../../assets/brand/icon-my-story.png'),         titleKey: 'home.myStory',        descKey: 'home.myStoryDesc',        route: ROUTES.STORY_FEED,     featureKey: 'my_story' },
+  { image: require('../../../assets/brand/icon-clip-of-day.png'),      titleKey: 'home.clipOfDay',       descKey: 'home.clipOfDayDesc',      route: ROUTES.CLIP_OF_DAY,    featureKey: 'clip_of_day' },
   { image: require('../../../assets/brand/icon-whats-happening.png'),  titleKey: 'home.whatsHappening', descKey: 'home.whatsHappeningDesc', route: ROUTES.WHAT_HAPPENING, featureKey: 'whats_happening' },
   { image: require('../../../assets/brand/icon-where-to-go.png'),      titleKey: 'home.whereToGo',      descKey: 'home.whereToGoDesc',      route: ROUTES.WHERE_TO_GO,    featureKey: 'where_to_go' },
   { image: require('../../../assets/brand/icon-spur-of-moment.png'),   titleKey: 'home.spurOfMoment',   descKey: 'home.spurOfMomentDesc',   route: ROUTES.SPUR_OF_MOMENT, featureKey: 'spur_of_moment' },
@@ -21,7 +22,6 @@ const FEATURES = [
   { image: require('../../../assets/brand/icon-venue.png'),            titleKey: 'home.venue',           descKey: 'home.venueDesc',          route: ROUTES.VENUE_HUB,      featureKey: 'venue_hub' },
   { image: require('../../../assets/brand/icon-market.png'),           titleKey: 'home.market',          descKey: 'home.marketDesc',         route: ROUTES.MARKET,         featureKey: 'market' },
   { image: require('../../../assets/brand/icon-events.png'),           titleKey: 'home.events',          descKey: 'home.eventsDesc',         route: ROUTES.EVENTS,         featureKey: 'events' },
-  { image: require('../../../assets/brand/icon-clip-of-day.png'),      titleKey: 'home.clipOfDay',       descKey: 'home.clipOfDayDesc',      route: ROUTES.CLIP_OF_DAY,    featureKey: 'clip_of_day' },
 ];
 
 const RESTRICTED_ROUTES = new Set([ROUTES.WHERE_TO_GO, ROUTES.VENUE_HUB]);
