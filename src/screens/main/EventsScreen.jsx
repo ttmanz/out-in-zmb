@@ -13,8 +13,7 @@ import { GradientIconCircle } from '../../components/common/GradientIcon';
 const EVENT_CATEGORIES = [
   { key: 'product_launch', icon: 'rocket',    image: require('../../../assets/brand/icon-events-product-launch.png') },
   { key: 'workshop',       icon: 'construct', image: require('../../../assets/brand/icon-events-workshop.png') },
-  // No dedicated icon supplied yet for "conference" — falls back to the vector icon.
-  { key: 'conference',     icon: 'mic' },
+  { key: 'conference',     icon: 'mic',       image: require('../../../assets/brand/icon-events-conference.png') },
   { key: 'networking',     icon: 'people',    image: require('../../../assets/brand/icon-events-networking.png') },
   { key: 'other',          icon: 'bookmark',  image: require('../../../assets/brand/icon-events-other.png') },
 ];
