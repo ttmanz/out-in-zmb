@@ -1,9 +1,10 @@
-import React from 'react';
-import { View, Text, Image, TouchableOpacity, StyleSheet, Alert, Platform } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, Image, TouchableOpacity, ActivityIndicator, StyleSheet, Alert, Platform } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { useVideoPlayer, VideoView } from 'expo-video';
 import { COLORS } from '../../constants/colors';
 import { resizeForUpload } from '../../lib/imageResize';
+import { compressVideoForUpload } from '../../lib/videoCompress';
 
 const isVideoUri = (u) => /\.(mp4|mov|m4v|avi|mkv)(\?.*)?$/i.test(u ?? '');
 
@@ -13,6 +14,8 @@ const VideoPreview = ({ uri, style }) => {
 };
 
 const PhotoPicker = ({ uri, onChange, aspect = [16, 9], allowVideo = false }) => {
+  const [processing, setProcessing] = useState(false);
+
   const pick = async () => {
     // iOS's picker (PHPicker) runs out-of-process and needs no photo-library
     // permission — requesting it manually shows a redundant native dialog
@@ -32,7 +35,11 @@ const PhotoPicker = ({ uri, onChange, aspect = [16, 9], allowVideo = false }) =>
     });
     if (!result.canceled && result.assets?.[0]?.uri) {
       const asset = result.assets[0];
-      const uri = asset.type === 'video' ? asset.uri : await resizeForUpload(asset.uri);
+      setProcessing(true);
+      const uri = asset.type === 'video'
+        ? await compressVideoForUpload(asset.uri)
+        : await resizeForUpload(asset.uri);
+      setProcessing(false);
       onChange(uri, asset.type);
     }
   };
@@ -52,9 +59,18 @@ const PhotoPicker = ({ uri, onChange, aspect = [16, 9], allowVideo = false }) =>
   }
 
   return (
-    <TouchableOpacity style={styles.addBtn} onPress={pick}>
-      <Text style={styles.addBtnIcon}>{allowVideo ? '🎬' : '📷'}</Text>
-      <Text style={styles.addBtnText}>{allowVideo ? 'Add Photo or Video' : 'Add photo'}</Text>
+    <TouchableOpacity style={styles.addBtn} onPress={pick} disabled={processing}>
+      {processing ? (
+        <>
+          <ActivityIndicator size="small" color={COLORS.primary} />
+          <Text style={styles.addBtnText}>Processing…</Text>
+        </>
+      ) : (
+        <>
+          <Text style={styles.addBtnIcon}>{allowVideo ? '🎬' : '📷'}</Text>
+          <Text style={styles.addBtnText}>{allowVideo ? 'Add Photo or Video' : 'Add photo'}</Text>
+        </>
+      )}
     </TouchableOpacity>
   );
 };

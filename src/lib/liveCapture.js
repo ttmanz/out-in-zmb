@@ -2,6 +2,7 @@ import { Alert } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import i18n from './i18n';
 import { resizeForUpload } from './imageResize';
+import { compressVideoForUpload } from './videoCompress';
 
 const launch = async (mediaType, videoMaxDuration = 60) => {
   const result = await ImagePicker.launchCameraAsync({
@@ -12,7 +13,7 @@ const launch = async (mediaType, videoMaxDuration = 60) => {
   const asset = result.assets?.[0];
   if (result.canceled || !asset?.uri) return null;
   const isVideo = asset.type === 'video';
-  const uri = isVideo ? asset.uri : await resizeForUpload(asset.uri);
+  const uri = isVideo ? await compressVideoForUpload(asset.uri) : await resizeForUpload(asset.uri);
   return { uri, isVideo };
 };
 
