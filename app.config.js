@@ -29,10 +29,11 @@ module.exports = () => {
     },
     android: {
       package: "com.ttleisureland.outinzmb",
-      // Local dev/prebuild reads the git-ignored file straight off disk;
-      // EAS Build injects the path via the GOOGLE_SERVICES_JSON file secret
-      // instead, since the git-ignored file itself never reaches the builder.
-      googleServicesFile: process.env.GOOGLE_SERVICES_JSON ?? "./google-services.json",
+      // No Firebase project set up for this app yet, so there's no
+      // google-services.json (local or via the GOOGLE_SERVICES_JSON file
+      // secret) — omit the field until push notifications are wired up;
+      // everything else builds and runs fine without it.
+      ...(process.env.GOOGLE_SERVICES_JSON ? { googleServicesFile: process.env.GOOGLE_SERVICES_JSON } : {}),
       versionCode: 1,
       softwareKeyboardLayoutMode: "resize",
       permissions: [
