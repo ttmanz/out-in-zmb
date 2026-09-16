@@ -95,7 +95,7 @@ module.exports = () => {
   };
 
   config.extra = {
-    eas: { projectId: process.env.EAS_PROJECT_ID ?? '' },
+    eas: { projectId: process.env.EAS_PROJECT_ID ?? '4fdbaaf0-5d00-4ec8-8914-4903518661e1' },
   };
 
   return { expo: config };

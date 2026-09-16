@@ -14,10 +14,7 @@
       "distribution": "internal",
       "env": {
         "EXPO_PUBLIC_SUPABASE_URL": "https://xomypskslmgibqaulyks.supabase.co",
-        "EXPO_PUBLIC_SUPABASE_ANON_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhvbXlwc2tzbG1naWJxYXVseWtzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg2MDE5MzYsImV4cCI6MjEwNDE3NzkzNn0.yBIEBri-XGZGkvhg5ngJ4GKowli3bWdDzLuu0DmlG6E",
-        "GOOGLE_MAPS_API_KEY": "",
-        "EXPO_PUBLIC_REVENUECAT_IOS_KEY": "",
-        "EXPO_PUBLIC_REVENUECAT_ANDROID_KEY": ""
+        "EXPO_PUBLIC_SUPABASE_ANON_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhvbXlwc2tzbG1naWJxYXVseWtzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg2MDE5MzYsImV4cCI6MjEwNDE3NzkzNn0.yBIEBri-XGZGkvhg5ngJ4GKowli3bWdDzLuu0DmlG6E"
       },
       "ios": { "simulator": false },
       "android": { "buildType": "apk" }
@@ -26,10 +23,7 @@
       "autoIncrement": true,
       "env": {
         "EXPO_PUBLIC_SUPABASE_URL": "https://xomypskslmgibqaulyks.supabase.co",
-        "EXPO_PUBLIC_SUPABASE_ANON_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhvbXlwc2tzbG1naWJxYXVseWtzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg2MDE5MzYsImV4cCI6MjEwNDE3NzkzNn0.yBIEBri-XGZGkvhg5ngJ4GKowli3bWdDzLuu0DmlG6E",
-        "GOOGLE_MAPS_API_KEY": "",
-        "EXPO_PUBLIC_REVENUECAT_IOS_KEY": "",
-        "EXPO_PUBLIC_REVENUECAT_ANDROID_KEY": ""
+        "EXPO_PUBLIC_SUPABASE_ANON_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhvbXlwc2tzbG1naWJxYXVseWtzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg2MDE5MzYsImV4cCI6MjEwNDE3NzkzNn0.yBIEBri-XGZGkvhg5ngJ4GKowli3bWdDzLuu0DmlG6E"
       },
       "ios": {
         "buildConfiguration": "Release",
@@ -38,20 +32,6 @@
       "android": {
         "buildType": "app-bundle",
         "distribution": "store"
-      }
-    }
-  },
-  "submit": {
-    "production": {
-      "android": {
-        "serviceAccountKeyPath": "./google-service-account.json",
-        "track": "alpha"
-      },
-      "ios": {
-        "ascApiKeyPath": "",
-        "ascApiKeyIssuerId": "",
-        "ascApiKeyId": "",
-        "ascAppId": ""
       }
     }
   }
