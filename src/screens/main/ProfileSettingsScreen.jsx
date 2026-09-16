@@ -9,6 +9,7 @@ import { getSession, deleteAccount } from '../../lib/auth';
 import { ROUTES } from '../../constants/routes';
 import { getProfile, updateProfileSettings } from '../../lib/profile';
 import { getFriends, getCloseFriendIds, addCloseFriend, removeCloseFriend, getMyBlockedProfiles, unblockMember } from '../../lib/friends';
+import { useUser } from '../../contexts/UserContext';
 import AdBanner from '../../components/common/AdBanner';
 import ProfileBanner from '../../components/common/ProfileBanner';
 import BackHeader from '../../components/common/BackHeader';
@@ -30,6 +31,7 @@ const VENUE_VISIBILITY_OPTIONS = [
 
 const ProfileSettingsScreen = ({ navigation }) => {
   const { t } = useTranslation();
+  const { profile: myProfile } = useUser();
   const [userId, setUserId] = useState(null);
   const [fullName, setFullName] = useState('');
   const [visibility, setVisibility] = useState('everyone');
@@ -188,6 +190,34 @@ const ProfileSettingsScreen = ({ navigation }) => {
           <View style={styles.editProfileText}>
             <Text style={styles.editProfileLabel}>{t('subscription.title')}</Text>
             <Text style={styles.editProfileDesc}>{t('subscription.manageDesc')}</Text>
+          </View>
+          <Text style={styles.editProfileChevron}>›</Text>
+        </TouchableOpacity>
+
+        {myProfile?.account_type === 'venue_owner' && (
+          <TouchableOpacity
+            style={styles.editProfileBtn}
+            onPress={() => navigation.navigate(ROUTES.VENUE_VOUCHERS)}
+            activeOpacity={0.8}
+          >
+            <Text style={styles.editProfileEmoji}>🎟️</Text>
+            <View style={styles.editProfileText}>
+              <Text style={styles.editProfileLabel}>My Vouchers</Text>
+              <Text style={styles.editProfileDesc}>Create discount codes for customers to share</Text>
+            </View>
+            <Text style={styles.editProfileChevron}>›</Text>
+          </TouchableOpacity>
+        )}
+
+        <TouchableOpacity
+          style={styles.editProfileBtn}
+          onPress={() => navigation.navigate(ROUTES.CHECK_VOUCHER)}
+          activeOpacity={0.8}
+        >
+          <Text style={styles.editProfileEmoji}>🔍</Text>
+          <View style={styles.editProfileText}>
+            <Text style={styles.editProfileLabel}>Check a Voucher</Text>
+            <Text style={styles.editProfileDesc}>Got a code from a friend? See if it's still valid</Text>
           </View>
           <Text style={styles.editProfileChevron}>›</Text>
         </TouchableOpacity>

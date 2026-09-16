@@ -40,6 +40,8 @@ export const ROUTES = {
   CREATE_STORY: 'CreateStory',
   CLIP_OF_DAY: 'ClipOfDay',
   ADMIN_CLIPS: 'AdminClips',
+  VENUE_VOUCHERS: 'VenueVouchers',
+  CHECK_VOUCHER: 'CheckVoucher',
   SUBSCRIPTION: 'Subscription',
   PAYWALL: 'Paywall',
   ADMIN_SUBSCRIPTION_PLANS: 'AdminSubscriptionPlans',
