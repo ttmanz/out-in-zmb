@@ -21,6 +21,10 @@ const INTERESTS = [
   '🎮 Gaming', '🎭 Events', '🏖️ Outdoor', '🎨 Arts & Culture', '✏️ Other',
 ];
 const OTHER_KEY = '✏️ Other';
+const LANGUAGES = [
+  'English', 'Bemba', 'Nyanja', 'Tonga', 'Lozi', 'Lunda', 'Luvale', 'Kaonde', 'Nsenga', 'Other',
+];
+const OTHER_LANGUAGE_KEY = 'Other';
 
 const formatDob = (text) => {
   const digits = text.replace(/\D/g, '').slice(0, 8);
@@ -54,6 +58,8 @@ const CompleteProfileScreen = ({ navigation }) => {
   const [bio, setBio] = useState('');
   const [selectedInterests, setSelectedInterests] = useState([]);
   const [otherInterests, setOtherInterests] = useState('');
+  const [selectedLanguages, setSelectedLanguages] = useState([]);
+  const [otherLanguages, setOtherLanguages] = useState('');
   const [phone, setPhone] = useState('');
   const [instagram, setInstagram] = useState('');
   const [accountType, setAccountType] = useState('member');
@@ -84,6 +90,16 @@ const CompleteProfileScreen = ({ navigation }) => {
           setOtherInterests(custom.join(', '));
         } else {
           setSelectedInterests(preset);
+        }
+        const savedLanguages = data.spoken_languages ?? [];
+        const presetLanguageKeys = new Set(LANGUAGES);
+        const customLanguages = savedLanguages.filter((l) => !presetLanguageKeys.has(l));
+        const presetLanguages = savedLanguages.filter((l) => presetLanguageKeys.has(l));
+        if (customLanguages.length) {
+          setSelectedLanguages([...presetLanguages, OTHER_LANGUAGE_KEY]);
+          setOtherLanguages(customLanguages.join(', '));
+        } else {
+          setSelectedLanguages(presetLanguages);
         }
         setPhone(data.phone ?? '');
         setInstagram(data.instagram ?? '');
@@ -126,9 +142,15 @@ const CompleteProfileScreen = ({ navigation }) => {
     );
   };
 
+  const toggleLanguage = (item) => {
+    setSelectedLanguages((prev) =>
+      prev.includes(item) ? prev.filter((l) => l !== item) : [...prev, item]
+    );
+  };
+
   const handleSave = async () => {
-    if (!dob.trim() || !gender || !city.trim() || !accountTypeTouched) {
-      Alert.alert('Required fields', 'Please fill in account type, date of birth, gender and city.');
+    if (!dob.trim() || !gender || !city.trim() || !accountTypeTouched || selectedLanguages.length === 0) {
+      Alert.alert('Required fields', 'Please fill in account type, date of birth, gender, city and spoken languages.');
       return;
     }
     setSaving(true);
@@ -142,6 +164,12 @@ const CompleteProfileScreen = ({ navigation }) => {
         ...selectedInterests.filter((i) => i !== OTHER_KEY),
         ...(selectedInterests.includes(OTHER_KEY)
           ? otherInterests.split(',').map((s) => s.trim()).filter(Boolean)
+          : []),
+      ],
+      spoken_languages: [
+        ...selectedLanguages.filter((l) => l !== OTHER_LANGUAGE_KEY),
+        ...(selectedLanguages.includes(OTHER_LANGUAGE_KEY)
+          ? otherLanguages.split(',').map((s) => s.trim()).filter(Boolean)
           : []),
       ],
       phone: phone.trim(),
@@ -240,6 +268,32 @@ const CompleteProfileScreen = ({ navigation }) => {
             placeholder="Your city"
             placeholderTextColor={COLORS.textMuted}
           />
+        </Field>
+
+        <Field label="Spoken Languages" required>
+          <View style={styles.chipRow}>
+            {LANGUAGES.map((item) => {
+              const active = selectedLanguages.includes(item);
+              return (
+                <TouchableOpacity
+                  key={item}
+                  style={[styles.chip, active && styles.chipActive]}
+                  onPress={() => toggleLanguage(item)}
+                >
+                  <Text style={[styles.chipText, active && styles.chipTextActive]}>{item}</Text>
+                </TouchableOpacity>
+              );
+            })}
+          </View>
+          {selectedLanguages.includes(OTHER_LANGUAGE_KEY) && (
+            <TextInput
+              style={[styles.input, { marginTop: 10 }]}
+              value={otherLanguages}
+              onChangeText={setOtherLanguages}
+              placeholder="Type other languages, separated by commas"
+              placeholderTextColor={COLORS.textMuted}
+            />
+          )}
         </Field>
 
         <Field label="About Me">

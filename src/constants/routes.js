@@ -42,6 +42,7 @@ export const ROUTES = {
   ADMIN_CLIPS: 'AdminClips',
   VENUE_VOUCHERS: 'VenueVouchers',
   CHECK_VOUCHER: 'CheckVoucher',
+  MY_POINTS: 'MyPoints',
   SUBSCRIPTION: 'Subscription',
   PAYWALL: 'Paywall',
   ADMIN_SUBSCRIPTION_PLANS: 'AdminSubscriptionPlans',

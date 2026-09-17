@@ -194,6 +194,19 @@ const ProfileSettingsScreen = ({ navigation }) => {
           <Text style={styles.editProfileChevron}>›</Text>
         </TouchableOpacity>
 
+        <TouchableOpacity
+          style={styles.editProfileBtn}
+          onPress={() => navigation.navigate(ROUTES.MY_POINTS)}
+          activeOpacity={0.8}
+        >
+          <Text style={styles.editProfileEmoji}>🏆</Text>
+          <View style={styles.editProfileText}>
+            <Text style={styles.editProfileLabel}>My Points</Text>
+            <Text style={styles.editProfileDesc}>Earn points by checking in at venues</Text>
+          </View>
+          <Text style={styles.editProfileChevron}>›</Text>
+        </TouchableOpacity>
+
         {myProfile?.account_type === 'venue_owner' && (
           <TouchableOpacity
             style={styles.editProfileBtn}
