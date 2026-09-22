@@ -3,7 +3,7 @@ import { supabase } from './supabase';
 export const getSubscriptionPlans = () =>
   supabase
     .from('subscription_plans')
-    .select('id, label, price_display, venue_price_display, duration_months, badge, description, sort_order')
+    .select('id, tier_key, label, price_display, venue_price_display, duration_months, badge, description, sort_order, revenuecat_product_id, venue_revenuecat_product_id')
     .eq('is_active', true)
     .order('sort_order');
 
@@ -11,8 +11,27 @@ export const getSubscriptionPlans = () =>
 export const getAllSubscriptionPlans = () =>
   supabase
     .from('subscription_plans')
-    .select('id, label, price_display, venue_price_display, duration_months, badge, description, sort_order, revenuecat_product_id, venue_revenuecat_product_id')
+    .select('id, tier_key, label, price_display, venue_price_display, duration_months, badge, description, sort_order, revenuecat_product_id, venue_revenuecat_product_id')
     .order('sort_order');
+
+// Membership tiers (Free/Silver/Gold/Platinum) — each carries the daily
+// post limit enforced server-side by the enforce_daily_post_limit trigger.
+export const getMembershipTiers = () =>
+  supabase.from('membership_tiers').select('*').order('sort_order');
+
+// Admin-only: RLS restricts this to profiles.is_admin = true
+export const updateMembershipTier = (tierKey, fields) =>
+  supabase.from('membership_tiers').update(fields).eq('tier_key', tierKey);
+
+// How many posts this member has made today, against their tier's limit —
+// for display only; the real cap is enforced by the DB trigger.
+export const getMyTodayPostCount = (userId) =>
+  supabase
+    .from('daily_post_counts')
+    .select('count')
+    .eq('user_id', userId)
+    .eq('post_date', new Date().toISOString().slice(0, 10))
+    .maybeSingle();
 
 // A venue owner sees their own price where the admin has set one;
 // otherwise everyone sees the regular member price.

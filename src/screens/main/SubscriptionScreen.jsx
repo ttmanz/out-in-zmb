@@ -11,13 +11,18 @@ import { getOfferings, purchasePackage, restorePurchases } from '../../lib/purch
 import { useUser } from '../../contexts/UserContext';
 import BackHeader from '../../components/common/BackHeader';
 
-// Our 3 fixed plan durations map onto RevenueCat's predefined package slots.
-const packageForPlan = (offering, durationMonths) => {
-  if (!offering) return null;
-  if (durationMonths === 1) return offering.monthly;
-  if (durationMonths === 6) return offering.sixMonth;
-  if (durationMonths === 12) return offering.annual;
-  return null;
+// A venue owner buys at their own RevenueCat product id where the admin has
+// set one; otherwise everyone buys the regular member product.
+const planProductIdFor = (plan, profile) =>
+  (profile?.account_type === 'venue_owner' && plan.venue_revenuecat_product_id)
+    ? plan.venue_revenuecat_product_id
+    : plan.revenuecat_product_id;
+
+// Matched by product id rather than a fixed monthly/sixMonth/annual slot,
+// so this works regardless of how many tiers exist.
+const packageForPlan = (offering, productId) => {
+  if (!offering || !productId) return null;
+  return offering.availablePackages?.find((pkg) => pkg.product?.identifier === productId) ?? null;
 };
 
 const SubscriptionScreen = ({ navigation, standalone = false }) => {
@@ -45,7 +50,7 @@ const SubscriptionScreen = ({ navigation, standalone = false }) => {
 
   const handleSubscribe = async (plan) => {
     if (!userId) return;
-    const pkg = packageForPlan(offering, plan.duration_months);
+    const pkg = packageForPlan(offering, planProductIdFor(plan, profile));
     if (!pkg) {
       Alert.alert(t('common.error'), t('subscription.notAvailable'));
       return;
@@ -126,41 +131,51 @@ const SubscriptionScreen = ({ navigation, standalone = false }) => {
         {loading ? (
           <ActivityIndicator color={COLORS.primary} style={{ marginTop: 40 }} />
         ) : (
-          plans.map((plan) => {
-            const isCurrentPlan = status.isActive && status.planId === plan.id;
-            return (
-              <View key={plan.id} style={[styles.planCard, isCurrentPlan && styles.planCardActive]}>
-                <View style={styles.planHeader}>
-                  <Text style={styles.planLabel}>{plan.label}</Text>
-                  {plan.badge ? (
-                    <View style={styles.badge}>
-                      <Text style={styles.badgeText}>{plan.badge}</Text>
+          (() => {
+            let lastTier = null;
+            return plans.map((plan) => {
+              const isCurrentPlan = status.isActive && status.planId === plan.id;
+              const showTierHeader = plan.tier_key !== lastTier;
+              lastTier = plan.tier_key;
+              return (
+                <React.Fragment key={plan.id}>
+                  {showTierHeader && (
+                    <Text style={styles.tierHeader}>{plan.tier_key?.toUpperCase()}</Text>
+                  )}
+                  <View style={[styles.planCard, isCurrentPlan && styles.planCardActive]}>
+                    <View style={styles.planHeader}>
+                      <Text style={styles.planLabel}>{plan.label}</Text>
+                      {plan.badge ? (
+                        <View style={styles.badge}>
+                          <Text style={styles.badgeText}>{plan.badge}</Text>
+                        </View>
+                      ) : null}
                     </View>
-                  ) : null}
-                </View>
-                <Text style={styles.planPrice}>{planPriceFor(plan, profile)}</Text>
-                {!!plan.description && (
-                  <Text style={styles.planDesc}>{plan.description}</Text>
-                )}
-                {isCurrentPlan ? (
-                  <View style={styles.currentBadge}>
-                    <Text style={styles.currentBadgeText}>✓ {t('subscription.currentPlan')}</Text>
+                    <Text style={styles.planPrice}>{planPriceFor(plan, profile)}</Text>
+                    {!!plan.description && (
+                      <Text style={styles.planDesc}>{plan.description}</Text>
+                    )}
+                    {isCurrentPlan ? (
+                      <View style={styles.currentBadge}>
+                        <Text style={styles.currentBadgeText}>✓ {t('subscription.currentPlan')}</Text>
+                      </View>
+                    ) : (
+                      <TouchableOpacity
+                        style={styles.subscribeBtn}
+                        onPress={() => handleSubscribe(plan)}
+                        disabled={subscribing !== null}
+                      >
+                        {subscribing === plan.id
+                          ? <ActivityIndicator color={COLORS.black} size="small" />
+                          : <Text style={styles.subscribeBtnText}>{t('subscription.subscribe')}</Text>
+                        }
+                      </TouchableOpacity>
+                    )}
                   </View>
-                ) : (
-                  <TouchableOpacity
-                    style={styles.subscribeBtn}
-                    onPress={() => handleSubscribe(plan)}
-                    disabled={subscribing !== null}
-                  >
-                    {subscribing === plan.id
-                      ? <ActivityIndicator color={COLORS.black} size="small" />
-                      : <Text style={styles.subscribeBtnText}>{t('subscription.subscribe')}</Text>
-                    }
-                  </TouchableOpacity>
-                )}
-              </View>
-            );
-          })
+                </React.Fragment>
+              );
+            });
+          })()
         )}
 
         <TouchableOpacity style={styles.restoreBtn} onPress={handleRestore} disabled={restoring}>
@@ -207,6 +222,10 @@ const styles = StyleSheet.create({
   sectionLabel: {
     fontSize: 12, fontWeight: '700', color: COLORS.primary,
     textTransform: 'uppercase', letterSpacing: 0.8, marginBottom: 16,
+  },
+  tierHeader: {
+    fontSize: 13, fontWeight: '800', color: COLORS.text,
+    letterSpacing: 1, marginTop: 12, marginBottom: 8,
   },
   planCard: {
     backgroundColor: COLORS.surface, borderRadius: 16,

@@ -11,18 +11,6 @@ const json = (body: unknown, status = 200) =>
     headers: { ...corsHeaders, 'Content-Type': 'application/json' },
   });
 
-// Subscription product id -> our own subscription_plans.id. Both the member
-// and venue-owner tier of a plan grant the same access, just at a different
-// store price, so they collapse to the same plan id here.
-const PLAN_BY_PRODUCT: Record<string, string> = {
-  monthly_member: 'monthly',
-  monthly_venue: 'monthly',
-  biannual_member: 'biannual',
-  biannual_venue: 'biannual',
-  yearly_member: 'yearly',
-  yearly_venue: 'yearly',
-};
-
 const SUBSCRIPTION_EVENTS = new Set(['INITIAL_PURCHASE', 'RENEWAL', 'UNCANCELLATION', 'PRODUCT_CHANGE']);
 
 Deno.serve(async (req) => {
@@ -47,15 +35,27 @@ Deno.serve(async (req) => {
   const productId = event.product_id as string | undefined;
 
   if (SUBSCRIPTION_EVENTS.has(event.type)) {
-    const planId = productId ? PLAN_BY_PRODUCT[productId] : undefined;
-    if (!planId) {
+    // Both the member and venue-owner price of a plan grant the same
+    // access, just at a different store price — either product id on a
+    // plan row resolves to that same plan. Looked up from
+    // subscription_plans directly (admin-configured) rather than a
+    // hardcoded map, so new tiers/plans just work once the admin fills in
+    // their RevenueCat product ids.
+    const { data: plan } = productId
+      ? await admin
+          .from('subscription_plans')
+          .select('id')
+          .or(`revenuecat_product_id.eq.${productId},venue_revenuecat_product_id.eq.${productId}`)
+          .maybeSingle()
+      : { data: null };
+    if (!plan) {
       console.error(`Unknown subscription product_id: ${productId}`);
       return json({ ok: true });
     }
     const expiresAt = event.expiration_at_ms ? new Date(event.expiration_at_ms).toISOString() : null;
     await admin
       .from('profiles')
-      .update({ subscription_plan: planId, subscription_expires_at: expiresAt })
+      .update({ subscription_plan: plan.id, subscription_expires_at: expiresAt })
       .eq('id', userId);
     return json({ ok: true });
   }
