@@ -46,3 +46,12 @@ export const getRecentPointsActivity = (limit = 30) =>
     .select('id, user_id, amount, reason, created_at')
     .order('created_at', { ascending: false })
     .limit(limit);
+
+// Admin-only: the live, editable amount for every earn event — read by the
+// triggers/edge function themselves, not just this screen. See
+// supabase/migrations/20260925050000_points_rules_config.sql.
+export const getPointsRules = () =>
+  supabase.from('points_rules').select('*').order('rule_key');
+
+export const updatePointsRule = (ruleKey, amount) =>
+  supabase.from('points_rules').update({ amount, updated_at: new Date().toISOString() }).eq('rule_key', ruleKey);

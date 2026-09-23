@@ -6,7 +6,10 @@ import {
 import { KeyboardAvoidingView } from 'react-native-keyboard-controller';
 import { useFocusEffect } from '@react-navigation/native';
 import { COLORS } from '../../constants/colors';
-import { getAllMembersWithPoints, awardPoints, getRecentPointsActivity, REASON_LABEL } from '../../lib/points';
+import {
+  getAllMembersWithPoints, awardPoints, getRecentPointsActivity, REASON_LABEL,
+  getPointsRules, updatePointsRule,
+} from '../../lib/points';
 import { formatAgo } from '../../utils/format';
 import Avatar from '../../components/common/Avatar';
 import BackHeader from '../../components/common/BackHeader';
@@ -14,6 +17,8 @@ import BackHeader from '../../components/common/BackHeader';
 const AdminPointsScreen = ({ navigation }) => {
   const [members, setMembers] = useState([]);
   const [activity, setActivity] = useState([]);
+  const [rules, setRules] = useState([]);
+  const [savingRules, setSavingRules] = useState(false);
   const [query, setQuery] = useState('');
   const [loading, setLoading] = useState(true);
   const [target, setTarget] = useState(null); // member being awarded/deducted
@@ -24,12 +29,14 @@ const AdminPointsScreen = ({ navigation }) => {
 
   const load = useCallback(async () => {
     setLoading(true);
-    const [{ data: membersData }, { data: activityData }] = await Promise.all([
+    const [{ data: membersData }, { data: activityData }, { data: rulesData }] = await Promise.all([
       getAllMembersWithPoints(),
       getRecentPointsActivity(),
+      getPointsRules(),
     ]);
     setMembers(membersData ?? []);
     setActivity(activityData ?? []);
+    setRules((rulesData ?? []).map((r) => ({ ...r, amount_draft: String(r.amount) })));
     setLoading(false);
   }, []);
 
@@ -42,6 +49,24 @@ const AdminPointsScreen = ({ navigation }) => {
   }, [members, query]);
 
   const memberName = (userId) => members.find((m) => m.id === userId)?.full_name ?? 'Member';
+
+  const setRuleDraft = (ruleKey, value) =>
+    setRules((prev) => prev.map((r) => (r.rule_key === ruleKey ? { ...r, amount_draft: value } : r)));
+
+  const handleSaveRules = async () => {
+    setSavingRules(true);
+    const results = await Promise.all(rules.map((r) => {
+      const amount = parseInt(r.amount_draft, 10);
+      if (!Number.isFinite(amount) || amount < 0 || amount === r.amount) return { error: null };
+      return updatePointsRule(r.rule_key, amount);
+    }));
+    setSavingRules(false);
+    if (results.some((r) => r.error)) {
+      Alert.alert('Error', 'Could not save all changes. Please try again.');
+      return;
+    }
+    load();
+  };
 
   const openModal = (member, awardMode) => {
     setTarget(member);
@@ -96,7 +121,33 @@ const AdminPointsScreen = ({ navigation }) => {
         data={filtered}
         keyExtractor={(item) => item.id}
         contentContainerStyle={styles.list}
-        ListHeaderComponent={<Text style={styles.sectionLabel}>Balances ({filtered.length})</Text>}
+        ListHeaderComponent={
+          <>
+            <Text style={styles.sectionLabel}>Points Rules</Text>
+            <Text style={styles.sectionHint}>
+              How many points each earn event pays out. Changes apply immediately, everywhere.
+            </Text>
+            {rules.map((r) => (
+              <View key={r.rule_key} style={styles.ruleRow}>
+                <Text style={styles.ruleLabel}>{r.label}</Text>
+                <TextInput
+                  style={styles.ruleInput}
+                  value={r.amount_draft}
+                  onChangeText={(v) => setRuleDraft(r.rule_key, v.replace(/[^0-9]/g, ''))}
+                  keyboardType="number-pad"
+                />
+              </View>
+            ))}
+            <TouchableOpacity style={styles.saveRulesBtn} onPress={handleSaveRules} disabled={savingRules}>
+              {savingRules
+                ? <ActivityIndicator color={COLORS.black} />
+                : <Text style={styles.saveRulesBtnText}>Save Rules</Text>
+              }
+            </TouchableOpacity>
+
+            <Text style={[styles.sectionLabel, { marginTop: 24 }]}>Balances ({filtered.length})</Text>
+          </>
+        }
         renderItem={({ item, index }) => (
           <View style={styles.row}>
             <Text style={styles.rank}>{index + 1}</Text>
@@ -196,7 +247,25 @@ const styles = StyleSheet.create({
     textTransform: 'uppercase', letterSpacing: 0.8,
     marginHorizontal: 20, marginTop: 16, marginBottom: 8,
   },
+  sectionHint: { fontSize: 12, color: COLORS.textLight, lineHeight: 17, marginHorizontal: 20, marginBottom: 12 },
   list: { paddingBottom: 48 },
+  ruleRow: {
+    flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
+    backgroundColor: COLORS.surface, borderRadius: 10, padding: 12,
+    marginHorizontal: 20, marginBottom: 8, borderWidth: 1, borderColor: COLORS.border,
+  },
+  ruleLabel: { fontSize: 13, color: COLORS.text, flex: 1, marginRight: 10 },
+  ruleInput: {
+    borderWidth: 1, borderColor: COLORS.borderAccent, borderRadius: 8,
+    paddingHorizontal: 10, paddingVertical: 6, fontSize: 14, fontWeight: '700',
+    color: COLORS.primary, backgroundColor: COLORS.surfaceAlt, width: 64, textAlign: 'center',
+  },
+  saveRulesBtn: {
+    backgroundColor: COLORS.primary, borderRadius: 10,
+    paddingVertical: 12, alignItems: 'center',
+    marginHorizontal: 20, marginTop: 4,
+  },
+  saveRulesBtnText: { fontSize: 13, fontWeight: '800', color: COLORS.black },
   row: {
     flexDirection: 'row', alignItems: 'center',
     backgroundColor: COLORS.surface, borderRadius: 12, padding: 12,

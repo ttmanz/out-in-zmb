@@ -17,8 +17,10 @@ const SUBSCRIPTION_EVENTS = new Set(['INITIAL_PURCHASE', 'RENEWAL', 'UNCANCELLAT
 // so an annual purchase isn't shortchanged against monthly renewals of the
 // same tier. Only awarded on an event that means a fresh payment period
 // just started (not UNCANCELLATION or PRODUCT_CHANGE, neither of which
-// necessarily means a new charge happened).
-const TIER_POINTS_PER_MONTH: Record<string, number> = { silver: 20, gold: 50, platinum: 100 };
+// necessarily means a new charge happened). Rate is admin-editable via
+// points_rules (rule_key `subscription_reward_<tier>`), not a constant —
+// these fallbacks only cover a missing/deleted rule row.
+const TIER_POINTS_FALLBACK: Record<string, number> = { silver: 20, gold: 50, platinum: 100 };
 const POINTS_EVENTS = new Set(['INITIAL_PURCHASE', 'RENEWAL']);
 
 Deno.serve(async (req) => {
@@ -78,7 +80,13 @@ Deno.serve(async (req) => {
       .eq('id', userId);
 
     if (POINTS_EVENTS.has(event.type) && plan.tier_key) {
-      const perMonth = TIER_POINTS_PER_MONTH[plan.tier_key as string];
+      const tierKey = plan.tier_key as string;
+      const { data: rule } = await admin
+        .from('points_rules')
+        .select('amount')
+        .eq('rule_key', `subscription_reward_${tierKey}`)
+        .maybeSingle();
+      const perMonth = rule?.amount ?? TIER_POINTS_FALLBACK[tierKey];
       if (perMonth) {
         const amount = perMonth * (plan.duration_months ?? 1);
         await admin
