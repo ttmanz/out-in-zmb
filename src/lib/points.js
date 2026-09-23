@@ -10,6 +10,8 @@ export const REASON_LABEL = {
   referral_welcome_bonus: 'Joined with a friend\'s code',
   profile_completion_bonus: 'Completed your profile',
   subscription_reward: 'Subscriber reward',
+  clip_posted: 'Posted a Clip of the Day',
+  clip_approved_bonus: 'Your clip was approved',
 };
 
 export const getMyPointsBalance = (userId) =>
