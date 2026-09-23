@@ -13,6 +13,14 @@ const json = (body: unknown, status = 200) =>
 
 const SUBSCRIPTION_EVENTS = new Set(['INITIAL_PURCHASE', 'RENEWAL', 'UNCANCELLATION', 'PRODUCT_CHANGE']);
 
+// Subscriber points reward, per month the payment covers — scaled by tier
+// so an annual purchase isn't shortchanged against monthly renewals of the
+// same tier. Only awarded on an event that means a fresh payment period
+// just started (not UNCANCELLATION or PRODUCT_CHANGE, neither of which
+// necessarily means a new charge happened).
+const TIER_POINTS_PER_MONTH: Record<string, number> = { silver: 20, gold: 50, platinum: 100 };
+const POINTS_EVENTS = new Set(['INITIAL_PURCHASE', 'RENEWAL']);
+
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });
 
@@ -31,6 +39,17 @@ Deno.serve(async (req) => {
     Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!,
   );
 
+  // Webhook delivery is at-least-once — a retry resends the same event.
+  // Dedupe on RevenueCat's own event.id before any side effect runs, so a
+  // resend can't double-apply a subscription change or double-pay points.
+  const eventId = event.id as string | undefined;
+  if (eventId) {
+    const { error: dedupeError } = await admin
+      .from('revenuecat_processed_events')
+      .insert({ event_id: eventId });
+    if (dedupeError) return json({ ok: true }); // already processed (or a transient issue) — ack and stop
+  }
+
   const userId = event.app_user_id as string;
   const productId = event.product_id as string | undefined;
 
@@ -44,7 +63,7 @@ Deno.serve(async (req) => {
     const { data: plan } = productId
       ? await admin
           .from('subscription_plans')
-          .select('id')
+          .select('id, tier_key, duration_months')
           .or(`revenuecat_product_id.eq.${productId},venue_revenuecat_product_id.eq.${productId}`)
           .maybeSingle()
       : { data: null };
@@ -57,6 +76,17 @@ Deno.serve(async (req) => {
       .from('profiles')
       .update({ subscription_plan: plan.id, subscription_expires_at: expiresAt })
       .eq('id', userId);
+
+    if (POINTS_EVENTS.has(event.type) && plan.tier_key) {
+      const perMonth = TIER_POINTS_PER_MONTH[plan.tier_key as string];
+      if (perMonth) {
+        const amount = perMonth * (plan.duration_months ?? 1);
+        await admin
+          .from('points_ledger')
+          .insert({ user_id: userId, amount, reason: 'subscription_reward' });
+      }
+    }
+
     return json({ ok: true });
   }
 

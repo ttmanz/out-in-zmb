@@ -9,6 +9,7 @@ export const REASON_LABEL = {
   referral_bonus: 'Friend joined with your code',
   referral_welcome_bonus: 'Joined with a friend\'s code',
   profile_completion_bonus: 'Completed your profile',
+  subscription_reward: 'Subscriber reward',
 };
 
 export const getMyPointsBalance = (userId) =>
