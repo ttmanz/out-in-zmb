@@ -29,6 +29,7 @@ const VenueVouchersScreen = ({ navigation }) => {
   const [venueName, setVenueName] = useState('');
   const [discountLabel, setDiscountLabel] = useState('');
   const [maxRedemptions, setMaxRedemptions] = useState('');
+  const [pointsPrice, setPointsPrice] = useState('');
   const [expiresAt, setExpiresAt] = useState(null);
   const [showPicker, setShowPicker] = useState(false);
   const [creating, setCreating] = useState(false);
@@ -55,6 +56,7 @@ const VenueVouchersScreen = ({ navigation }) => {
       discountLabel: discountLabel.trim(),
       expiresAt: expiresAt ? expiresAt.toISOString() : null,
       maxRedemptions: maxRedemptions.trim() ? parseInt(maxRedemptions, 10) : null,
+      pointsPrice: pointsPrice.trim() ? parseInt(pointsPrice, 10) : null,
     });
     setCreating(false);
     if (error || !data) {
@@ -63,6 +65,7 @@ const VenueVouchersScreen = ({ navigation }) => {
     }
     setDiscountLabel('');
     setMaxRedemptions('');
+    setPointsPrice('');
     setExpiresAt(null);
     setVouchers((prev) => [data, ...prev]);
   };
@@ -152,6 +155,14 @@ const VenueVouchersScreen = ({ navigation }) => {
           placeholderTextColor={COLORS.textMuted}
           keyboardType="number-pad"
         />
+        <TextInput
+          style={styles.input}
+          value={pointsPrice}
+          onChangeText={(v) => setPointsPrice(v.replace(/[^0-9]/g, ''))}
+          placeholder="Points price (optional — lists it in the Rewards catalog)"
+          placeholderTextColor={COLORS.textMuted}
+          keyboardType="number-pad"
+        />
 
         <TouchableOpacity style={styles.input} onPress={() => setShowPicker(true)} activeOpacity={0.7}>
           <Text style={expiresAt ? styles.dateText : styles.datePlaceholder}>
@@ -203,6 +214,9 @@ const VenueVouchersScreen = ({ navigation }) => {
                     <Text style={[styles.status, { color: STATUS_COLOR[status] }]}>{STATUS_LABEL[status]}</Text>
                   </View>
                   <Text style={styles.discount}>{voucher.discount_label}</Text>
+                  {voucher.points_price != null && (
+                    <Text style={styles.pointsBadge}>🏆 {voucher.points_price} pts in Rewards catalog</Text>
+                  )}
                   <Text style={styles.meta}>{voucher.venue_name}</Text>
                   <Text style={styles.meta}>
                     {voucher.redemption_count} redeemed{voucher.max_redemptions != null ? ` / ${voucher.max_redemptions} max` : ''}
@@ -269,6 +283,7 @@ const styles = StyleSheet.create({
   code: { fontSize: 20, fontWeight: '800', color: COLORS.text, letterSpacing: 2 },
   status: { fontSize: 11, fontWeight: '800', letterSpacing: 0.5 },
   discount: { fontSize: 15, fontWeight: '700', color: COLORS.primary, marginBottom: 4 },
+  pointsBadge: { fontSize: 11, fontWeight: '700', color: COLORS.success, marginBottom: 4 },
   meta: { fontSize: 12, color: COLORS.textMuted, marginBottom: 2 },
   actions: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginTop: 12 },
   actionBtn: {

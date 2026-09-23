@@ -1,7 +1,8 @@
 import React, { useState, useCallback } from 'react';
-import { View, Text, FlatList, StyleSheet, ActivityIndicator } from 'react-native';
+import { View, Text, FlatList, TouchableOpacity, StyleSheet, ActivityIndicator } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import { COLORS } from '../../constants/colors';
+import { ROUTES } from '../../constants/routes';
 import { getMyPointsBalance, getMyPointsHistory, REASON_LABEL } from '../../lib/points';
 import { formatAgo } from '../../utils/format';
 import { useUser } from '../../contexts/UserContext';
@@ -40,6 +41,10 @@ const MyPointsScreen = ({ navigation }) => {
         </View>
       </GradientBorder>
 
+      <TouchableOpacity style={styles.rewardsBtn} onPress={() => navigation.navigate(ROUTES.REWARDS)}>
+        <Text style={styles.rewardsBtnText}>🎁 Redeem for a Reward</Text>
+      </TouchableOpacity>
+
       <Text style={styles.sectionLabel}>History</Text>
 
       {loading ? (
@@ -74,6 +79,12 @@ const styles = StyleSheet.create({
   balanceLabel: { fontSize: 13, color: COLORS.textMuted, marginBottom: 6 },
   balanceValue: { fontSize: 44, fontWeight: '800', color: COLORS.primary },
   balanceHint: { fontSize: 12, color: COLORS.textMuted, marginTop: 2 },
+  rewardsBtn: {
+    marginHorizontal: 20, marginBottom: 8,
+    backgroundColor: COLORS.primary, borderRadius: 12,
+    paddingVertical: 13, alignItems: 'center',
+  },
+  rewardsBtnText: { fontSize: 14, fontWeight: '800', color: COLORS.black },
   sectionLabel: {
     fontSize: 13, fontWeight: '700', color: COLORS.primary,
     textTransform: 'uppercase', letterSpacing: 0.8,

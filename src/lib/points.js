@@ -5,6 +5,7 @@ import { supabase } from './supabase';
 
 export const REASON_LABEL = {
   at_venue_checkin: 'Checked in at a venue',
+  voucher_redemption: 'Redeemed a venue voucher',
 };
 
 export const getMyPointsBalance = (userId) =>

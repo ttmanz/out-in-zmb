@@ -13,7 +13,7 @@ export const getMyVouchers = (venueOwnerId) =>
 
 // A voucher code is short and human-typed, so retry on the rare collision
 // rather than relying on a client-generated UUID-grade code.
-export const createVoucher = async (venueOwnerId, { venueName, discountLabel, expiresAt, maxRedemptions }) => {
+export const createVoucher = async (venueOwnerId, { venueName, discountLabel, expiresAt, maxRedemptions, pointsPrice }) => {
   for (let attempt = 0; attempt < 5; attempt += 1) {
     const { data, error } = await supabase
       .from('venue_vouchers')
@@ -24,6 +24,7 @@ export const createVoucher = async (venueOwnerId, { venueName, discountLabel, ex
         code: generateCode(),
         expires_at: expiresAt,
         max_redemptions: maxRedemptions,
+        points_price: pointsPrice ?? null,
       })
       .select()
       .single();
@@ -50,6 +51,33 @@ export const getVoucherByCode = (code) =>
     .select('*, venue_owner:profiles(full_name)')
     .eq('code', code.toUpperCase().trim())
     .maybeSingle();
+
+export const setVoucherPointsPrice = (id, pointsPrice) =>
+  supabase.from('venue_vouchers').update({ points_price: pointsPrice }).eq('id', id);
+
+// Member-facing catalog: every active, points-priced voucher across every
+// venue, cheapest first.
+export const getRedeemableVouchers = () =>
+  supabase
+    .from('venue_vouchers')
+    .select('*')
+    .not('points_price', 'is', null)
+    .eq('is_active', true)
+    .order('points_price', { ascending: true });
+
+// Server-enforced — see redeem_voucher_with_points() in
+// supabase/migrations/20260924020000_points_voucher_redemption.sql. Checks
+// balance, expiry, stock and duplicate-claim atomically; the client can't
+// bypass any of that by calling this with a bad voucher id.
+export const redeemVoucherWithPoints = (voucherId) =>
+  supabase.rpc('redeem_voucher_with_points', { p_voucher_id: voucherId });
+
+export const getMyVoucherRedemptions = (userId) =>
+  supabase
+    .from('voucher_redemptions')
+    .select('id, voucher_id, points_spent, redeemed_at, venue_vouchers(code, venue_name, discount_label)')
+    .eq('user_id', userId)
+    .order('redeemed_at', { ascending: false });
 
 export const getVoucherStatus = (voucher) => {
   if (!voucher) return 'not_found';

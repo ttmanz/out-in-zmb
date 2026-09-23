@@ -43,6 +43,7 @@ export const ROUTES = {
   VENUE_VOUCHERS: 'VenueVouchers',
   CHECK_VOUCHER: 'CheckVoucher',
   MY_POINTS: 'MyPoints',
+  REWARDS: 'Rewards',
   SUBSCRIPTION: 'Subscription',
   PAYWALL: 'Paywall',
   ADMIN_SUBSCRIPTION_PLANS: 'AdminSubscriptionPlans',

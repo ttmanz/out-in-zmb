@@ -23,6 +23,7 @@ import ProfileSettingsScreen from '../screens/main/ProfileSettingsScreen';
 import VenueVouchersScreen from '../screens/main/VenueVouchersScreen';
 import CheckVoucherScreen from '../screens/main/CheckVoucherScreen';
 import MyPointsScreen from '../screens/main/MyPointsScreen';
+import RewardsScreen from '../screens/main/RewardsScreen';
 import OpenChatScreen from '../screens/main/OpenChatScreen';
 import CreateOpenChatScreen from '../screens/main/CreateOpenChatScreen';
 import MemberProfileScreen from '../screens/main/MemberProfileScreen';
@@ -93,6 +94,7 @@ const HomeStackNavigator = () => (
     <HomeStack.Screen name={ROUTES.VENUE_VOUCHERS} component={VenueVouchersScreen} />
     <HomeStack.Screen name={ROUTES.CHECK_VOUCHER} component={CheckVoucherScreen} />
     <HomeStack.Screen name={ROUTES.MY_POINTS} component={MyPointsScreen} />
+    <HomeStack.Screen name={ROUTES.REWARDS} component={RewardsScreen} />
     <HomeStack.Screen name={ROUTES.OPEN_CHAT} component={OpenChatScreen} />
     <HomeStack.Screen name={ROUTES.CREATE_OPEN_CHAT} component={CreateOpenChatScreen} />
     <HomeStack.Screen name={ROUTES.MEMBER_PROFILE} component={MemberProfileScreen} />
