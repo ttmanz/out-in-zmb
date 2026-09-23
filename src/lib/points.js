@@ -8,6 +8,7 @@ export const REASON_LABEL = {
   voucher_redemption: 'Redeemed a venue voucher',
   referral_bonus: 'Friend joined with your code',
   referral_welcome_bonus: 'Joined with a friend\'s code',
+  profile_completion_bonus: 'Completed your profile',
 };
 
 export const getMyPointsBalance = (userId) =>

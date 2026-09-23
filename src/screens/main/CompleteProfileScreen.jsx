@@ -64,6 +64,7 @@ const CompleteProfileScreen = ({ navigation }) => {
   // choice without retroactively blocking anyone who completed their
   // profile before this field existed.
   const [accountTypeTouched, setAccountTypeTouched] = useState(false);
+  const [wasAlreadyCompleted, setWasAlreadyCompleted] = useState(false);
 
   useEffect(() => {
     getSession().then(async ({ data: { session } }) => {
@@ -91,6 +92,7 @@ const CompleteProfileScreen = ({ navigation }) => {
         setInstagram(data.instagram ?? '');
         setAccountType(data.account_type ?? 'member');
         setAccountTypeTouched(data.profile_completed === true);
+        setWasAlreadyCompleted(data.profile_completed === true);
       }
       setLoading(false);
     });
@@ -154,6 +156,9 @@ const CompleteProfileScreen = ({ navigation }) => {
     setSaving(false);
     if (error) { Alert.alert('Error', error.message); return; }
     await refreshProfile();
+    if (!wasAlreadyCompleted) {
+      Alert.alert('Profile complete! 🎉', "You've earned +20 points for finishing your profile.");
+    }
     navigation.goBack();
   };
 
