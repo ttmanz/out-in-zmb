@@ -2,7 +2,7 @@ import React, { createContext, useContext, useState, useEffect, useCallback } fr
 import { Alert } from 'react-native';
 import { getSession, onAuthStateChange, signOut } from '../lib/auth';
 import { getProfile } from '../lib/profile';
-import { subscriptionStatus, getSubscriptionSettings, getSubscriptionPlans, getFeatureAccess, getMyFeatureUnlocks, canAccessFeature, isFeatureEnabled } from '../lib/subscription';
+import { subscriptionStatus, getSubscriptionSettings, getSubscriptionPlans, getFeatureAccess, getMyFeatureUnlocks, canAccessFeature, isFeatureEnabled, resolveTierKey } from '../lib/subscription';
 import { configurePurchases } from '../lib/purchases';
 import { registerForPushNotificationsAsync } from '../lib/pushNotifications';
 
@@ -18,6 +18,7 @@ export const UserProvider = ({ children }) => {
   const [profile, setProfile] = useState(null);
   const [settings, setSettings] = useState(null);
   const [monthlyPlan, setMonthlyPlan] = useState(null);
+  const [plans, setPlans] = useState([]);
   const [featureMap, setFeatureMap] = useState({});
   const [unlockedFeatureKeys, setUnlockedFeatureKeys] = useState(new Set());
 
@@ -31,6 +32,7 @@ export const UserProvider = ({ children }) => {
       userId ? getMyFeatureUnlocks(userId) : Promise.resolve({ data: [] }),
     ]);
     setSettings(settingsData ?? null);
+    setPlans(plansData ?? []);
     setMonthlyPlan((plansData ?? []).find((p) => p.id === 'monthly') ?? null);
     const map = {};
     (featuresData ?? []).forEach((f) => { map[f.feature_key] = f; });
@@ -73,10 +75,11 @@ export const UserProvider = ({ children }) => {
   const refreshFeatureConfig = useCallback(() => refreshAccessConfig(), [refreshAccessConfig]);
 
   const { hasAccess } = subscriptionStatus(profile, settings);
+  const myTier = resolveTierKey(profile, plans);
 
   const checkFeature = useCallback(
-    (featureKey) => canAccessFeature(featureKey, { profile, settings, featureMap, unlockedFeatureKeys }),
-    [profile, settings, featureMap, unlockedFeatureKeys]
+    (featureKey) => canAccessFeature(featureKey, { profile, settings, featureMap, unlockedFeatureKeys, plans }),
+    [profile, settings, featureMap, unlockedFeatureKeys, plans]
   );
 
   const checkFeatureEnabled = useCallback(
@@ -85,7 +88,7 @@ export const UserProvider = ({ children }) => {
   );
 
   return (
-    <UserContext.Provider value={{ profile, refreshProfile, refreshFeatureConfig, hasAccess, canAccessFeature: checkFeature, isFeatureEnabled: checkFeatureEnabled, settings, monthlyPlan }}>
+    <UserContext.Provider value={{ profile, refreshProfile, refreshFeatureConfig, hasAccess, canAccessFeature: checkFeature, isFeatureEnabled: checkFeatureEnabled, settings, monthlyPlan, plans, myTier }}>
       {children}
     </UserContext.Provider>
   );
