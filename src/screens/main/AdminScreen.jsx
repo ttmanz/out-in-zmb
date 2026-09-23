@@ -241,6 +241,14 @@ const AdminScreen = ({ navigation }) => {
           <Text style={styles.navCardEmoji}>📊</Text>
           <Text style={styles.navCardText}>Flagged</Text>
         </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.navCard}
+          onPress={() => navigation.navigate(ROUTES.ADMIN_POINTS)}
+          activeOpacity={0.75}
+        >
+          <Text style={styles.navCardEmoji}>🏆</Text>
+          <Text style={styles.navCardText}>Points</Text>
+        </TouchableOpacity>
       </View>
       <Text style={styles.count}>{members.length} members</Text>
 

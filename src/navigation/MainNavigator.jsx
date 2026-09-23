@@ -65,6 +65,7 @@ import AdminOpenGroupsScreen from '../screens/main/AdminOpenGroupsScreen';
 import AdminAdsScreen from '../screens/main/AdminAdsScreen';
 import AdminAccessControlScreen from '../screens/main/AdminAccessControlScreen';
 import AdminReportsScreen from '../screens/main/AdminReportsScreen';
+import AdminPointsScreen from '../screens/main/AdminPointsScreen';
 import AdminClipsScreen from '../screens/main/AdminClipsScreen';
 import AdminFlaggedMembersScreen from '../screens/main/AdminFlaggedMembersScreen';
 
@@ -149,6 +150,7 @@ const AdminStackNavigator = () => (
     <AdminStack.Screen name={ROUTES.ADMIN_REPORTS} component={AdminReportsScreen} />
     <AdminStack.Screen name={ROUTES.ADMIN_CLIPS} component={AdminClipsScreen} />
     <AdminStack.Screen name={ROUTES.ADMIN_FLAGGED_MEMBERS} component={AdminFlaggedMembersScreen} />
+    <AdminStack.Screen name={ROUTES.ADMIN_POINTS} component={AdminPointsScreen} />
   </AdminStack.Navigator>
 );
 
