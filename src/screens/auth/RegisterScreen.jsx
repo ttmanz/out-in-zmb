@@ -5,6 +5,7 @@ import * as AppleAuthentication from 'expo-apple-authentication';
 import { COLORS } from '../../constants/colors';
 import { ROUTES } from '../../constants/routes';
 import { signUpWithEmail, signInWithGoogle, signInWithApple } from '../../lib/auth';
+import { claimReferral } from '../../lib/referrals';
 import AuthInput from '../../components/auth/AuthInput';
 import SocialButton from '../../components/auth/SocialButton';
 import PrimaryButton from '../../components/common/PrimaryButton';
@@ -52,7 +53,20 @@ const RegisterScreen = ({ navigation }) => {
     setSocialLoading(provider);
     const { error } = await loginFn();
     setSocialLoading(null);
-    if (error) Alert.alert(t('common.error'), error.message);
+    if (error) {
+      Alert.alert(t('common.error'), error.message);
+      return;
+    }
+    // Google/Apple sign-in doesn't carry the referral code entered above the
+    // way email signup does, so claim it as a separate step here. This is
+    // a no-op (server-side, quietly) for a returning user or an empty code —
+    // see claim_referral()'s own guards — so it's safe to always attempt.
+    if (referralCode.trim()) {
+      const { error: referralError } = await claimReferral(referralCode.trim());
+      if (!referralError) {
+        Alert.alert('Bonus unlocked! 🎉', "You and your friend both earned points for the referral.");
+      }
+    }
   };
 
   return (
