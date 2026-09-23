@@ -78,8 +78,8 @@ export const UserProvider = ({ children }) => {
   const myTier = resolveTierKey(profile, plans);
 
   const checkFeature = useCallback(
-    (featureKey) => canAccessFeature(featureKey, { profile, settings, featureMap, unlockedFeatureKeys, plans }),
-    [profile, settings, featureMap, unlockedFeatureKeys, plans]
+    (featureKey) => canAccessFeature(featureKey, { profile, settings, featureMap, unlockedFeatureKeys }),
+    [profile, settings, featureMap, unlockedFeatureKeys]
   );
 
   const checkFeatureEnabled = useCallback(

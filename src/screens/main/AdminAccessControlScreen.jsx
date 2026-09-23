@@ -15,15 +15,9 @@ import BackHeader from '../../components/common/BackHeader';
 // not a Home tab — keep it out of the on/off list.
 const TOGGLEABLE = (f) => f.feature_key !== 'messages';
 
-const TIERS = [
-  { key: 'free', label: 'Free' },
-  { key: 'silver', label: 'Silver' },
-  { key: 'gold', label: 'Gold' },
-  { key: 'platinum', label: 'Platinum' },
-];
-
 const MODES = [
   { key: 'free', label: 'Free', desc: 'Everyone has full access to every feature' },
+  { key: 'levels', label: 'Levels', desc: 'The Free/Silver/Gold/Platinum plan is in effect — daily post limits follow each member\'s tier (set in Plans). No feature is blocked outright; every member keeps full access, same as "Free".' },
   { key: 'free_until', label: 'Free Until…', desc: 'Free for everyone until a set date — after that, any active subscription (any plan, any tier) is required just to post anywhere. The paid list below does not apply in this mode.' },
   { key: 'free_except', label: 'Free Except…', desc: 'Everyone keeps full access, except the paid list below, which costs its one-off price unless subscribed (any plan, any tier)' },
   { key: 'free_except_venue', label: 'Free Except Venue', desc: 'Members keep full free access, same as "Free". Venue accounts get a 30-day trial from signup, then need an active subscription for the whole app. The paid list below does not apply in this mode.' },
@@ -51,7 +45,6 @@ const AdminAccessControlScreen = ({ navigation }) => {
     setFeatures((featureData ?? []).map((f) => ({
       ...f,
       enabled: f.enabled !== false,
-      min_tier: f.min_tier ?? 'free',
       one_off_price_draft: f.one_off_price != null ? String(f.one_off_price) : '',
     })));
     setLoading(false);
@@ -77,7 +70,6 @@ const AdminAccessControlScreen = ({ navigation }) => {
         enabled: f.enabled,
         is_paid: f.is_paid,
         one_off_price: f.is_paid ? (parseFloat(f.one_off_price_draft) || null) : null,
-        min_tier: f.min_tier,
       })
     ));
     setSaving(false);
@@ -180,33 +172,6 @@ const AdminAccessControlScreen = ({ navigation }) => {
           </View>
         ))}
 
-        <Text style={[styles.sectionLabel, { marginTop: 24 }]}>Minimum Tier</Text>
-        <Text style={styles.sectionHint}>
-          Require Silver, Gold, or Platinum to use a feature at all — independent of
-          Subscription Mode above. Applies to everyone except staff/admin, in every mode.
-          Leave at "Free" for no tier requirement.
-        </Text>
-
-        {features.filter(TOGGLEABLE).map((f) => (
-          <View key={`tier-${f.feature_key}`} style={styles.featureRow}>
-            <Text style={styles.featureLabel}>{f.label}</Text>
-            <View style={styles.tierRow}>
-              {TIERS.map((tier) => {
-                const selected = f.min_tier === tier.key;
-                return (
-                  <TouchableOpacity
-                    key={tier.key}
-                    style={[styles.tierChip, selected && styles.tierChipActive]}
-                    onPress={() => setFeatureField(f.feature_key, 'min_tier', tier.key)}
-                  >
-                    <Text style={[styles.tierChipText, selected && styles.tierChipTextActive]}>{tier.label}</Text>
-                  </TouchableOpacity>
-                );
-              })}
-            </View>
-          </View>
-        ))}
-
         <Text style={[styles.sectionLabel, { marginTop: 24 }]}>Paid / Premium Features</Text>
         <Text style={styles.sectionHint}>
           {mode === 'free_except'
@@ -215,7 +180,7 @@ const AdminAccessControlScreen = ({ navigation }) => {
               ? 'Not in effect while mode is "Free Until" — after the date passes, any subscription alone unlocks everything, including these.'
               : mode === 'free_except_venue'
                 ? 'Not in effect while mode is "Free Except Venue" — members stay free, venue accounts are gated by subscription alone.'
-                : 'Not in effect while mode is "Free" — nobody is charged for anything.'}
+                : `Not in effect while mode is "${mode === 'levels' ? 'Levels' : 'Free'}" — nobody is charged for anything.`}
         </Text>
 
         {features.map((f) => (
@@ -312,14 +277,6 @@ const styles = StyleSheet.create({
   paidToggleActive: { backgroundColor: COLORS.primary, borderColor: COLORS.primary },
   paidToggleText: { fontSize: 12, fontWeight: '700', color: COLORS.textMuted },
   paidToggleTextActive: { color: COLORS.black },
-  tierRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginTop: 10 },
-  tierChip: {
-    borderWidth: 1, borderColor: COLORS.borderAccent, borderRadius: 16,
-    paddingHorizontal: 12, paddingVertical: 6,
-  },
-  tierChipActive: { backgroundColor: COLORS.primary, borderColor: COLORS.primary },
-  tierChipText: { fontSize: 12, fontWeight: '700', color: COLORS.textMuted },
-  tierChipTextActive: { color: COLORS.black },
   priceRow: { flexDirection: 'row', alignItems: 'center', marginTop: 10, gap: 6 },
   priceCurrency: { fontSize: 14, color: COLORS.text, fontWeight: '700' },
   priceInput: {

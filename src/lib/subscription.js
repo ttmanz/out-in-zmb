@@ -75,24 +75,14 @@ const hasActivePlan = (profile) => {
   return new Date(profile.subscription_expires_at) > new Date();
 };
 
-// Free < Silver < Gold < Platinum. Mirrors the tier resolution the
-// enforce_daily_post_limit() DB trigger already does: the active plan's
-// tier if one exists and hasn't expired, otherwise 'free'.
-const TIER_ORDER = ['free', 'silver', 'gold', 'platinum'];
-
+// Mirrors the tier resolution the enforce_daily_post_limit() DB trigger
+// already does: the active plan's tier if one exists and hasn't expired,
+// otherwise 'free'. Under 'levels' mode this is what the post-limit
+// trigger keys off of; there's no separate per-feature gate on top of it.
 export const resolveTierKey = (profile, plans) => {
   if (!hasActivePlan(profile)) return 'free';
   const plan = plans?.find((p) => p.id === profile.subscription_plan);
   return plan?.tier_key ?? 'free';
-};
-
-export const tierLabel = (tierKey) => tierKey ? tierKey.charAt(0).toUpperCase() + tierKey.slice(1) : 'Free';
-
-const meetsMinTier = (tierKey, minTier) => {
-  const have = TIER_ORDER.indexOf(tierKey);
-  const need = TIER_ORDER.indexOf(minTier ?? 'free');
-  if (have === -1 || need === -1) return true; // unrecognized tier key — don't block on it
-  return have >= need;
 };
 
 // Under 'free_except_venue' mode only: venue accounts get a trial window
@@ -126,19 +116,16 @@ const isVenueLocked = (profile) =>
 // - 'free_except_venue': members have full free access, same as 'free'.
 //   Venue accounts (account_type = 'venue_owner') get a 30-day trial from
 //   signup, then need an active subscription for the whole app.
-export const canAccessFeature = (featureKey, { profile, settings, featureMap, unlockedFeatureKeys, plans }) => {
+// - 'levels': the Free/Silver/Gold/Platinum plan is in effect, but the only
+//   thing that differs by tier is the daily post limit (enforced by the
+//   enforce_daily_post_limit() DB trigger, independent of this mode) — no
+//   feature is blocked outright, same as 'free'.
+export const canAccessFeature = (featureKey, { profile, settings, featureMap, unlockedFeatureKeys }) => {
   // Admin-disabled feature: hidden for everyone, staff/admin included.
   const feature = featureMap?.[featureKey];
   if (feature?.enabled === false) return { allowed: false, disabled: true };
 
   if (isBypassRole(profile)) return { allowed: true };
-
-  // Tier gate applies regardless of subscription mode — a feature can
-  // require e.g. Gold+ even while mode is 'free' for everything else.
-  const tierKey = resolveTierKey(profile, plans);
-  if (feature?.min_tier && feature.min_tier !== 'free' && !meetsMinTier(tierKey, feature.min_tier)) {
-    return { allowed: false, tierLocked: true, minTier: feature.min_tier, tierKey };
-  }
 
   const mode = settings?.mode ?? 'free';
 
@@ -147,7 +134,7 @@ export const canAccessFeature = (featureKey, { profile, settings, featureMap, un
     return isVenueLocked(profile) ? { allowed: false, venueLocked: true } : { allowed: true };
   }
 
-  if (mode === 'free') return { allowed: true };
+  if (mode === 'free' || mode === 'levels') return { allowed: true };
 
   if (mode === 'free_until') {
     const stillFree = settings?.free_until && new Date(settings.free_until) > new Date();
