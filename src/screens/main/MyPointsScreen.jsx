@@ -41,9 +41,14 @@ const MyPointsScreen = ({ navigation }) => {
         </View>
       </GradientBorder>
 
-      <TouchableOpacity style={styles.rewardsBtn} onPress={() => navigation.navigate(ROUTES.REWARDS)}>
-        <Text style={styles.rewardsBtnText}>🎁 Redeem for a Reward</Text>
-      </TouchableOpacity>
+      <View style={styles.actionRow}>
+        <TouchableOpacity style={[styles.rewardsBtn, styles.actionHalf]} onPress={() => navigation.navigate(ROUTES.REWARDS)}>
+          <Text style={styles.rewardsBtnText}>🎁 Rewards</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={[styles.inviteBtn, styles.actionHalf]} onPress={() => navigation.navigate(ROUTES.INVITE_FRIENDS)}>
+          <Text style={styles.inviteBtnText}>👥 Invite Friends</Text>
+        </TouchableOpacity>
+      </View>
 
       <Text style={styles.sectionLabel}>History</Text>
 
@@ -79,12 +84,18 @@ const styles = StyleSheet.create({
   balanceLabel: { fontSize: 13, color: COLORS.textMuted, marginBottom: 6 },
   balanceValue: { fontSize: 44, fontWeight: '800', color: COLORS.primary },
   balanceHint: { fontSize: 12, color: COLORS.textMuted, marginTop: 2 },
+  actionRow: { flexDirection: 'row', gap: 10, marginHorizontal: 20, marginBottom: 8 },
+  actionHalf: { flex: 1 },
   rewardsBtn: {
-    marginHorizontal: 20, marginBottom: 8,
     backgroundColor: COLORS.primary, borderRadius: 12,
     paddingVertical: 13, alignItems: 'center',
   },
-  rewardsBtnText: { fontSize: 14, fontWeight: '800', color: COLORS.black },
+  rewardsBtnText: { fontSize: 13, fontWeight: '800', color: COLORS.black },
+  inviteBtn: {
+    borderWidth: 1, borderColor: COLORS.primary, borderRadius: 12,
+    paddingVertical: 13, alignItems: 'center',
+  },
+  inviteBtnText: { fontSize: 13, fontWeight: '800', color: COLORS.primary },
   sectionLabel: {
     fontSize: 13, fontWeight: '700', color: COLORS.primary,
     textTransform: 'uppercase', letterSpacing: 0.8,

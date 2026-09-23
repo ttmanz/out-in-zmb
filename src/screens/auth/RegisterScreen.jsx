@@ -24,6 +24,7 @@ const RegisterScreen = ({ navigation }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [referralCode, setReferralCode] = useState('');
   const [fieldError, setFieldError] = useState('');
   const [loading, setLoading] = useState(false);
   const [socialLoading, setSocialLoading] = useState(null);
@@ -33,7 +34,7 @@ const RegisterScreen = ({ navigation }) => {
     if (error) { setFieldError(error); return; }
     setFieldError('');
     setLoading(true);
-    const { error: authError } = await signUpWithEmail(email, password, fullName);
+    const { error: authError } = await signUpWithEmail(email, password, fullName, referralCode);
     setLoading(false);
     if (authError) {
       Alert.alert(t('auth.errors.registerFailed'), authError.message);
@@ -87,6 +88,13 @@ const RegisterScreen = ({ navigation }) => {
         value={confirmPassword}
         onChangeText={setConfirmPassword}
         secureTextEntry
+      />
+      <AuthInput
+        label={t('auth.referralCode')}
+        placeholder={t('auth.referralCodePlaceholder')}
+        value={referralCode}
+        onChangeText={(v) => setReferralCode(v.toUpperCase())}
+        autoCapitalize="characters"
       />
 
       <PrimaryButton label={t('auth.register')} onPress={handleRegister} loading={loading} />

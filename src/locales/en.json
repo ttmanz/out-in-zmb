@@ -81,6 +81,8 @@
     "passwordPlaceholder": "Enter your password",
     "confirmPasswordPlaceholder": "Confirm your password",
     "fullNamePlaceholder": "Enter your full name",
+    "referralCode": "Referral Code (optional)",
+    "referralCodePlaceholder": "Got a friend's code? Enter it here",
     "registerSuccess": "Account created! Please check your email.",
     "errors": {
       "invalidEmail": "Please enter a valid email",

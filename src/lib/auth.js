@@ -34,11 +34,11 @@ const oauthSignIn = async (provider) => {
 export const signInWithEmail = (email, password) =>
   supabase.auth.signInWithPassword({ email, password });
 
-export const signUpWithEmail = (email, password, fullName) =>
+export const signUpWithEmail = (email, password, fullName, referralCode) =>
   supabase.auth.signUp({
     email,
     password,
-    options: { data: { full_name: fullName } },
+    options: { data: { full_name: fullName, referral_code: referralCode?.trim() || undefined } },
   });
 
 export const signInWithGoogle = () => oauthSignIn('google');

@@ -44,6 +44,7 @@ export const ROUTES = {
   CHECK_VOUCHER: 'CheckVoucher',
   MY_POINTS: 'MyPoints',
   REWARDS: 'Rewards',
+  INVITE_FRIENDS: 'InviteFriends',
   SUBSCRIPTION: 'Subscription',
   PAYWALL: 'Paywall',
   ADMIN_SUBSCRIPTION_PLANS: 'AdminSubscriptionPlans',
