@@ -59,4 +59,7 @@ export const ROUTES = {
   ADMIN_REPORTS: 'AdminReports',
   ADMIN_FLAGGED_MEMBERS: 'AdminFlaggedMembers',
   ADMIN_POINTS: 'AdminPoints',
+  MY_CASHBACK: 'MyCashback',
+  VENUE_CASHBACK: 'VenueCashback',
+  ADMIN_CASHBACK: 'AdminCashback',
 };

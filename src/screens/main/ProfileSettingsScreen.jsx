@@ -222,6 +222,34 @@ const ProfileSettingsScreen = ({ navigation }) => {
           </TouchableOpacity>
         )}
 
+        {myProfile?.account_type === 'venue_owner' ? (
+          <TouchableOpacity
+            style={styles.editProfileBtn}
+            onPress={() => navigation.navigate(ROUTES.VENUE_CASHBACK)}
+            activeOpacity={0.8}
+          >
+            <Text style={styles.editProfileEmoji}>💸</Text>
+            <View style={styles.editProfileText}>
+              <Text style={styles.editProfileLabel}>Report Cash Back</Text>
+              <Text style={styles.editProfileDesc}>Give customers real cash back on their spend</Text>
+            </View>
+            <Text style={styles.editProfileChevron}>›</Text>
+          </TouchableOpacity>
+        ) : (
+          <TouchableOpacity
+            style={styles.editProfileBtn}
+            onPress={() => navigation.navigate(ROUTES.MY_CASHBACK)}
+            activeOpacity={0.8}
+          >
+            <Text style={styles.editProfileEmoji}>💸</Text>
+            <View style={styles.editProfileText}>
+              <Text style={styles.editProfileLabel}>Cash Back</Text>
+              <Text style={styles.editProfileDesc}>Real money back when you spend at partner venues</Text>
+            </View>
+            <Text style={styles.editProfileChevron}>›</Text>
+          </TouchableOpacity>
+        )}
+
         <TouchableOpacity
           style={styles.editProfileBtn}
           onPress={() => navigation.navigate(ROUTES.CHECK_VOUCHER)}

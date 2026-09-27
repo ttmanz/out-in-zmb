@@ -23,6 +23,8 @@ import ProfileSettingsScreen from '../screens/main/ProfileSettingsScreen';
 import VenueVouchersScreen from '../screens/main/VenueVouchersScreen';
 import CheckVoucherScreen from '../screens/main/CheckVoucherScreen';
 import MyPointsScreen from '../screens/main/MyPointsScreen';
+import MyCashbackScreen from '../screens/main/MyCashbackScreen';
+import VenueCashbackScreen from '../screens/main/VenueCashbackScreen';
 import RewardsScreen from '../screens/main/RewardsScreen';
 import InviteFriendsScreen from '../screens/main/InviteFriendsScreen';
 import OpenChatScreen from '../screens/main/OpenChatScreen';
@@ -68,6 +70,7 @@ import AdminAdsScreen from '../screens/main/AdminAdsScreen';
 import AdminAccessControlScreen from '../screens/main/AdminAccessControlScreen';
 import AdminReportsScreen from '../screens/main/AdminReportsScreen';
 import AdminPointsScreen from '../screens/main/AdminPointsScreen';
+import AdminCashbackScreen from '../screens/main/AdminCashbackScreen';
 import AdminClipsScreen from '../screens/main/AdminClipsScreen';
 import AdminFlaggedMembersScreen from '../screens/main/AdminFlaggedMembersScreen';
 
@@ -95,6 +98,8 @@ const HomeStackNavigator = () => (
     <HomeStack.Screen name={ROUTES.VENUE_VOUCHERS} component={VenueVouchersScreen} />
     <HomeStack.Screen name={ROUTES.CHECK_VOUCHER} component={CheckVoucherScreen} />
     <HomeStack.Screen name={ROUTES.MY_POINTS} component={MyPointsScreen} />
+    <HomeStack.Screen name={ROUTES.MY_CASHBACK} component={MyCashbackScreen} />
+    <HomeStack.Screen name={ROUTES.VENUE_CASHBACK} component={VenueCashbackScreen} />
     <HomeStack.Screen name={ROUTES.REWARDS} component={RewardsScreen} />
     <HomeStack.Screen name={ROUTES.INVITE_FRIENDS} component={InviteFriendsScreen} />
     <HomeStack.Screen name={ROUTES.OPEN_CHAT} component={OpenChatScreen} />
@@ -155,6 +160,7 @@ const AdminStackNavigator = () => (
     <AdminStack.Screen name={ROUTES.ADMIN_CLIPS} component={AdminClipsScreen} />
     <AdminStack.Screen name={ROUTES.ADMIN_FLAGGED_MEMBERS} component={AdminFlaggedMembersScreen} />
     <AdminStack.Screen name={ROUTES.ADMIN_POINTS} component={AdminPointsScreen} />
+    <AdminStack.Screen name={ROUTES.ADMIN_CASHBACK} component={AdminCashbackScreen} />
   </AdminStack.Navigator>
 );
 
