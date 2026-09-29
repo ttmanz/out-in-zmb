@@ -11,7 +11,7 @@ import {
   getMyCashbackBalances, getMyCashbackHistory, getMyCashbackPayoutRequests, requestCashbackPayout, listPayoutMethods,
   getMyCashbackClaims, cancelCashbackClaim, getMyVenueCredits, requestCreditRedemption,
   getMyPendingCreditRedemptions, cancelCreditRedemption,
-  formatAmount, participationSummary, CASHBACK_REASON_LABEL, CLAIM_STATUS_LABEL, REWARD_LABEL,
+  formatAmount, CASHBACK_REASON_LABEL, CLAIM_STATUS_LABEL, REWARD_LABEL,
 } from '../../lib/cashback';
 import { formatAgo } from '../../utils/format';
 import { useUser } from '../../contexts/UserContext';
@@ -168,10 +168,6 @@ const MyCashbackScreen = ({ navigation }) => {
           <Text style={styles.outlineBtnText}>💸 Cash out</Text>
         </TouchableOpacity>
       </View>
-
-      <TouchableOpacity style={styles.participationLink} onPress={() => navigation.navigate(ROUTES.PARTICIPATION)}>
-        <Text style={styles.participationText}>Your rewards: {participationSummary(profile?.participation)} ›</Text>
-      </TouchableOpacity>
 
       <FlatList
         data={history}
@@ -402,8 +398,6 @@ const styles = StyleSheet.create({
   outlineBtn: { borderWidth: 1, borderColor: COLORS.primary, borderRadius: 12, paddingVertical: 13, alignItems: 'center' },
   outlineBtnText: { fontSize: 13, fontWeight: '800', color: COLORS.primary },
   btnDisabled: { opacity: 0.4 },
-  participationLink: { marginHorizontal: 20, marginBottom: 4 },
-  participationText: { fontSize: 12, fontWeight: '700', color: COLORS.textSecondary },
   sectionLabel: {
     fontSize: 13, fontWeight: '700', color: COLORS.primary,
     textTransform: 'uppercase', letterSpacing: 0.8,

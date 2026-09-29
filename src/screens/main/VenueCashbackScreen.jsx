@@ -7,9 +7,9 @@ import { KeyboardAvoidingView } from 'react-native-keyboard-controller';
 import { useFocusEffect } from '@react-navigation/native';
 import { COLORS } from '../../constants/colors';
 import {
-  getCountries, getMyVenueApproval, getMyVenueOffer, setVenueCashbackOffer, getCashbackSettings, getVenueClaims, resolveCashbackClaim,
+  getCountries, getMyVenueStatus, getMyVenueOffer, setVenueCashbackOffer, getCashbackSettings, getVenueClaims, resolveCashbackClaim,
   getVenuePendingRedemptions, resolveCreditRedemption, getVenueCreditOutstanding,
-  formatAmount, CLAIM_STATUS_LABEL, REWARD_LABEL,
+  formatAmount, PARTICIPATION_OPTIONS, CLAIM_STATUS_LABEL, REWARD_LABEL,
 } from '../../lib/cashback';
 import { getSignedUrl } from '../../lib/storage';
 import { useUser } from '../../contexts/UserContext';
@@ -21,9 +21,8 @@ const STATUS_COLOR = { confirmed: COLORS.success, rejected: COLORS.error, cancel
 
 const VenueCashbackScreen = ({ navigation }) => {
   const { profile } = useUser();
-  const [cashDraft, setCashDraft] = useState('');
-  const [creditDraft, setCreditDraft] = useState('');
-  const [discountDraft, setDiscountDraft] = useState('');
+  const [offered, setOffered] = useState([]);
+  const [percents, setPercents] = useState({ cash: '', credit: '', discount: '' });
   const [approved, setApproved] = useState(true);
   const [countries, setCountries] = useState([]);
   const [countryCode, setCountryCode] = useState(null);
@@ -41,9 +40,9 @@ const VenueCashbackScreen = ({ navigation }) => {
   const load = useCallback(async () => {
     if (!profile?.id) return;
     setLoading(true);
-    const [countriesRes, approvalRes, offerRes, settingsRes, claimsRes, redemptionsRes, outstandingRes] = await Promise.all([
+    const [countriesRes, statusRes, offerRes, settingsRes, claimsRes, redemptionsRes, outstandingRes] = await Promise.all([
       getCountries(),
-      getMyVenueApproval(profile.id),
+      getMyVenueStatus(profile.id),
       getMyVenueOffer(profile.id),
       getCashbackSettings(),
       getVenueClaims(profile.id),
@@ -53,10 +52,14 @@ const VenueCashbackScreen = ({ navigation }) => {
     const claimsData = claimsRes.data ?? [];
     setCountries((countriesRes.data ?? []).filter((c) => c.is_active));
     setCountryCode(offerRes.data?.country_code ?? null);
-    setApproved(approvalRes.data?.venue_approved === true);
-    setCashDraft(String(offerRes.data?.cash_percent ?? 0));
-    setCreditDraft(String(offerRes.data?.credit_percent ?? 0));
-    setDiscountDraft(String(offerRes.data?.discount_percent ?? 0));
+    setApproved(statusRes.data?.venue_approved === true);
+    setOffered(statusRes.data?.participation ?? []);
+    const show = (n) => (Number(n) > 0 ? String(n) : '');
+    setPercents({
+      cash: show(offerRes.data?.cash_percent),
+      credit: show(offerRes.data?.credit_percent),
+      discount: show(offerRes.data?.discount_percent),
+    });
     setMaxCash(Number(settingsRes.data?.max_cash_percent ?? 0));
     setClaims(claimsData);
     setRedemptions(redemptionsRes.data ?? []);
@@ -77,12 +80,18 @@ const VenueCashbackScreen = ({ navigation }) => {
     if (!countryCode) return Alert.alert('Choose your country', 'Your country sets the currency your customers\' rewards are in.');
     setSavingOffer(true);
     const { error } = await setVenueCashbackOffer(
-      parseFloat(cashDraft) || 0, parseFloat(creditDraft) || 0, parseFloat(discountDraft) || 0, countryCode,
+      parseFloat(percents.cash) || 0, parseFloat(percents.credit) || 0, parseFloat(percents.discount) || 0,
+      countryCode, offered,
     );
     setSavingOffer(false);
     if (error) return Alert.alert('Error', error.message ?? 'Could not save your offer.');
     Alert.alert('Saved', 'Your offer is live. Customers will see it when they claim at your venue.');
   };
+
+  const toggleOffered = (key) =>
+    setOffered((prev) => PARTICIPATION_OPTIONS.map((o) => o.key).filter((k) => (k === key ? !prev.includes(k) : prev.includes(k))));
+
+  const percentLabel = { cash: 'Cash back %  (up to ' + maxCash + '%)', credit: 'Store credit %', discount: 'Discount %' };
 
   const resolve = async (id, action) => {
     setBusyId(id);
@@ -155,8 +164,9 @@ const VenueCashbackScreen = ({ navigation }) => {
 
         <Text style={styles.sectionLabel}>Your offer</Text>
         <Text style={styles.sectionHint}>
-          Choose any mix of rewards; set one to 0 to not offer it. Cash back (up to {maxCash}%) is paid to the customer
-          in money. Store credit can only be spent at your venue. A discount comes off the customer's bill at the till.
+          Tick the rewards you take part in, then give each a percentage. Customers only see what you tick. Cash back
+          is paid to the customer in money, store credit can only be spent at your venue, and a discount comes off
+          the customer's bill at the till.
         </Text>
         <Text style={styles.fieldLabel}>Your country</Text>
         <TouchableOpacity style={styles.countryBtn} onPress={() => setShowCountries(true)} activeOpacity={0.8}>
@@ -167,35 +177,35 @@ const VenueCashbackScreen = ({ navigation }) => {
         <Text style={styles.sectionHint}>
           It sets the currency for your customers' rewards and can't be changed once customers have claimed with you.
         </Text>
-        <View style={styles.offerRow}>
-          <View style={styles.offerField}>
-            <Text style={styles.fieldLabel}>Cash back %</Text>
-            <TextInput
-              style={styles.offerInput}
-              value={cashDraft}
-              onChangeText={(v) => setCashDraft(v.replace(/[^0-9.]/g, ''))}
-              keyboardType="decimal-pad"
-            />
-          </View>
-          <View style={styles.offerField}>
-            <Text style={styles.fieldLabel}>Credit %</Text>
-            <TextInput
-              style={styles.offerInput}
-              value={creditDraft}
-              onChangeText={(v) => setCreditDraft(v.replace(/[^0-9.]/g, ''))}
-              keyboardType="decimal-pad"
-            />
-          </View>
-          <View style={styles.offerField}>
-            <Text style={styles.fieldLabel}>Discount %</Text>
-            <TextInput
-              style={styles.offerInput}
-              value={discountDraft}
-              onChangeText={(v) => setDiscountDraft(v.replace(/[^0-9.]/g, ''))}
-              keyboardType="decimal-pad"
-            />
-          </View>
-        </View>
+        <Text style={[styles.fieldLabel, { marginTop: 10 }]}>Participation</Text>
+        {PARTICIPATION_OPTIONS.map((o) => {
+          const on = offered.includes(o.key);
+          return (
+            <View key={o.key} style={[styles.rewardCard, on && styles.rewardCardOn]}>
+              <TouchableOpacity style={styles.rewardTop} onPress={() => toggleOffered(o.key)} activeOpacity={0.85}>
+                <Text style={styles.rewardEmoji}>{o.emoji}</Text>
+                <View style={styles.rewardText}>
+                  <Text style={styles.rewardTitle}>{o.label}</Text>
+                  <Text style={styles.rewardDesc}>{o.desc}</Text>
+                </View>
+                <Text style={[styles.box, on && styles.boxOn]}>{on ? '✓' : ''}</Text>
+              </TouchableOpacity>
+              {on && (
+                <View style={styles.percentRow}>
+                  <Text style={styles.fieldLabel}>{percentLabel[o.key]}</Text>
+                  <TextInput
+                    style={styles.offerInput}
+                    value={percents[o.key]}
+                    onChangeText={(v) => setPercents((p) => ({ ...p, [o.key]: v.replace(/[^0-9.]/g, '') }))}
+                    keyboardType="decimal-pad"
+                    placeholder="e.g. 5"
+                    placeholderTextColor={COLORS.textMuted}
+                  />
+                </View>
+              )}
+            </View>
+          );
+        })}
         <TouchableOpacity style={styles.saveBtn} onPress={handleSaveOffer} disabled={savingOffer}>
           {savingOffer ? <ActivityIndicator color={COLORS.black} /> : <Text style={styles.saveBtnText}>Save offer</Text>}
         </TouchableOpacity>
@@ -333,8 +343,22 @@ const styles = StyleSheet.create({
     textTransform: 'uppercase', letterSpacing: 0.8, marginBottom: 6,
   },
   sectionHint: { fontSize: 12, color: COLORS.textMuted, marginBottom: 14, lineHeight: 17 },
-  offerRow: { flexDirection: 'row', gap: 10, marginBottom: 10 },
-  offerField: { flex: 1 },
+  rewardCard: {
+    backgroundColor: COLORS.surface, borderRadius: 12, padding: 12, marginBottom: 8,
+    borderWidth: 1, borderColor: COLORS.border,
+  },
+  rewardCardOn: { borderColor: COLORS.borderAccent },
+  rewardTop: { flexDirection: 'row', alignItems: 'center' },
+  rewardEmoji: { fontSize: 22, marginRight: 10 },
+  rewardText: { flex: 1 },
+  rewardTitle: { fontSize: 14, fontWeight: '700', color: COLORS.text },
+  rewardDesc: { fontSize: 11, color: COLORS.textLight, marginTop: 2, lineHeight: 15 },
+  box: {
+    width: 24, height: 24, borderRadius: 7, borderWidth: 1.5, borderColor: COLORS.borderAccent,
+    textAlign: 'center', lineHeight: 21, fontSize: 15, fontWeight: '800', color: COLORS.black, overflow: 'hidden',
+  },
+  boxOn: { backgroundColor: COLORS.primary },
+  percentRow: { marginTop: 10 },
   fieldLabel: { fontSize: 12, color: COLORS.textMuted, marginBottom: 4 },
   offerInput: {
     borderWidth: 1, borderColor: COLORS.borderAccent, borderRadius: 10,

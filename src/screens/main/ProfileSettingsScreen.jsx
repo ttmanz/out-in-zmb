@@ -251,7 +251,7 @@ const ProfileSettingsScreen = ({ navigation }) => {
           </TouchableOpacity>
         )}
 
-        {myProfile?.account_type !== 'venue_owner' && (
+        {myProfile?.account_type === 'venue_owner' && (
           <TouchableOpacity
             style={styles.editProfileBtn}
             onPress={() => navigation.navigate(ROUTES.PARTICIPATION)}

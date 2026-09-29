@@ -60,7 +60,7 @@ const CompleteProfileScreen = ({ navigation }) => {
   const [phone, setPhone] = useState('');
   const [instagram, setInstagram] = useState('');
   const [accountType, setAccountType] = useState('member');
-  const [participation, setParticipation] = useState(ALL_REWARDS);
+  const [participation, setParticipation] = useState([]);
   // profiles.account_type defaults to 'member' in the database, so the
   // loaded value is never actually empty — this tracks whether the person
   // has deliberately picked one, so first-time setup can require a real
@@ -94,7 +94,7 @@ const CompleteProfileScreen = ({ navigation }) => {
         setPhone(data.phone ?? '');
         setInstagram(data.instagram ?? '');
         setAccountType(data.account_type ?? 'member');
-        setParticipation(data.participation ?? ALL_REWARDS);
+        setParticipation(data.participation ?? []);
         setAccountTypeTouched(data.profile_completed === true);
         setWasAlreadyCompleted(data.profile_completed === true);
       }
@@ -159,7 +159,7 @@ const CompleteProfileScreen = ({ navigation }) => {
       phone: phone.trim(),
       instagram: instagram.trim().replace(/^@/, ''),
       account_type: accountType,
-      participation: accountType === 'venue_owner' ? null : participation,
+      participation: accountType === 'venue_owner' ? participation : null,
     });
     setSaving(false);
     if (error) { Alert.alert('Error', error.message); return; }
@@ -223,8 +223,8 @@ const CompleteProfileScreen = ({ navigation }) => {
           </View>
         </Field>
 
-        {accountType !== 'venue_owner' && (
-          <Field label="Rewards you'd like" hint="you can change this any time under Participation">
+        {accountType === 'venue_owner' && (
+          <Field label="Rewards you'll offer" hint="you set the percentages later under Cash Back & Credit">
             <View style={styles.chipRow}>
               {PARTICIPATION_OPTIONS.map((o) => {
                 const active = participation.includes(o.key);

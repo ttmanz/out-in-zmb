@@ -7,7 +7,6 @@ import { KeyboardAvoidingView } from 'react-native-keyboard-controller';
 import { useFocusEffect } from '@react-navigation/native';
 import * as ImagePicker from 'expo-image-picker';
 import { COLORS } from '../../constants/colors';
-import { ROUTES } from '../../constants/routes';
 import { getCashbackVenues, submitCashbackClaim, formatAmount } from '../../lib/cashback';
 import { uploadReceipt } from '../../lib/storage';
 import { resizeForUpload } from '../../lib/imageResize';
@@ -47,27 +46,11 @@ const SubmitReceiptScreen = ({ navigation }) => {
   useFocusEffect(useCallback(() => { load(); }, [load]));
 
   const venue = useMemo(() => venues.find((v) => v.venue_owner_id === venueId) ?? null, [venues, venueId]);
-  // Members only see the rewards they opted into (null = not chosen yet, so everything).
-  const participation = profile?.participation ?? null;
-  const offers = useMemo(
-    () => offersFor(venue).filter((o) => !participation || participation.includes(o.type)),
-    [venue, participation],
-  );
+  const offers = useMemo(() => offersFor(venue), [venue]);
 
   const chooseVenue = (v) => {
-    const list = offersFor(v).filter((o) => !participation || participation.includes(o.type));
-    if (list.length === 0) {
-      Alert.alert(
-        'Not in your participation',
-        `${v.venue_name} only offers rewards you haven't opted into.`,
-        [
-          { text: 'Not now', style: 'cancel' },
-          { text: 'Update participation', onPress: () => navigation.navigate(ROUTES.PARTICIPATION) },
-        ],
-      );
-      return;
-    }
     setVenueId(v.venue_owner_id);
+    const list = offersFor(v);
     setRewardType(list.length === 1 ? list[0].type : null);
   };
 
@@ -134,24 +117,6 @@ const SubmitReceiptScreen = ({ navigation }) => {
       <BackHeader title="Submit a Receipt" onBack={() => navigation.goBack()} />
 
       <ScrollView contentContainerStyle={styles.scroll} keyboardShouldPersistTaps="handled">
-        {(participation === null || participation.length === 0) && (
-          <GradientBorder radius={14} style={styles.noticeOuter}>
-            <View style={styles.notice}>
-              <Text style={styles.noticeTitle}>
-                {participation === null ? 'Choose which rewards you want' : 'You\'ve opted out of rewards'}
-              </Text>
-              <Text style={styles.noticeText}>
-                {participation === null
-                  ? 'Pick cash back, store credit and/or discounts once and you\'ll only be offered those.'
-                  : 'Turn on at least one reward in your participation to claim at venues.'}
-              </Text>
-              <TouchableOpacity onPress={() => navigation.navigate(ROUTES.PARTICIPATION)}>
-                <Text style={styles.noticeLink}>Choose now ›</Text>
-              </TouchableOpacity>
-            </View>
-          </GradientBorder>
-        )}
-
         <Text style={styles.sectionLabel}>Where did you spend?</Text>
         {loading ? (
           <ActivityIndicator color={COLORS.primary} style={{ marginVertical: 16 }} />
@@ -160,12 +125,10 @@ const SubmitReceiptScreen = ({ navigation }) => {
         ) : (
           venues.map((v) => {
             const selected = v.venue_owner_id === venueId;
-            const wanted = (type) => !participation || participation.includes(type);
             const parts = [];
-            if (Number(v.cash_percent) > 0 && wanted('cash')) parts.push(`${Number(v.cash_percent)}% cash back`);
-            if (Number(v.credit_percent) > 0 && wanted('credit')) parts.push(`${Number(v.credit_percent)}% store credit`);
-            if (Number(v.discount_percent) > 0 && wanted('discount')) parts.push(`${Number(v.discount_percent)}% off your bill`);
-            if (parts.length === 0) parts.push('Rewards you haven\'t opted into');
+            if (Number(v.cash_percent) > 0) parts.push(`${Number(v.cash_percent)}% cash back`);
+            if (Number(v.credit_percent) > 0) parts.push(`${Number(v.credit_percent)}% store credit`);
+            if (Number(v.discount_percent) > 0) parts.push(`${Number(v.discount_percent)}% off your bill`);
             return (
               <TouchableOpacity
                 key={v.venue_owner_id}
@@ -268,11 +231,6 @@ const styles = StyleSheet.create({
     textTransform: 'uppercase', letterSpacing: 0.8, marginTop: 18, marginBottom: 8,
   },
   empty: { fontSize: 14, color: COLORS.textMuted },
-  noticeOuter: { marginTop: 4 },
-  notice: { backgroundColor: COLORS.surface, borderRadius: 13.5, padding: 14 },
-  noticeTitle: { fontSize: 14, fontWeight: '800', color: COLORS.textSecondary, marginBottom: 4 },
-  noticeText: { fontSize: 12, color: COLORS.textLight, lineHeight: 17 },
-  noticeLink: { fontSize: 13, fontWeight: '800', color: COLORS.primary, marginTop: 8 },
   optionRow: {
     flexDirection: 'row', alignItems: 'center',
     backgroundColor: COLORS.surface, borderRadius: 12, padding: 14, marginBottom: 8,

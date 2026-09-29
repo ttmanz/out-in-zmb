@@ -10,8 +10,8 @@ export const getProfile = (userId) =>
 export const updateProfileSettings = (userId, { visibility, allow_friend_requests, full_name, venue_visibility, push_notifications_enabled }) =>
   supabase.from('profiles').update({ visibility, allow_friend_requests, full_name, venue_visibility, push_notifications_enabled }).eq('id', userId);
 
-// Which rewards the member wants from venues (cash, credit, discount). Null =
-// not chosen yet, empty = opted out. The server enforces it on every claim.
+// Which rewards a venue owner takes part in (cash, credit, discount). Customers
+// are only offered ticked rewards, and the server enforces it on every claim.
 export const setParticipation = (userId, participation) =>
   supabase.from('profiles').update({ participation }).eq('id', userId);
 

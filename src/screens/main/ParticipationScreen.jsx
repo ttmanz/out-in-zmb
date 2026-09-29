@@ -11,7 +11,7 @@ const ALL_KEYS = PARTICIPATION_OPTIONS.map((o) => o.key);
 
 const ParticipationScreen = ({ navigation }) => {
   const { profile, refreshProfile } = useUser();
-  const [selected, setSelected] = useState(profile?.participation ?? ALL_KEYS);
+  const [selected, setSelected] = useState(profile?.participation ?? []);
   const [saving, setSaving] = useState(false);
 
   const toggle = (key) =>
@@ -39,7 +39,8 @@ const ParticipationScreen = ({ navigation }) => {
 
       <ScrollView contentContainerStyle={styles.scroll}>
         <Text style={styles.intro}>
-          Choose the rewards you'd like from venues. You'll only be offered the ones you tick, and you can change this any time.
+          Choose which rewards your venue offers. Customers only see the ones you tick. You set the percentage for each
+          under Cash Back & Credit, and you can change this any time.
         </Text>
 
         {PARTICIPATION_OPTIONS.map((o) => {
@@ -62,7 +63,7 @@ const ParticipationScreen = ({ navigation }) => {
 
         {selected.length === 0 && (
           <Text style={styles.warning}>
-            With nothing ticked you won't be able to claim any rewards at venues.
+            With nothing ticked your venue offers no rewards, so customers won't see it.
           </Text>
         )}
 

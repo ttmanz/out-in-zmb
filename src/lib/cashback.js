@@ -30,16 +30,17 @@ export const CLAIM_STATUS_LABEL = {
 
 export const REWARD_LABEL = { cash: 'cash back', credit: 'store credit', discount: 'discount' };
 
-// What a member can opt into on their profile ("participation").
+// What a venue owner can choose to offer ("participation"). Customers only see
+// the rewards a venue has ticked (and given a percentage).
 export const PARTICIPATION_OPTIONS = [
-  { key: 'cash', emoji: '💸', label: 'Cash back', desc: 'Get part of what you spend back as real money.' },
-  { key: 'credit', emoji: '🎟️', label: 'Store credit', desc: 'Earn credit you can redeem at that venue later.' },
-  { key: 'discount', emoji: '🏷️', label: 'Discount', desc: 'Take a percentage off your bill at the till.' },
+  { key: 'cash', emoji: '💸', label: 'Cash back', desc: 'Give customers part of their spend back as real money.' },
+  { key: 'credit', emoji: '🎟️', label: 'Store credit', desc: 'Give customers credit they can redeem at your venue later.' },
+  { key: 'discount', emoji: '🏷️', label: 'Discount', desc: 'Take a percentage off the customer\'s bill at the till.' },
 ];
 
 export const participationSummary = (participation) => {
-  if (participation == null) return "Choose which rewards you'd like";
-  if (participation.length === 0) return 'Not taking part';
+  if (participation == null) return 'Choose which rewards you offer';
+  if (participation.length === 0) return 'No rewards offered';
   return PARTICIPATION_OPTIONS.filter((o) => participation.includes(o.key)).map((o) => o.label).join(', ');
 };
 
@@ -132,21 +133,25 @@ export const getCountries = () =>
 // --- Venue owner ---
 
 // Venues start unapproved: they can set an offer, but aren't listed to
-// customers and can't confirm anything until an admin approves them.
-export const getMyVenueApproval = (venueOwnerId) =>
-  supabase.from('profiles').select('venue_approved').eq('id', venueOwnerId).single();
+// customers and can't confirm anything until an admin approves them. Also
+// returns the rewards the venue has ticked (participation).
+export const getMyVenueStatus = (venueOwnerId) =>
+  supabase.from('profiles').select('venue_approved, participation').eq('id', venueOwnerId).single();
 
 export const getMyVenueOffer = (venueOwnerId) =>
   supabase.from('venue_cashback_offers').select('cash_percent, credit_percent, discount_percent, country_code').eq('venue_owner_id', venueOwnerId).maybeSingle();
 
 // The venue's country fixes the currency of every claim at it, and can't be
-// changed once customers have claimed there.
-export const setVenueCashbackOffer = (cashPercent, creditPercent, discountPercent, countryCode) =>
+// changed once customers have claimed there. `participation` is the list of
+// rewards ticked ('cash', 'credit', 'discount'): each ticked reward needs a
+// percentage, and an unticked one is not offered whatever its percentage.
+export const setVenueCashbackOffer = (cashPercent, creditPercent, discountPercent, countryCode, participation) =>
   supabase.rpc('set_venue_cashback_offer', {
     p_cash_percent: cashPercent,
     p_credit_percent: creditPercent,
     p_discount_percent: discountPercent,
     p_country_code: countryCode,
+    p_participation: participation,
   });
 
 export const getVenueClaims = (venueOwnerId) =>
