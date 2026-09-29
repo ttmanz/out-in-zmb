@@ -24,6 +24,7 @@ import VenueVouchersScreen from '../screens/main/VenueVouchersScreen';
 import CheckVoucherScreen from '../screens/main/CheckVoucherScreen';
 import MyPointsScreen from '../screens/main/MyPointsScreen';
 import MyCashbackScreen from '../screens/main/MyCashbackScreen';
+import SubmitReceiptScreen from '../screens/main/SubmitReceiptScreen';
 import VenueCashbackScreen from '../screens/main/VenueCashbackScreen';
 import RewardsScreen from '../screens/main/RewardsScreen';
 import InviteFriendsScreen from '../screens/main/InviteFriendsScreen';
@@ -99,6 +100,7 @@ const HomeStackNavigator = () => (
     <HomeStack.Screen name={ROUTES.CHECK_VOUCHER} component={CheckVoucherScreen} />
     <HomeStack.Screen name={ROUTES.MY_POINTS} component={MyPointsScreen} />
     <HomeStack.Screen name={ROUTES.MY_CASHBACK} component={MyCashbackScreen} />
+    <HomeStack.Screen name={ROUTES.SUBMIT_RECEIPT} component={SubmitReceiptScreen} />
     <HomeStack.Screen name={ROUTES.VENUE_CASHBACK} component={VenueCashbackScreen} />
     <HomeStack.Screen name={ROUTES.REWARDS} component={RewardsScreen} />
     <HomeStack.Screen name={ROUTES.INVITE_FRIENDS} component={InviteFriendsScreen} />

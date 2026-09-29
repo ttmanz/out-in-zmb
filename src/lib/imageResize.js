@@ -14,16 +14,18 @@ const getSize = (uri) => new Promise((resolve, reject) => {
   Image.getSize(uri, (width, height) => resolve({ width, height }), reject);
 });
 
-export const resizeForUpload = async (uri) => {
+// Receipts pass a larger maxEdge: they're tall, and at 1024px the small print
+// on a till slip becomes unreadable.
+export const resizeForUpload = async (uri, maxEdge = MAX_EDGE) => {
   try {
     const { width, height } = await getSize(uri);
-    if (width <= MAX_EDGE && height <= MAX_EDGE) return uri;
+    if (width <= maxEdge && height <= maxEdge) return uri;
 
     const context = ImageManipulator.manipulate(uri);
     if (width >= height) {
-      context.resize({ width: MAX_EDGE, height: null });
+      context.resize({ width: maxEdge, height: null });
     } else {
-      context.resize({ width: null, height: MAX_EDGE });
+      context.resize({ width: null, height: maxEdge });
     }
     const rendered = await context.renderAsync();
     const result = await rendered.saveAsync({ format: SaveFormat.JPEG, compress: 0.65 });

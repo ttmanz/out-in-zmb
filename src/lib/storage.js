@@ -5,24 +5,46 @@ import { supabase } from './supabase';
 const VIDEO_EXTS = ['mp4', 'mov', 'avi', 'mkv', 'm4v'];
 
 // Bypasses supabase-js's storage client, which never attaches the signed-in
-// user's access token to upload requests in this SDK version (it silently
-// falls back to the anon key, so every RLS-protected upload is rejected).
+// user's access token to storage requests in this SDK version (it silently
+// falls back to the anon key, so every RLS-protected call is rejected).
+const authHeaders = async () => {
+  const { data: { session } } = await supabase.auth.getSession();
+  return {
+    apikey: CONFIG.supabaseAnonKey,
+    Authorization: `Bearer ${session?.access_token ?? CONFIG.supabaseAnonKey}`,
+  };
+};
+
 const uploadToBucket = async (bucket, path, uri, contentType, upsert) => {
   const arrayBuffer = await new File(uri).arrayBuffer();
-  const { data: { session } } = await supabase.auth.getSession();
   const response = await fetch(`${CONFIG.supabaseUrl}/storage/v1/object/${bucket}/${path}`, {
     method: 'POST',
-    headers: {
-      apikey: CONFIG.supabaseAnonKey,
-      Authorization: `Bearer ${session?.access_token ?? CONFIG.supabaseAnonKey}`,
-      'Content-Type': contentType,
-      'x-upsert': String(upsert),
-    },
+    headers: { ...(await authHeaders()), 'Content-Type': contentType, 'x-upsert': String(upsert) },
     body: arrayBuffer,
   });
   if (!response.ok) return { error: new Error(await response.text()) };
   const { data } = supabase.storage.from(bucket).getPublicUrl(path);
-  return { url: data.publicUrl };
+  return { url: data.publicUrl, path };
+};
+
+// Receipts live in a private bucket — returns the storage path (what the
+// claim row keeps), never a public URL.
+export const uploadReceipt = (userId, uri) => {
+  const ext = uri.split('.').pop().split('?')[0].toLowerCase() || 'jpg';
+  return uploadToBucket('receipts', `${userId}/${Date.now()}.${ext}`, uri, `image/${ext}`, false);
+};
+
+// Short-lived link to a private file, for displaying it. Null if the caller
+// isn't allowed to see it.
+export const getSignedUrl = async (bucket, path, expiresIn = 3600) => {
+  const response = await fetch(`${CONFIG.supabaseUrl}/storage/v1/object/sign/${bucket}/${path}`, {
+    method: 'POST',
+    headers: { ...(await authHeaders()), 'Content-Type': 'application/json' },
+    body: JSON.stringify({ expiresIn }),
+  });
+  if (!response.ok) return null;
+  const { signedURL } = await response.json();
+  return `${CONFIG.supabaseUrl}/storage/v1${signedURL}`;
 };
 
 export const uploadAvatar = async (userId, uri) => {

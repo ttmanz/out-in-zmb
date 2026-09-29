@@ -60,6 +60,7 @@ export const ROUTES = {
   ADMIN_FLAGGED_MEMBERS: 'AdminFlaggedMembers',
   ADMIN_POINTS: 'AdminPoints',
   MY_CASHBACK: 'MyCashback',
+  SUBMIT_RECEIPT: 'SubmitReceipt',
   VENUE_CASHBACK: 'VenueCashback',
   ADMIN_CASHBACK: 'AdminCashback',
 };

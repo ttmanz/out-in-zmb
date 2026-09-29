@@ -8,11 +8,10 @@ import { COLORS } from '../../constants/colors';
 import {
   getCashbackSettings, updateCashbackSettings, getPendingCashbackPayoutRequests,
   getRecentCashbackPayoutRequests, resolveCashbackPayout, getRecentCashbackClaims,
+  formatZmw, CLAIM_STATUS_LABEL, REWARD_LABEL,
 } from '../../lib/cashback';
 import { formatAgo } from '../../utils/format';
 import BackHeader from '../../components/common/BackHeader';
-
-const formatZmw = (amount) => `K${Number(amount ?? 0).toFixed(2)}`;
 
 const AdminCashbackScreen = ({ navigation }) => {
   const [percentDraft, setPercentDraft] = useState('');
@@ -32,7 +31,7 @@ const AdminCashbackScreen = ({ navigation }) => {
       getRecentCashbackPayoutRequests(),
       getRecentCashbackClaims(),
     ]);
-    setPercentDraft(String(settingsData?.percent ?? ''));
+    setPercentDraft(String(settingsData?.max_cash_percent ?? ''));
     setMinSpendDraft(String(settingsData?.min_spend ?? ''));
     setPending(pendingData ?? []);
     setResolved(resolvedData ?? []);
@@ -106,11 +105,11 @@ const AdminCashbackScreen = ({ navigation }) => {
           <>
             <Text style={styles.sectionLabel}>Cash Back Rate</Text>
             <Text style={styles.sectionHint}>
-              Percentage of spend a member gets back in cash, and the minimum spend that qualifies. Venue-funded, applies to every venue.
+              Venues set their own cash back and store credit rates. This caps how much cash back any venue can offer (you pay members before recovering it from the venue), and sets the smallest receipt that qualifies.
             </Text>
             <View style={styles.settingsRow}>
               <View style={styles.settingsField}>
-                <Text style={styles.ruleLabel}>Cash back %</Text>
+                <Text style={styles.ruleLabel}>Max cash back %</Text>
                 <TextInput
                   style={styles.settingsInput}
                   value={percentDraft}
@@ -172,16 +171,16 @@ const AdminCashbackScreen = ({ navigation }) => {
               </View>
             ))}
 
-            <Text style={[styles.sectionLabel, { marginTop: 20 }]}>Recent Venue Claims</Text>
+            <Text style={[styles.sectionLabel, { marginTop: 20 }]}>Recent Receipts</Text>
             {claims.length === 0 && <Text style={styles.empty}>Nothing yet.</Text>}
             {claims.map((c) => (
               <View key={c.id} style={styles.activityRow}>
                 <View style={styles.activityText}>
                   <Text style={styles.activityName}>{c.member?.full_name ?? 'Member'} at {c.venue?.full_name ?? 'a venue'}</Text>
-                  <Text style={styles.activityTime}>{formatAgo(c.created_at)}</Text>
+                  <Text style={styles.activityTime}>{CLAIM_STATUS_LABEL[c.status]} · {formatAgo(c.created_at)}</Text>
                 </View>
-                <Text style={styles.activityAmount}>
-                  {formatZmw(c.spend_amount)} → {formatZmw(c.cashback_amount)}
+                <Text style={[styles.activityAmount, c.status !== 'confirmed' && styles.activityAmountNegative]}>
+                  {formatZmw(c.spend_amount)} → {formatZmw(c.cashback_amount)} {REWARD_LABEL[c.reward_type]}
                 </Text>
               </View>
             ))}

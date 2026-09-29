@@ -230,8 +230,8 @@ const ProfileSettingsScreen = ({ navigation }) => {
           >
             <Text style={styles.editProfileEmoji}>💸</Text>
             <View style={styles.editProfileText}>
-              <Text style={styles.editProfileLabel}>Report Cash Back</Text>
-              <Text style={styles.editProfileDesc}>Give customers real cash back on their spend</Text>
+              <Text style={styles.editProfileLabel}>Cash Back & Credit</Text>
+              <Text style={styles.editProfileDesc}>Set your offer and confirm customer receipts</Text>
             </View>
             <Text style={styles.editProfileChevron}>›</Text>
           </TouchableOpacity>
@@ -244,7 +244,7 @@ const ProfileSettingsScreen = ({ navigation }) => {
             <Text style={styles.editProfileEmoji}>💸</Text>
             <View style={styles.editProfileText}>
               <Text style={styles.editProfileLabel}>Cash Back</Text>
-              <Text style={styles.editProfileDesc}>Real money back when you spend at partner venues</Text>
+              <Text style={styles.editProfileDesc}>Snap a receipt, earn cash back or store credit</Text>
             </View>
             <Text style={styles.editProfileChevron}>›</Text>
           </TouchableOpacity>

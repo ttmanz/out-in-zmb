@@ -22,6 +22,8 @@ const TYPE_ICON = {
   message: '✉️',
   new_post: '📣',
   content_report: '🚩',
+  cashback_pending: '🧾',
+  cashback_result: '💸',
 };
 
 const NotificationsScreen = ({ navigation }) => {
@@ -62,6 +64,13 @@ const NotificationsScreen = ({ navigation }) => {
     if (item.type === 'message') return t('notifications.message', { name: actor });
     if (item.type === 'new_post') return t('notifications.newPost', { name: actor });
     if (item.type === 'content_report') return t('notifications.contentReport', { reason: t(`report.reasons.${item.reference_text}`) });
+    if (item.type === 'cashback_pending') {
+      const key = { redemption: 'cashbackRedemptionPending', discount: 'cashbackDiscountPending' }[item.reference_type] ?? 'cashbackClaimPending';
+      return t(`notifications.${key}`, { name: actor, amount: item.reference_text });
+    }
+    if (item.type === 'cashback_result') {
+      return t(`notifications.cashbackResult.${item.reference_type}`, { name: actor, amount: item.reference_text });
+    }
     return '';
   };
 

@@ -196,6 +196,12 @@ export const resolveNotificationRoute = async (item, fallbackName = 'Someone') =
   if (item.type === 'content_report') {
     return { stack: 'AdminTab', screen: ROUTES.ADMIN_REPORTS, initial: false };
   }
+  if (item.type === 'cashback_pending') {
+    return { stack: 'HomeTab', screen: ROUTES.VENUE_CASHBACK };
+  }
+  if (item.type === 'cashback_result') {
+    return { stack: 'HomeTab', screen: ROUTES.MY_CASHBACK };
+  }
   if (item.type === 'new_post') {
     const screen = NEW_POST_TARGETS[item.reference_type];
     return screen ? { stack: 'HomeTab', screen, params: { focusItemId: item.reference_id } } : null;

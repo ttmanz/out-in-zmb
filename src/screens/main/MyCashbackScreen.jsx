@@ -6,77 +6,104 @@ import {
 import { KeyboardAvoidingView } from 'react-native-keyboard-controller';
 import { useFocusEffect } from '@react-navigation/native';
 import { COLORS } from '../../constants/colors';
+import { ROUTES } from '../../constants/routes';
 import {
-  getMyCashbackBalance, getMyCashbackHistory, getMyCashbackPayoutRequests,
-  requestCashbackPayout, CASHBACK_REASON_LABEL,
+  getMyCashbackBalance, getMyCashbackHistory, getMyCashbackPayoutRequests, requestCashbackPayout,
+  getMyCashbackClaims, cancelCashbackClaim, getMyVenueCredits, requestCreditRedemption,
+  getMyPendingCreditRedemptions, cancelCreditRedemption,
+  formatZmw, CASHBACK_REASON_LABEL, CLAIM_STATUS_LABEL, REWARD_LABEL,
 } from '../../lib/cashback';
 import { formatAgo } from '../../utils/format';
 import { useUser } from '../../contexts/UserContext';
 import BackHeader from '../../components/common/BackHeader';
 import GradientBorder from '../../components/common/GradientBorder';
 
-const STATUS_LABEL = { pending: 'Pending', paid: 'Paid', rejected: 'Declined' };
-const STATUS_COLOR = { pending: COLORS.textSecondary, paid: COLORS.success, rejected: COLORS.error };
-
-const formatZmw = (amount) => `K${Number(amount ?? 0).toFixed(2)}`;
+const PAYOUT_STATUS_LABEL = { pending: 'Pending', paid: 'Paid', rejected: 'Declined' };
+const STATUS_COLOR = {
+  pending: COLORS.textSecondary, paid: COLORS.success, confirmed: COLORS.success,
+  rejected: COLORS.error, cancelled: COLORS.textMuted,
+};
 
 const MyCashbackScreen = ({ navigation }) => {
   const { profile } = useUser();
   const [balance, setBalance] = useState(0);
   const [history, setHistory] = useState([]);
   const [requests, setRequests] = useState([]);
+  const [claims, setClaims] = useState([]);
+  const [credits, setCredits] = useState([]);
+  const [redemptions, setRedemptions] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [showModal, setShowModal] = useState(false);
+  const [showCashOut, setShowCashOut] = useState(false);
   const [amountDraft, setAmountDraft] = useState('');
   const [numberDraft, setNumberDraft] = useState('');
+  const [creditTarget, setCreditTarget] = useState(null);
+  const [creditDraft, setCreditDraft] = useState('');
   const [saving, setSaving] = useState(false);
+  const [busyId, setBusyId] = useState(null);
 
   const load = useCallback(async () => {
     if (!profile?.id) return;
     setLoading(true);
-    const [balanceRes, historyRes, requestsRes] = await Promise.all([
+    const [balanceRes, historyRes, requestsRes, claimsRes, creditsRes, redemptionsRes] = await Promise.all([
       getMyCashbackBalance(profile.id),
       getMyCashbackHistory(profile.id),
       getMyCashbackPayoutRequests(profile.id),
+      getMyCashbackClaims(profile.id),
+      getMyVenueCredits(),
+      getMyPendingCreditRedemptions(profile.id),
     ]);
     if (!balanceRes.error) setBalance(balanceRes.data?.cashback_balance ?? 0);
     if (!historyRes.error) setHistory(historyRes.data ?? []);
     if (!requestsRes.error) setRequests(requestsRes.data ?? []);
+    if (!claimsRes.error) setClaims(claimsRes.data ?? []);
+    if (!creditsRes.error) setCredits(creditsRes.data ?? []);
+    if (!redemptionsRes.error) setRedemptions(redemptionsRes.data ?? []);
     setLoading(false);
   }, [profile?.id]);
 
   useFocusEffect(useCallback(() => { load(); }, [load]));
 
-  const openModal = () => {
+  const openCashOut = () => {
     setAmountDraft(String(balance));
     setNumberDraft('');
-    setShowModal(true);
+    setShowCashOut(true);
   };
 
-  const handleSubmit = async () => {
+  const handleCashOut = async () => {
     const amount = parseFloat(amountDraft);
-    if (!amount || amount <= 0) {
-      Alert.alert('Error', 'Enter a positive amount.');
-      return;
-    }
-    if (amount > balance) {
-      Alert.alert('Error', 'That\'s more than your cash back balance.');
-      return;
-    }
-    if (!numberDraft.trim()) {
-      Alert.alert('Error', 'Enter the Mobile Money number to receive the payout.');
-      return;
-    }
+    if (!amount || amount <= 0) return Alert.alert('Error', 'Enter a positive amount.');
+    if (amount > balance) return Alert.alert('Error', 'That\'s more than your cash back balance.');
+    if (!numberDraft.trim()) return Alert.alert('Error', 'Enter the Mobile Money number to receive the payout.');
     setSaving(true);
     const { error } = await requestCashbackPayout(amount, numberDraft.trim());
     setSaving(false);
-    if (error) {
-      Alert.alert('Error', error.message ?? 'Could not submit your request. Please try again.');
-      return;
-    }
-    setShowModal(false);
+    if (error) return Alert.alert('Error', error.message ?? 'Could not submit your request. Please try again.');
+    setShowCashOut(false);
     load();
   };
+
+  const handleUseCredit = async () => {
+    const amount = parseFloat(creditDraft);
+    if (!amount || amount <= 0) return Alert.alert('Error', 'Enter a positive amount.');
+    if (amount > Number(creditTarget.balance)) return Alert.alert('Error', 'That\'s more than your credit at this venue.');
+    setSaving(true);
+    const { error } = await requestCreditRedemption(creditTarget.venue_owner_id, amount);
+    setSaving(false);
+    if (error) return Alert.alert('Error', error.message ?? 'Could not send your request. Please try again.');
+    setCreditTarget(null);
+    load();
+  };
+
+  const handleCancel = async (id, cancelFn) => {
+    setBusyId(id);
+    const { error } = await cancelFn(id);
+    setBusyId(null);
+    if (error) return Alert.alert('Error', error.message ?? 'Could not cancel this.');
+    load();
+  };
+
+  const pendingClaims = claims.filter((c) => c.status === 'pending');
+  const doneClaims = claims.filter((c) => c.status !== 'pending').slice(0, 5);
 
   if (loading) {
     return (
@@ -98,9 +125,18 @@ const MyCashbackScreen = ({ navigation }) => {
         </View>
       </GradientBorder>
 
-      <TouchableOpacity style={styles.cashOutBtn} onPress={openModal} disabled={balance <= 0}>
-        <Text style={styles.cashOutBtnText}>💸 Cash Out</Text>
-      </TouchableOpacity>
+      <View style={styles.actionRow}>
+        <TouchableOpacity style={[styles.primaryBtn, styles.actionHalf]} onPress={() => navigation.navigate(ROUTES.SUBMIT_RECEIPT)}>
+          <Text style={styles.primaryBtnText}>🧾 Submit receipt</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[styles.outlineBtn, styles.actionHalf, balance <= 0 && styles.btnDisabled]}
+          onPress={openCashOut}
+          disabled={balance <= 0}
+        >
+          <Text style={styles.outlineBtnText}>💸 Cash out</Text>
+        </TouchableOpacity>
+      </View>
 
       <FlatList
         data={history}
@@ -108,6 +144,70 @@ const MyCashbackScreen = ({ navigation }) => {
         contentContainerStyle={styles.list}
         ListHeaderComponent={
           <>
+            {credits.length > 0 && (
+              <>
+                <Text style={styles.sectionLabel}>Store credit</Text>
+                {credits.map((c) => (
+                  <View key={c.venue_owner_id} style={styles.row}>
+                    <View style={styles.rowText}>
+                      <Text style={styles.reason}>{c.venue_name}</Text>
+                      <Text style={styles.time}>Spend it at this venue only</Text>
+                    </View>
+                    <Text style={styles.credit}>{formatZmw(c.balance)}</Text>
+                    <TouchableOpacity
+                      style={styles.useBtn}
+                      onPress={() => { setCreditTarget(c); setCreditDraft(String(c.balance)); }}
+                    >
+                      <Text style={styles.useBtnText}>Use</Text>
+                    </TouchableOpacity>
+                  </View>
+                ))}
+              </>
+            )}
+
+            {(pendingClaims.length > 0 || redemptions.length > 0) && (
+              <>
+                <Text style={styles.sectionLabel}>Waiting for a venue</Text>
+                {pendingClaims.map((c) => (
+                  <View key={c.id} style={styles.pendingRow}>
+                    <View style={styles.rowText}>
+                      <Text style={styles.reason}>{c.venue?.full_name ?? 'Venue'} — {formatZmw(c.spend_amount)} {c.reward_type === 'discount' ? 'bill' : 'receipt'}</Text>
+                      <Text style={styles.time}>{formatZmw(c.cashback_amount)} {REWARD_LABEL[c.reward_type]} · {formatAgo(c.created_at)}</Text>
+                    </View>
+                    <TouchableOpacity onPress={() => handleCancel(c.id, cancelCashbackClaim)} disabled={busyId === c.id}>
+                      <Text style={styles.cancelText}>Cancel</Text>
+                    </TouchableOpacity>
+                  </View>
+                ))}
+                {redemptions.map((r) => (
+                  <View key={r.id} style={styles.pendingRow}>
+                    <View style={styles.rowText}>
+                      <Text style={styles.reason}>Using {formatZmw(r.amount)} credit at {r.venue?.full_name ?? 'venue'}</Text>
+                      <Text style={styles.time}>Ask the venue to confirm · {formatAgo(r.created_at)}</Text>
+                    </View>
+                    <TouchableOpacity onPress={() => handleCancel(r.id, cancelCreditRedemption)} disabled={busyId === r.id}>
+                      <Text style={styles.cancelText}>Cancel</Text>
+                    </TouchableOpacity>
+                  </View>
+                ))}
+              </>
+            )}
+
+            {doneClaims.length > 0 && (
+              <>
+                <Text style={styles.sectionLabel}>Recent receipts</Text>
+                {doneClaims.map((c) => (
+                  <View key={c.id} style={styles.row}>
+                    <View style={styles.rowText}>
+                      <Text style={styles.reason}>{c.venue?.full_name ?? 'Venue'} — {formatZmw(c.spend_amount)}</Text>
+                      <Text style={styles.time}>{formatZmw(c.cashback_amount)} {REWARD_LABEL[c.reward_type]} · {formatAgo(c.created_at)}</Text>
+                    </View>
+                    <Text style={[styles.statusBadge, { color: STATUS_COLOR[c.status] }]}>{CLAIM_STATUS_LABEL[c.status]}</Text>
+                  </View>
+                ))}
+              </>
+            )}
+
             {requests.length > 0 && (
               <>
                 <Text style={styles.sectionLabel}>Payout Requests</Text>
@@ -117,7 +217,7 @@ const MyCashbackScreen = ({ navigation }) => {
                       <Text style={styles.reason}>{formatZmw(r.amount)} to {r.mobile_money_number}</Text>
                       <Text style={styles.time}>{formatAgo(r.requested_at)}</Text>
                     </View>
-                    <Text style={[styles.statusBadge, { color: STATUS_COLOR[r.status] }]}>{STATUS_LABEL[r.status]}</Text>
+                    <Text style={[styles.statusBadge, { color: STATUS_COLOR[r.status] }]}>{PAYOUT_STATUS_LABEL[r.status]}</Text>
                   </View>
                 ))}
               </>
@@ -125,7 +225,7 @@ const MyCashbackScreen = ({ navigation }) => {
             <Text style={styles.sectionLabel}>History</Text>
           </>
         }
-        ListEmptyComponent={<Text style={styles.empty}>No cash back yet — spend at a partner venue to start earning.</Text>}
+        ListEmptyComponent={<Text style={styles.empty}>No cash back yet — submit a receipt from a partner venue to start earning.</Text>}
         renderItem={({ item }) => (
           <View style={styles.row}>
             <View style={styles.rowText}>
@@ -139,7 +239,7 @@ const MyCashbackScreen = ({ navigation }) => {
         )}
       />
 
-      <Modal visible={showModal} transparent animationType="fade" onRequestClose={() => setShowModal(false)}>
+      <Modal visible={showCashOut} transparent animationType="fade" onRequestClose={() => setShowCashOut(false)}>
         <KeyboardAvoidingView style={styles.modalBackdrop} behavior="padding">
           <View style={styles.modalCard}>
             <Text style={styles.modalTitle}>Cash Out</Text>
@@ -166,13 +266,44 @@ const MyCashbackScreen = ({ navigation }) => {
             />
 
             <View style={styles.modalActions}>
-              <TouchableOpacity style={styles.modalCancel} onPress={() => setShowModal(false)} disabled={saving}>
+              <TouchableOpacity style={styles.modalCancel} onPress={() => setShowCashOut(false)} disabled={saving}>
                 <Text style={styles.modalCancelText}>Cancel</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={styles.modalConfirm} onPress={handleSubmit} disabled={saving}>
+              <TouchableOpacity style={styles.modalConfirm} onPress={handleCashOut} disabled={saving}>
                 {saving
                   ? <ActivityIndicator color={COLORS.black} />
                   : <Text style={styles.modalConfirmText}>Request Payout</Text>
+                }
+              </TouchableOpacity>
+            </View>
+          </View>
+        </KeyboardAvoidingView>
+      </Modal>
+
+      <Modal visible={!!creditTarget} transparent animationType="fade" onRequestClose={() => setCreditTarget(null)}>
+        <KeyboardAvoidingView style={styles.modalBackdrop} behavior="padding">
+          <View style={styles.modalCard}>
+            <Text style={styles.modalTitle}>Use credit at {creditTarget?.venue_name}</Text>
+            <Text style={styles.modalHint}>Ask the venue to confirm on their phone. Your credit is only spent once they do.</Text>
+
+            <Text style={styles.modalLabel}>Amount (max {formatZmw(creditTarget?.balance)})</Text>
+            <TextInput
+              style={styles.modalInput}
+              value={creditDraft}
+              onChangeText={(v) => setCreditDraft(v.replace(/[^0-9.]/g, ''))}
+              placeholder="e.g. 20"
+              placeholderTextColor={COLORS.textMuted}
+              keyboardType="decimal-pad"
+            />
+
+            <View style={styles.modalActions}>
+              <TouchableOpacity style={styles.modalCancel} onPress={() => setCreditTarget(null)} disabled={saving}>
+                <Text style={styles.modalCancelText}>Cancel</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.modalConfirm} onPress={handleUseCredit} disabled={saving}>
+                {saving
+                  ? <ActivityIndicator color={COLORS.black} />
+                  : <Text style={styles.modalConfirmText}>Ask venue</Text>
                 }
               </TouchableOpacity>
             </View>
@@ -191,11 +322,13 @@ const styles = StyleSheet.create({
   balanceLabel: { fontSize: 13, color: COLORS.textMuted, marginBottom: 6 },
   balanceValue: { fontSize: 40, fontWeight: '800', color: COLORS.primary },
   balanceHint: { fontSize: 12, color: COLORS.textMuted, marginTop: 2 },
-  cashOutBtn: {
-    backgroundColor: COLORS.primary, borderRadius: 12,
-    paddingVertical: 14, alignItems: 'center', marginHorizontal: 20, marginBottom: 8,
-  },
-  cashOutBtnText: { fontSize: 14, fontWeight: '800', color: COLORS.black },
+  actionRow: { flexDirection: 'row', gap: 10, marginHorizontal: 20, marginBottom: 8 },
+  actionHalf: { flex: 1 },
+  primaryBtn: { backgroundColor: COLORS.primary, borderRadius: 12, paddingVertical: 13, alignItems: 'center' },
+  primaryBtnText: { fontSize: 13, fontWeight: '800', color: COLORS.black },
+  outlineBtn: { borderWidth: 1, borderColor: COLORS.primary, borderRadius: 12, paddingVertical: 13, alignItems: 'center' },
+  outlineBtnText: { fontSize: 13, fontWeight: '800', color: COLORS.primary },
+  btnDisabled: { opacity: 0.4 },
   sectionLabel: {
     fontSize: 13, fontWeight: '700', color: COLORS.primary,
     textTransform: 'uppercase', letterSpacing: 0.8,
@@ -208,6 +341,11 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.surface, borderRadius: 12, padding: 14, marginBottom: 8,
     borderWidth: 1, borderColor: COLORS.border,
   },
+  pendingRow: {
+    flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
+    backgroundColor: COLORS.surfaceAlt, borderRadius: 12, padding: 14, marginBottom: 8,
+    borderWidth: 1, borderColor: COLORS.borderAccent,
+  },
   requestRow: {
     flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
     backgroundColor: COLORS.surfaceAlt, borderRadius: 12, padding: 14, marginBottom: 8,
@@ -218,6 +356,10 @@ const styles = StyleSheet.create({
   time: { fontSize: 12, color: COLORS.textMuted, marginTop: 2 },
   amount: { fontSize: 16, fontWeight: '800', color: COLORS.success },
   amountNegative: { color: COLORS.error },
+  credit: { fontSize: 15, fontWeight: '800', color: COLORS.primary, marginHorizontal: 10 },
+  useBtn: { backgroundColor: COLORS.primary, borderRadius: 16, paddingHorizontal: 14, paddingVertical: 7 },
+  useBtnText: { fontSize: 12, fontWeight: '800', color: COLORS.black },
+  cancelText: { fontSize: 12, fontWeight: '700', color: COLORS.error, marginLeft: 10 },
   statusBadge: { fontSize: 12, fontWeight: '800' },
   modalBackdrop: { flex: 1, backgroundColor: 'rgba(0,0,0,0.6)', justifyContent: 'center', padding: 24 },
   modalCard: { backgroundColor: COLORS.surface, borderRadius: 16, padding: 20 },
