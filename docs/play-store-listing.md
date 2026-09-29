@@ -49,7 +49,7 @@ PRIVACY FIRST
 
 Your location is only shared when you choose to check in. It's shown to a limited radius (300m) and automatically hidden after 3 hours. You control everything — what's visible, who can message you, and when you appear.
 
-Rollout Plus is built for Zambia but open to anyone who loves going out.
+Rollout Plus is for anyone who loves going out.
 
 Rollout Plus. Go out. Connect. Meet people.
 ```

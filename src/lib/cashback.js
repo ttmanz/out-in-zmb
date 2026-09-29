@@ -2,7 +2,7 @@ import { supabase } from './supabase';
 
 // Cash back and store credit. A member photographs a receipt and submits a
 // claim; nothing is credited until the venue confirms it. Cash goes to the
-// member's cash back balance (paid out via Mobile Money); store credit is
+// member's cash back balance (paid out to the member); store credit is
 // spendable only at the venue that issued it. Everything is written by
 // SECURITY DEFINER functions — see
 // supabase/migrations/20260929000000_cashback_receipts_credits.sql. The app

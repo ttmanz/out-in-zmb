@@ -255,7 +255,7 @@ const CompleteProfileScreen = ({ navigation }) => {
             style={styles.input}
             value={languages}
             onChangeText={setLanguages}
-            placeholder="e.g. English, Bemba, Nyanja"
+            placeholder="e.g. English, French, Spanish"
             placeholderTextColor={COLORS.textMuted}
           />
         </Field>

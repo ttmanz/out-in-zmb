@@ -5,8 +5,8 @@ import { ImageManipulator, SaveFormat } from 'expo-image-manipulator';
 // 3000px+ on a side) with no cap — a single post can cost several MB of
 // the user's data. Downscaling to this before upload keeps photos sharp on
 // any phone screen while cutting typical file sizes by 10-20x. Tuned for a
-// data-cost-sensitive audience (prepaid mobile data is expensive in the
-// target Southern Africa market) — still sharp at typical phone screen
+// data-cost-sensitive audience (prepaid mobile data is expensive in
+// many markets) — still sharp at typical phone screen
 // widths, just not archival quality.
 const MAX_EDGE = 1024;
 

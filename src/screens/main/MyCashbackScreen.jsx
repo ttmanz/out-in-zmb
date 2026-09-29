@@ -73,7 +73,7 @@ const MyCashbackScreen = ({ navigation }) => {
     const amount = parseFloat(amountDraft);
     if (!amount || amount <= 0) return Alert.alert('Error', 'Enter a positive amount.');
     if (amount > balance) return Alert.alert('Error', 'That\'s more than your cash back balance.');
-    if (!numberDraft.trim()) return Alert.alert('Error', 'Enter the Mobile Money number to receive the payout.');
+    if (!numberDraft.trim()) return Alert.alert('Error', 'Enter your payout details.');
     setSaving(true);
     const { error } = await requestCashbackPayout(amount, numberDraft.trim());
     setSaving(false);
@@ -121,7 +121,7 @@ const MyCashbackScreen = ({ navigation }) => {
         <View style={styles.balanceCard}>
           <Text style={styles.balanceLabel}>Your cash back balance</Text>
           <Text style={styles.balanceValue}>{formatAmount(balance)}</Text>
-          <Text style={styles.balanceHint}>real money, paid via Mobile Money</Text>
+          <Text style={styles.balanceHint}>real money, paid out to you</Text>
         </View>
       </GradientBorder>
 
@@ -243,7 +243,7 @@ const MyCashbackScreen = ({ navigation }) => {
         <KeyboardAvoidingView style={styles.modalBackdrop} behavior="padding">
           <View style={styles.modalCard}>
             <Text style={styles.modalTitle}>Cash Out</Text>
-            <Text style={styles.modalHint}>We'll send this to your Mobile Money number — admin fulfils requests manually for now, usually within a day or two.</Text>
+            <Text style={styles.modalHint}>We'll send this to the payout details you enter — an admin fulfils requests manually for now, usually within a day or two.</Text>
 
             <Text style={styles.modalLabel}>Amount (max {formatAmount(balance)})</Text>
             <TextInput
@@ -255,14 +255,13 @@ const MyCashbackScreen = ({ navigation }) => {
               keyboardType="decimal-pad"
             />
 
-            <Text style={styles.modalLabel}>Mobile Money number</Text>
+            <Text style={styles.modalLabel}>Payout details</Text>
             <TextInput
               style={styles.modalInput}
               value={numberDraft}
               onChangeText={setNumberDraft}
-              placeholder="e.g. 097XXXXXXX"
+              placeholder="e.g. mobile money number or bank account"
               placeholderTextColor={COLORS.textMuted}
-              keyboardType="phone-pad"
             />
 
             <View style={styles.modalActions}>

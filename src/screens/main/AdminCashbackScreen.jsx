@@ -94,7 +94,7 @@ const AdminCashbackScreen = ({ navigation }) => {
     Alert.alert(
       verb,
       approve
-        ? `Confirm you've sent ${formatAmount(request.amount)} to ${request.mobile_money_number} via Mobile Money.`
+        ? `Confirm you've sent ${formatAmount(request.amount)} to ${request.mobile_money_number}.`
         : `${request.member?.full_name ?? 'This member'}'s balance will be refunded.`,
       [
         { text: 'Cancel', style: 'cancel' },

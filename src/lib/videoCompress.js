@@ -5,8 +5,8 @@ import { Video } from 'react-native-compressor';
 // can cost 60-130MB+ of the user's data. 'auto' left the bitrate up to the
 // library's own heuristics, which could still land high on newer phones —
 // pinning it explicitly gives a predictable, data-cost-sensitive size
-// regardless of source device (target market is prepaid mobile data in
-// Southern Africa, where that matters a lot). At 1.2 Mbps / 960px, a
+// regardless of source device (prepaid mobile data is expensive in
+// many markets, so that matters a lot). At 1.2 Mbps / 960px, a
 // 1-minute clip lands around 9MB instead of 60-130MB+, still watchable at
 // phone screen size.
 export const compressVideoForUpload = async (uri) => {

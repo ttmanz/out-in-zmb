@@ -1,5 +1,5 @@
 export const COLORS = {
-  // Brand — Zambian teal / gold
+  // Brand — teal / gold
   primary: '#fdab53',       // Gold — primary actions, chevrons, active state
   primaryDark: '#fc8a03',   // Deep gold — pressed / gradient edge
   glow: '#fdab53',          // Active Glow
