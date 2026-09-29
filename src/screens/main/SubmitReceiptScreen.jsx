@@ -7,7 +7,7 @@ import { KeyboardAvoidingView } from 'react-native-keyboard-controller';
 import { useFocusEffect } from '@react-navigation/native';
 import * as ImagePicker from 'expo-image-picker';
 import { COLORS } from '../../constants/colors';
-import { getCashbackVenues, getCashbackSettings, submitCashbackClaim, formatAmount } from '../../lib/cashback';
+import { getCashbackVenues, submitCashbackClaim, formatAmount } from '../../lib/cashback';
 import { uploadReceipt } from '../../lib/storage';
 import { resizeForUpload } from '../../lib/imageResize';
 import { useUser } from '../../contexts/UserContext';
@@ -28,7 +28,6 @@ const offersFor = (venue) => {
 const SubmitReceiptScreen = ({ navigation }) => {
   const { profile } = useUser();
   const [venues, setVenues] = useState([]);
-  const [minSpend, setMinSpend] = useState(0);
   const [loading, setLoading] = useState(true);
   const [venueId, setVenueId] = useState(null);
   const [rewardType, setRewardType] = useState(null);
@@ -39,12 +38,8 @@ const SubmitReceiptScreen = ({ navigation }) => {
 
   const load = useCallback(async () => {
     setLoading(true);
-    const [{ data: venuesData }, { data: settingsData }] = await Promise.all([
-      getCashbackVenues(),
-      getCashbackSettings(),
-    ]);
-    setVenues(venuesData ?? []);
-    setMinSpend(Number(settingsData?.min_spend ?? 0));
+    const { data } = await getCashbackVenues();
+    setVenues(data ?? []);
     setLoading(false);
   }, []);
 
@@ -59,6 +54,8 @@ const SubmitReceiptScreen = ({ navigation }) => {
     setRewardType(list.length === 1 ? list[0].type : null);
   };
 
+  const currency = venue?.currency_code ?? null;
+  const minSpend = Number(venue?.min_spend ?? 0);
   const isDiscount = rewardType === 'discount';
   const spend = parseFloat(amount);
   const chosen = offers.find((o) => o.type === rewardType);
@@ -90,7 +87,7 @@ const SubmitReceiptScreen = ({ navigation }) => {
     if (!rewardType) return Alert.alert('Missing info', 'Choose what you\'d like from this venue.');
     if (!isDiscount && !receiptUri) return Alert.alert('Missing info', 'Add a photo of your receipt.');
     if (!spend || spend <= 0) return Alert.alert('Missing info', isDiscount ? 'Enter your bill total.' : 'Enter the total on your receipt.');
-    if (spend < minSpend) return Alert.alert('Too small', `The minimum is ${formatAmount(minSpend)}.`);
+    if (spend < minSpend) return Alert.alert('Too small', `The minimum is ${formatAmount(minSpend, currency)}.`);
 
     setSubmitting(true);
     let path = null;
@@ -154,7 +151,7 @@ const SubmitReceiptScreen = ({ navigation }) => {
             <Text style={styles.sectionLabel}>What would you like?</Text>
             {offers.map((o) => {
               const selected = o.type === rewardType;
-              const value = spend > 0 ? ` — ${formatAmount(Math.round(spend * o.percent) / 100)}` : '';
+              const value = spend > 0 ? ` — ${formatAmount(Math.round(spend * o.percent) / 100, currency)}` : '';
               return (
                 <TouchableOpacity
                   key={o.type}
@@ -197,12 +194,12 @@ const SubmitReceiptScreen = ({ navigation }) => {
           style={styles.input}
           value={amount}
           onChangeText={(v) => setAmount(v.replace(/[^0-9.]/g, ''))}
-          placeholder="Amount"
+          placeholder={currency ? `Amount (${currency})` : 'Amount'}
           placeholderTextColor={COLORS.textMuted}
           keyboardType="decimal-pad"
         />
         <Text style={styles.hint}>
-          {minSpend > 0 ? `Minimum ${formatAmount(minSpend)}. ` : ''}
+          {minSpend > 0 ? `Minimum ${formatAmount(minSpend, currency)}. ` : ''}
           {isDiscount ? 'Do this before you pay — the venue takes the discount off your bill.' : 'The venue will check this against your photo.'}
         </Text>
 
@@ -211,8 +208,8 @@ const SubmitReceiptScreen = ({ navigation }) => {
             <View style={styles.summary}>
               <Text style={styles.summaryText}>
                 {isDiscount
-                  ? `You'll get ${formatAmount(reward)} off your ${formatAmount(spend)} bill once ${venue.venue_name} confirms.`
-                  : `You'll get ${formatAmount(reward)} ${chosen.type === 'cash' ? 'cash back' : `store credit at ${venue.venue_name}`} once they confirm.`}
+                  ? `You'll get ${formatAmount(reward, currency)} off your ${formatAmount(spend, currency)} bill once ${venue.venue_name} confirms.`
+                  : `You'll get ${formatAmount(reward, currency)} ${chosen.type === 'cash' ? 'cash back' : `store credit at ${venue.venue_name}`} once they confirm.`}
               </Text>
             </View>
           </GradientBorder>

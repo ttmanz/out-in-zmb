@@ -7,7 +7,7 @@ import { KeyboardAvoidingView } from 'react-native-keyboard-controller';
 import { useFocusEffect } from '@react-navigation/native';
 import { COLORS } from '../../constants/colors';
 import {
-  getMyVenueApproval, getMyVenueOffer, setVenueCashbackOffer, getCashbackSettings, getVenueClaims, resolveCashbackClaim,
+  getCountries, getMyVenueApproval, getMyVenueOffer, setVenueCashbackOffer, getCashbackSettings, getVenueClaims, resolveCashbackClaim,
   getVenuePendingRedemptions, resolveCreditRedemption, getVenueCreditOutstanding,
   formatAmount, CLAIM_STATUS_LABEL, REWARD_LABEL,
 } from '../../lib/cashback';
@@ -25,6 +25,9 @@ const VenueCashbackScreen = ({ navigation }) => {
   const [creditDraft, setCreditDraft] = useState('');
   const [discountDraft, setDiscountDraft] = useState('');
   const [approved, setApproved] = useState(true);
+  const [countries, setCountries] = useState([]);
+  const [countryCode, setCountryCode] = useState(null);
+  const [showCountries, setShowCountries] = useState(false);
   const [maxCash, setMaxCash] = useState(0);
   const [claims, setClaims] = useState([]);
   const [redemptions, setRedemptions] = useState([]);
@@ -38,7 +41,8 @@ const VenueCashbackScreen = ({ navigation }) => {
   const load = useCallback(async () => {
     if (!profile?.id) return;
     setLoading(true);
-    const [approvalRes, offerRes, settingsRes, claimsRes, redemptionsRes, outstandingRes] = await Promise.all([
+    const [countriesRes, approvalRes, offerRes, settingsRes, claimsRes, redemptionsRes, outstandingRes] = await Promise.all([
+      getCountries(),
       getMyVenueApproval(profile.id),
       getMyVenueOffer(profile.id),
       getCashbackSettings(),
@@ -47,6 +51,8 @@ const VenueCashbackScreen = ({ navigation }) => {
       getVenueCreditOutstanding(),
     ]);
     const claimsData = claimsRes.data ?? [];
+    setCountries((countriesRes.data ?? []).filter((c) => c.is_active));
+    setCountryCode(offerRes.data?.country_code ?? null);
     setApproved(approvalRes.data?.venue_approved === true);
     setCashDraft(String(offerRes.data?.cash_percent ?? 0));
     setCreditDraft(String(offerRes.data?.credit_percent ?? 0));
@@ -64,10 +70,14 @@ const VenueCashbackScreen = ({ navigation }) => {
 
   useFocusEffect(useCallback(() => { load(); }, [load]));
 
+  // The venue's country fixes the currency every claim at it is in.
+  const currency = countries.find((c) => c.code === countryCode)?.currency_code ?? null;
+
   const handleSaveOffer = async () => {
+    if (!countryCode) return Alert.alert('Choose your country', 'Your country sets the currency your customers\' rewards are in.');
     setSavingOffer(true);
     const { error } = await setVenueCashbackOffer(
-      parseFloat(cashDraft) || 0, parseFloat(creditDraft) || 0, parseFloat(discountDraft) || 0,
+      parseFloat(cashDraft) || 0, parseFloat(creditDraft) || 0, parseFloat(discountDraft) || 0, countryCode,
     );
     setSavingOffer(false);
     if (error) return Alert.alert('Error', error.message ?? 'Could not save your offer.');
@@ -90,8 +100,8 @@ const VenueCashbackScreen = ({ navigation }) => {
       approve ? `Confirm this ${what}?` : `Reject this ${what}?`,
       approve
         ? isDiscount
-          ? `Take ${formatAmount(claim.cashback_amount)} off ${name}'s ${formatAmount(claim.spend_amount)} bill, then confirm. This can't be undone.`
-          : `Does the photo show ${formatAmount(claim.spend_amount)} spent at your venue? ${name} will get ${formatAmount(claim.cashback_amount)} ${REWARD_LABEL[claim.reward_type]}. This can't be undone.`
+          ? `Take ${formatAmount(claim.cashback_amount, claim.currency_code)} off ${name}'s ${formatAmount(claim.spend_amount, claim.currency_code)} bill, then confirm. This can't be undone.`
+          : `Does the photo show ${formatAmount(claim.spend_amount, claim.currency_code)} spent at your venue? ${name} will get ${formatAmount(claim.cashback_amount, claim.currency_code)} ${REWARD_LABEL[claim.reward_type]}. This can't be undone.`
         : `${name} won't get anything for this ${what}.`,
       [
         { text: 'Cancel', style: 'cancel' },
@@ -109,7 +119,7 @@ const VenueCashbackScreen = ({ navigation }) => {
     Alert.alert(
       approve ? 'Confirm store credit use?' : 'Reject this request?',
       approve
-        ? `Take ${formatAmount(redemption.amount)} off ${name}'s bill, then confirm. This can't be undone.`
+        ? `Take ${formatAmount(redemption.amount, redemption.currency_code)} off ${name}'s bill, then confirm. This can't be undone.`
         : `${name} keeps their credit.`,
       [
         { text: 'Cancel', style: 'cancel' },
@@ -148,6 +158,15 @@ const VenueCashbackScreen = ({ navigation }) => {
           Choose any mix of rewards; set one to 0 to not offer it. Cash back (up to {maxCash}%) is paid to the customer
           in money. Store credit can only be spent at your venue. A discount comes off the customer's bill at the till.
         </Text>
+        <Text style={styles.fieldLabel}>Your country</Text>
+        <TouchableOpacity style={styles.countryBtn} onPress={() => setShowCountries(true)} activeOpacity={0.8}>
+          <Text style={countryCode ? styles.countryText : styles.countryPlaceholder}>
+            {countryCode ? `${countries.find((c) => c.code === countryCode)?.name ?? countryCode} · ${currency ?? ''}` : 'Choose your country'}
+          </Text>
+        </TouchableOpacity>
+        <Text style={styles.sectionHint}>
+          It sets the currency for your customers' rewards and can't be changed once customers have claimed with you.
+        </Text>
         <View style={styles.offerRow}>
           <View style={styles.offerField}>
             <Text style={styles.fieldLabel}>Cash back %</Text>
@@ -180,7 +199,7 @@ const VenueCashbackScreen = ({ navigation }) => {
         <TouchableOpacity style={styles.saveBtn} onPress={handleSaveOffer} disabled={savingOffer}>
           {savingOffer ? <ActivityIndicator color={COLORS.black} /> : <Text style={styles.saveBtnText}>Save offer</Text>}
         </TouchableOpacity>
-        <Text style={styles.outstanding}>Store credit you owe customers: {formatAmount(outstanding)}</Text>
+        <Text style={styles.outstanding}>Store credit you owe customers: {formatAmount(outstanding, currency)}</Text>
 
         <Text style={[styles.sectionLabel, { marginTop: 28 }]}>Waiting for you ({waiting})</Text>
         {loading ? (
@@ -207,9 +226,9 @@ const VenueCashbackScreen = ({ navigation }) => {
                       <View style={styles.cardText}>
                         <Text style={styles.cardName}>{claim.member?.full_name ?? 'Customer'}</Text>
                         <Text style={styles.cardMeta}>
-                          {claim.reward_type === 'discount' ? `Bill ${formatAmount(claim.spend_amount)}` : `Spent ${formatAmount(claim.spend_amount)}`}
+                          {claim.reward_type === 'discount' ? `Bill ${formatAmount(claim.spend_amount, claim.currency_code)}` : `Spent ${formatAmount(claim.spend_amount, claim.currency_code)}`}
                         </Text>
-                        <Text style={styles.cardMeta}>{formatAmount(claim.cashback_amount)} {REWARD_LABEL[claim.reward_type]}</Text>
+                        <Text style={styles.cardMeta}>{formatAmount(claim.cashback_amount, claim.currency_code)} {REWARD_LABEL[claim.reward_type]}</Text>
                         <Text style={styles.cardTime}>{formatAgo(claim.created_at)}{url ? ' · tap photo to enlarge' : ''}</Text>
                       </View>
                     </View>
@@ -232,7 +251,7 @@ const VenueCashbackScreen = ({ navigation }) => {
                 <GradientBorder key={r.id} radius={14} style={styles.cardOuter}>
                   <View style={styles.card}>
                     <Text style={styles.cardName}>{r.member?.full_name ?? 'Customer'} wants to use store credit</Text>
-                    <Text style={styles.cardMeta}>{formatAmount(r.amount)} off their bill</Text>
+                    <Text style={styles.cardMeta}>{formatAmount(r.amount, r.currency_code)} off their bill</Text>
                     <Text style={styles.cardTime}>{formatAgo(r.created_at)}</Text>
                     <View style={styles.actions}>
                       <TouchableOpacity style={styles.confirmBtn} onPress={() => confirmRedemption(r, true)} disabled={busy}>
@@ -257,7 +276,7 @@ const VenueCashbackScreen = ({ navigation }) => {
                 <View style={styles.cardText}>
                   <Text style={styles.cardName}>{c.member?.full_name ?? 'Customer'}</Text>
                   <Text style={styles.cardTime}>
-                    {formatAmount(c.spend_amount)} → {formatAmount(c.cashback_amount)} {REWARD_LABEL[c.reward_type]} · {formatAgo(c.created_at)}
+                    {formatAmount(c.spend_amount, c.currency_code)} → {formatAmount(c.cashback_amount, c.currency_code)} {REWARD_LABEL[c.reward_type]} · {formatAgo(c.created_at)}
                   </Text>
                 </View>
                 <Text style={[styles.status, { color: STATUS_COLOR[c.status] }]}>{CLAIM_STATUS_LABEL[c.status]}</Text>
@@ -266,6 +285,29 @@ const VenueCashbackScreen = ({ navigation }) => {
           </>
         )}
       </ScrollView>
+
+      <Modal visible={showCountries} transparent animationType="fade" onRequestClose={() => setShowCountries(false)}>
+        <View style={styles.pickerBackdrop}>
+          <View style={styles.pickerCard}>
+            <Text style={styles.pickerTitle}>Your country</Text>
+            <ScrollView>
+              {countries.map((c) => (
+                <TouchableOpacity
+                  key={c.code}
+                  style={[styles.pickerRow, c.code === countryCode && styles.pickerRowActive]}
+                  onPress={() => { setCountryCode(c.code); setShowCountries(false); }}
+                >
+                  <Text style={styles.pickerName}>{c.name}</Text>
+                  <Text style={styles.pickerCurrency}>{c.currency_code}</Text>
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
+            <TouchableOpacity style={styles.viewerClose} onPress={() => setShowCountries(false)}>
+              <Text style={styles.viewerCloseText}>Cancel</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
 
       <Modal visible={!!viewing} transparent animationType="fade" onRequestClose={() => setViewing(null)}>
         <View style={styles.viewerBackdrop}>
@@ -324,6 +366,22 @@ const styles = StyleSheet.create({
     borderWidth: 1, borderColor: COLORS.border,
   },
   status: { fontSize: 11, fontWeight: '800' },
+  countryBtn: {
+    backgroundColor: COLORS.surface, borderWidth: 1, borderColor: COLORS.borderAccent,
+    borderRadius: 14, padding: 14, marginBottom: 6,
+  },
+  countryText: { fontSize: 14, color: COLORS.text },
+  countryPlaceholder: { fontSize: 14, color: COLORS.textMuted },
+  pickerBackdrop: { flex: 1, backgroundColor: 'rgba(0,0,0,0.6)', justifyContent: 'center', padding: 24 },
+  pickerCard: { backgroundColor: COLORS.surface, borderRadius: 16, padding: 16, maxHeight: '80%' },
+  pickerTitle: { fontSize: 16, fontWeight: '700', color: COLORS.text, marginBottom: 10 },
+  pickerRow: {
+    flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',
+    paddingVertical: 12, paddingHorizontal: 10, borderRadius: 10,
+  },
+  pickerRowActive: { backgroundColor: COLORS.surfaceAlt },
+  pickerName: { fontSize: 14, color: COLORS.text },
+  pickerCurrency: { fontSize: 12, fontWeight: '700', color: COLORS.primary },
   viewerBackdrop: { flex: 1, backgroundColor: 'rgba(0,0,0,0.92)', justifyContent: 'center' },
   viewerImage: { width: '100%', height: '85%' },
   viewerClose: { alignSelf: 'center', paddingVertical: 12, paddingHorizontal: 28 },

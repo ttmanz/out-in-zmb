@@ -72,6 +72,7 @@ import AdminAccessControlScreen from '../screens/main/AdminAccessControlScreen';
 import AdminReportsScreen from '../screens/main/AdminReportsScreen';
 import AdminPointsScreen from '../screens/main/AdminPointsScreen';
 import AdminCashbackScreen from '../screens/main/AdminCashbackScreen';
+import AdminPayoutSetupScreen from '../screens/main/AdminPayoutSetupScreen';
 import AdminClipsScreen from '../screens/main/AdminClipsScreen';
 import AdminFlaggedMembersScreen from '../screens/main/AdminFlaggedMembersScreen';
 
@@ -163,6 +164,7 @@ const AdminStackNavigator = () => (
     <AdminStack.Screen name={ROUTES.ADMIN_FLAGGED_MEMBERS} component={AdminFlaggedMembersScreen} />
     <AdminStack.Screen name={ROUTES.ADMIN_POINTS} component={AdminPointsScreen} />
     <AdminStack.Screen name={ROUTES.ADMIN_CASHBACK} component={AdminCashbackScreen} />
+    <AdminStack.Screen name={ROUTES.ADMIN_PAYOUT_SETUP} component={AdminPayoutSetupScreen} />
   </AdminStack.Navigator>
 );
 

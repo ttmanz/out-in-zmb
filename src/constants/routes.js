@@ -63,4 +63,5 @@ export const ROUTES = {
   SUBMIT_RECEIPT: 'SubmitReceipt',
   VENUE_CASHBACK: 'VenueCashback',
   ADMIN_CASHBACK: 'AdminCashback',
+  ADMIN_PAYOUT_SETUP: 'AdminPayoutSetup',
 };

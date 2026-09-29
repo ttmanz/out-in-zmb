@@ -5,10 +5,11 @@ import {
 } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import { COLORS } from '../../constants/colors';
+import { ROUTES } from '../../constants/routes';
 import {
   getCashbackSettings, updateCashbackSettings, getPendingCashbackPayoutRequests,
   getRecentCashbackPayoutRequests, resolveCashbackPayout, getRecentCashbackClaims,
-  getVenueOwners, setVenueApproved,
+  getVenueOwners, getVenueCountries, getCountries, setVenueApproved,
   formatAmount, CLAIM_STATUS_LABEL, REWARD_LABEL,
 } from '../../lib/cashback';
 import { formatAgo } from '../../utils/format';
@@ -16,27 +17,30 @@ import BackHeader from '../../components/common/BackHeader';
 
 const AdminCashbackScreen = ({ navigation }) => {
   const [percentDraft, setPercentDraft] = useState('');
-  const [minSpendDraft, setMinSpendDraft] = useState('');
   const [savingSettings, setSavingSettings] = useState(false);
   const [pending, setPending] = useState([]);
   const [resolved, setResolved] = useState([]);
   const [claims, setClaims] = useState([]);
   const [venues, setVenues] = useState([]);
+  const [countryOf, setCountryOf] = useState({});
   const [loading, setLoading] = useState(true);
   const [busyId, setBusyId] = useState(null);
 
   const load = useCallback(async () => {
     setLoading(true);
-    const [{ data: settingsData }, { data: pendingData }, { data: resolvedData }, { data: claimsData }, { data: venuesData }] = await Promise.all([
+    const [{ data: settingsData }, { data: pendingData }, { data: resolvedData }, { data: claimsData }, { data: venuesData }, { data: venueCountries }, { data: countriesData }] = await Promise.all([
       getCashbackSettings(),
       getPendingCashbackPayoutRequests(),
       getRecentCashbackPayoutRequests(),
       getRecentCashbackClaims(),
       getVenueOwners(),
+      getVenueCountries(),
+      getCountries(),
     ]);
     setVenues(venuesData ?? []);
     setPercentDraft(String(settingsData?.max_cash_percent ?? ''));
-    setMinSpendDraft(String(settingsData?.min_spend ?? ''));
+    const names = Object.fromEntries((countriesData ?? []).map((c) => [c.code, `${c.name} · ${c.currency_code}`]));
+    setCountryOf(Object.fromEntries((venueCountries ?? []).map((o) => [o.venue_owner_id, names[o.country_code] ?? o.country_code])));
     setPending(pendingData ?? []);
     setResolved(resolvedData ?? []);
     setClaims(claimsData ?? []);
@@ -47,13 +51,12 @@ const AdminCashbackScreen = ({ navigation }) => {
 
   const handleSaveSettings = async () => {
     const percent = parseFloat(percentDraft);
-    const minSpend = parseFloat(minSpendDraft) || 0;
     if (!Number.isFinite(percent) || percent <= 0) {
       Alert.alert('Error', 'Enter a positive percentage.');
       return;
     }
     setSavingSettings(true);
-    const { error } = await updateCashbackSettings(percent, minSpend);
+    const { error } = await updateCashbackSettings(percent);
     setSavingSettings(false);
     if (error) {
       Alert.alert('Error', 'Could not save. Please try again.');
@@ -94,7 +97,7 @@ const AdminCashbackScreen = ({ navigation }) => {
     Alert.alert(
       verb,
       approve
-        ? `Confirm you've sent ${formatAmount(request.amount)} to ${request.mobile_money_number}.`
+        ? `Confirm you've sent ${formatAmount(request.amount, request.currency_code)} to ${request.mobile_money_number} (${request.method_label}).`
         : `${request.member?.full_name ?? 'This member'}'s balance will be refunded.`,
       [
         { text: 'Cancel', style: 'cancel' },
@@ -146,7 +149,7 @@ const AdminCashbackScreen = ({ navigation }) => {
                   <Text style={styles.time}>
                     {[v.city, v.phone, v.instagram ? `@${v.instagram}` : null].filter(Boolean).join(' · ') || 'No contact details'}
                   </Text>
-                  <Text style={styles.time}>Joined {formatAgo(v.created_at)}</Text>
+                  <Text style={styles.time}>{countryOf[v.id] ?? 'No country chosen yet'} · Joined {formatAgo(v.created_at)}</Text>
                 </View>
                 {v.venue_approved ? (
                   <TouchableOpacity style={[styles.declineBtn, styles.venueBtn]} onPress={() => handleVenue(v, false)} disabled={busyId === v.id}>
@@ -162,7 +165,7 @@ const AdminCashbackScreen = ({ navigation }) => {
 
             <Text style={[styles.sectionLabel, { marginTop: 24 }]}>Cash Back Rate</Text>
             <Text style={styles.sectionHint}>
-              Venues set their own cash back and store credit rates. This caps how much cash back any venue can offer (you pay members before recovering it from the venue), and sets the smallest receipt that qualifies.
+              Venues set their own cash back and store credit rates. This caps how much cash back any venue can offer (you pay members before recovering it from the venue). Minimum receipt size is set per country.
             </Text>
             <View style={styles.settingsRow}>
               <View style={styles.settingsField}>
@@ -174,18 +177,17 @@ const AdminCashbackScreen = ({ navigation }) => {
                   keyboardType="decimal-pad"
                 />
               </View>
-              <View style={styles.settingsField}>
-                <Text style={styles.ruleLabel}>Min spend</Text>
-                <TextInput
-                  style={styles.settingsInput}
-                  value={minSpendDraft}
-                  onChangeText={setMinSpendDraft}
-                  keyboardType="decimal-pad"
-                />
-              </View>
             </View>
             <TouchableOpacity style={styles.saveBtn} onPress={handleSaveSettings} disabled={savingSettings}>
               {savingSettings ? <ActivityIndicator color={COLORS.black} /> : <Text style={styles.saveBtnText}>Save Rate</Text>}
+            </TouchableOpacity>
+
+            <Text style={[styles.sectionLabel, { marginTop: 24 }]}>Countries and payout methods</Text>
+            <Text style={styles.sectionHint}>
+              Each venue's country sets its currency. Payout methods decide how members can be paid in each currency.
+            </Text>
+            <TouchableOpacity style={styles.saveBtn} onPress={() => navigation.navigate(ROUTES.ADMIN_PAYOUT_SETUP)}>
+              <Text style={styles.saveBtnText}>Manage countries and payout methods</Text>
             </TouchableOpacity>
 
             <Text style={[styles.sectionLabel, { marginTop: 24 }]}>Pending Payouts ({pending.length})</Text>
@@ -198,7 +200,8 @@ const AdminCashbackScreen = ({ navigation }) => {
             <View style={styles.requestRow}>
               <View style={styles.info}>
                 <Text style={styles.name}>{item.member?.full_name ?? 'Member'}</Text>
-                <Text style={styles.meta}>{formatAmount(item.amount)} → {item.mobile_money_number}</Text>
+                <Text style={styles.meta}>{formatAmount(item.amount, item.currency_code)} via {item.method_label}</Text>
+                <Text style={styles.meta}>{item.mobile_money_number}</Text>
                 <Text style={styles.time}>{formatAgo(item.requested_at)}</Text>
               </View>
               <View style={styles.requestActions}>
@@ -223,7 +226,7 @@ const AdminCashbackScreen = ({ navigation }) => {
                   <Text style={styles.activityTime}>{formatAgo(r.resolved_at ?? r.requested_at)}</Text>
                 </View>
                 <Text style={[styles.activityAmount, r.status === 'rejected' && styles.activityAmountNegative]}>
-                  {formatAmount(r.amount)} · {r.status === 'paid' ? 'Paid' : 'Declined'}
+                  {formatAmount(r.amount, r.currency_code)} · {r.status === 'paid' ? 'Paid' : 'Declined'}
                 </Text>
               </View>
             ))}
@@ -237,7 +240,7 @@ const AdminCashbackScreen = ({ navigation }) => {
                   <Text style={styles.activityTime}>{CLAIM_STATUS_LABEL[c.status]} · {formatAgo(c.created_at)}</Text>
                 </View>
                 <Text style={[styles.activityAmount, c.status !== 'confirmed' && styles.activityAmountNegative]}>
-                  {formatAmount(c.spend_amount)} → {formatAmount(c.cashback_amount)} {REWARD_LABEL[c.reward_type]}
+                  {formatAmount(c.spend_amount, c.currency_code)} → {formatAmount(c.cashback_amount, c.currency_code)} {REWARD_LABEL[c.reward_type]}
                 </Text>
               </View>
             ))}
