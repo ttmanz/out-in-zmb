@@ -8,6 +8,7 @@ import { COLORS } from '../../constants/colors';
 import {
   getCashbackSettings, updateCashbackSettings, getPendingCashbackPayoutRequests,
   getRecentCashbackPayoutRequests, resolveCashbackPayout, getRecentCashbackClaims,
+  getVenueOwners, setVenueApproved,
   formatZmw, CLAIM_STATUS_LABEL, REWARD_LABEL,
 } from '../../lib/cashback';
 import { formatAgo } from '../../utils/format';
@@ -20,17 +21,20 @@ const AdminCashbackScreen = ({ navigation }) => {
   const [pending, setPending] = useState([]);
   const [resolved, setResolved] = useState([]);
   const [claims, setClaims] = useState([]);
+  const [venues, setVenues] = useState([]);
   const [loading, setLoading] = useState(true);
   const [busyId, setBusyId] = useState(null);
 
   const load = useCallback(async () => {
     setLoading(true);
-    const [{ data: settingsData }, { data: pendingData }, { data: resolvedData }, { data: claimsData }] = await Promise.all([
+    const [{ data: settingsData }, { data: pendingData }, { data: resolvedData }, { data: claimsData }, { data: venuesData }] = await Promise.all([
       getCashbackSettings(),
       getPendingCashbackPayoutRequests(),
       getRecentCashbackPayoutRequests(),
       getRecentCashbackClaims(),
+      getVenueOwners(),
     ]);
+    setVenues(venuesData ?? []);
     setPercentDraft(String(settingsData?.max_cash_percent ?? ''));
     setMinSpendDraft(String(settingsData?.min_spend ?? ''));
     setPending(pendingData ?? []);
@@ -56,6 +60,33 @@ const AdminCashbackScreen = ({ navigation }) => {
       return;
     }
     load();
+  };
+
+  const handleVenue = (venue, approve) => {
+    const name = venue.full_name ?? 'this venue';
+    Alert.alert(
+      approve ? `Approve ${name}?` : `Remove approval for ${name}?`,
+      approve
+        ? 'Customers will see this venue and can send it receipts. It will be able to confirm cash back, which you then pay out — only approve venues you trust.'
+        : 'It will disappear from customers\' lists and can\'t confirm anything until approved again. Store credit customers already hold stays on their account.',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: approve ? 'Approve' : 'Remove',
+          style: approve ? 'default' : 'destructive',
+          onPress: async () => {
+            setBusyId(venue.id);
+            const { error } = await setVenueApproved(venue.id, approve);
+            setBusyId(null);
+            if (error) {
+              Alert.alert('Error', error.message ?? 'Could not update this venue.');
+              return;
+            }
+            load();
+          },
+        },
+      ],
+    );
   };
 
   const handleResolve = (request, approve) => {
@@ -103,7 +134,33 @@ const AdminCashbackScreen = ({ navigation }) => {
         contentContainerStyle={styles.list}
         ListHeaderComponent={
           <>
-            <Text style={styles.sectionLabel}>Cash Back Rate</Text>
+            <Text style={styles.sectionLabel}>Venues ({venues.filter((v) => !v.venue_approved).length} waiting)</Text>
+            <Text style={styles.sectionHint}>
+              Anyone can sign up as a venue owner. A venue isn't listed to customers, and can't confirm receipts, until you approve it.
+            </Text>
+            {venues.length === 0 && <Text style={styles.empty}>No venue accounts yet.</Text>}
+            {venues.map((v) => (
+              <View key={v.id} style={styles.venueRow}>
+                <View style={styles.activityText}>
+                  <Text style={styles.name}>{v.full_name || 'Unnamed venue'}</Text>
+                  <Text style={styles.time}>
+                    {[v.city, v.phone, v.instagram ? `@${v.instagram}` : null].filter(Boolean).join(' · ') || 'No contact details'}
+                  </Text>
+                  <Text style={styles.time}>Joined {formatAgo(v.created_at)}</Text>
+                </View>
+                {v.venue_approved ? (
+                  <TouchableOpacity style={[styles.declineBtn, styles.venueBtn]} onPress={() => handleVenue(v, false)} disabled={busyId === v.id}>
+                    <Text style={styles.declineBtnText}>Approved · Remove</Text>
+                  </TouchableOpacity>
+                ) : (
+                  <TouchableOpacity style={[styles.payBtn, styles.venueBtn]} onPress={() => handleVenue(v, true)} disabled={busyId === v.id}>
+                    {busyId === v.id ? <ActivityIndicator size="small" color={COLORS.black} /> : <Text style={styles.payBtnText}>Approve</Text>}
+                  </TouchableOpacity>
+                )}
+              </View>
+            ))}
+
+            <Text style={[styles.sectionLabel, { marginTop: 24 }]}>Cash Back Rate</Text>
             <Text style={styles.sectionHint}>
               Venues set their own cash back and store credit rates. This caps how much cash back any venue can offer (you pay members before recovering it from the venue), and sets the smallest receipt that qualifies.
             </Text>
@@ -216,6 +273,12 @@ const styles = StyleSheet.create({
   },
   saveBtnText: { fontSize: 13, fontWeight: '800', color: COLORS.black },
   empty: { fontSize: 13, color: COLORS.textMuted, marginHorizontal: 20 },
+  venueBtn: { flex: 0, paddingHorizontal: 14, marginLeft: 8 },
+  venueRow: {
+    flexDirection: 'row', alignItems: 'center',
+    backgroundColor: COLORS.surface, borderRadius: 12, padding: 12,
+    marginHorizontal: 20, marginBottom: 8, borderWidth: 1, borderColor: COLORS.border,
+  },
   requestRow: {
     backgroundColor: COLORS.surface, borderRadius: 12, padding: 14,
     marginHorizontal: 20, marginBottom: 8, borderWidth: 1, borderColor: COLORS.borderAccent,

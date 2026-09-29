@@ -31,7 +31,7 @@ const InviteFriendsScreen = ({ navigation }) => {
 
   const handleShare = () => {
     Share.share({
-      message: `Join me on Out-in-Zmb! Use my code ${code} when you sign up and we both get bonus points. 🎉`,
+      message: `Join me on Rollout Plus! Use my code ${code} when you sign up and we both get bonus points. 🎉`,
     });
   };
 

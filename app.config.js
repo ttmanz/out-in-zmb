@@ -1,6 +1,6 @@
 module.exports = () => {
   const config = {
-    name: "Out-in-Zmb",
+    name: "Rollout Plus",
     slug: "out-in-zmb",
     scheme: "outandaround",
     version: "1.0.0",
@@ -15,20 +15,20 @@ module.exports = () => {
     },
     ios: {
       supportsTablet: false,
-      bundleIdentifier: "com.ttleisureland.outinzmb",
+      bundleIdentifier: "com.ttleisureland.rolloutplus",
       buildNumber: "1",
       infoPlist: {
         ITSAppUsesNonExemptEncryption: false,
-        NSLocationWhenInUseUsageDescription: "Out-in-Zmb uses your location to show nearby members on the At Venue map and tag posts with your area.",
-        NSLocationAlwaysAndWhenInUseUsageDescription: "Out-in-Zmb uses your location to show nearby members on the At Venue map and tag posts with your area.",
-        NSCameraUsageDescription: "Out-in-Zmb uses your camera to take profile photos and post images.",
-        NSPhotoLibraryUsageDescription: "Out-in-Zmb accesses your photo library to upload profile photos and post images.",
-        NSPhotoLibraryAddUsageDescription: "Out-in-Zmb saves photos to your library.",
-        NSMicrophoneUsageDescription: "Out-in-Zmb may access your microphone for video features."
+        NSLocationWhenInUseUsageDescription: "Rollout Plus uses your location to show nearby members on the At Venue map and tag posts with your area.",
+        NSLocationAlwaysAndWhenInUseUsageDescription: "Rollout Plus uses your location to show nearby members on the At Venue map and tag posts with your area.",
+        NSCameraUsageDescription: "Rollout Plus uses your camera to take profile photos and post images.",
+        NSPhotoLibraryUsageDescription: "Rollout Plus accesses your photo library to upload profile photos and post images.",
+        NSPhotoLibraryAddUsageDescription: "Rollout Plus saves photos to your library.",
+        NSMicrophoneUsageDescription: "Rollout Plus may access your microphone for video features."
       }
     },
     android: {
-      package: "com.ttleisureland.outinzmb",
+      package: "com.ttleisureland.rolloutplus",
       // No Firebase project set up for this app yet, so there's no
       // google-services.json (local or via the GOOGLE_SERVICES_JSON file
       // secret) — omit the field until push notifications are wired up;
@@ -60,14 +60,14 @@ module.exports = () => {
       [
         "expo-location",
         {
-          locationAlwaysAndWhenInUsePermission: "Out-in-Zmb uses your location to show nearby members on the At Venue map and tag posts with your area."
+          locationAlwaysAndWhenInUsePermission: "Rollout Plus uses your location to show nearby members on the At Venue map and tag posts with your area."
         }
       ],
       [
         "expo-image-picker",
         {
-          photosPermission: "Out-in-Zmb accesses your photos to upload profile and post images.",
-          cameraPermission: "Out-in-Zmb uses your camera to take profile and post photos."
+          photosPermission: "Rollout Plus accesses your photos to upload profile and post images.",
+          cameraPermission: "Rollout Plus uses your camera to take profile and post photos."
         }
       ],
       "@react-native-community/datetimepicker",

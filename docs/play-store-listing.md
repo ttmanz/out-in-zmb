@@ -1,13 +1,13 @@
-# Google Play Store Listing — Out-in-Zmb
+# Google Play Store Listing — Rollout Plus
 
 ## App Details
-- **Package:** com.ttleisureland.outinzmb
+- **Package:** com.ttleisureland.rolloutplus
 - **Category:** Social
 - **Content Rating:** Teen (13+) — suggested; fill IARC questionnaire in Play Console
 - **Target Audience:** 18+ (configure in Play Console → Store presence → Target audience)
-- **Website:** https://out-in-zmb.com
-- **Privacy Policy URL:** https://out-in-zmb.com/privacy-policy.html
-- **Email:** support@out-in-zmb.com
+- **Website:** https://rollout-plus.com
+- **Privacy Policy URL:** https://rollout-plus.com/privacy-policy.html
+- **Email:** support@rollout-plus.com
 
 ---
 
@@ -20,9 +20,9 @@ Go out, find people nearby and plan unforgettable nights out.
 
 ### Full Description (4000 chars max)
 ```
-Out-in-Zmb is the social app built for people who actually go out.
+Rollout Plus is the social app built for people who actually go out.
 
-Whether you're heading to a bar, a rooftop, a club, or a lakeside party — Out-in-Zmb connects you with real people who are out at the same venues, planning the same kinds of nights, and looking to meet.
+Whether you're heading to a bar, a rooftop, a club, or a lakeside party — Rollout Plus connects you with real people who are out at the same venues, planning the same kinds of nights, and looking to meet.
 
 WHAT YOU CAN DO
 
@@ -49,9 +49,9 @@ PRIVACY FIRST
 
 Your location is only shared when you choose to check in. It's shown to a limited radius (300m) and automatically hidden after 3 hours. You control everything — what's visible, who can message you, and when you appear.
 
-Out-in-Zmb is built for Zambia but open to anyone who loves going out.
+Rollout Plus is built for Zambia but open to anyone who loves going out.
 
-Out-in-Zmb. Go out. Connect. Meet people.
+Rollout Plus. Go out. Connect. Meet people.
 ```
 
 ---
@@ -85,7 +85,7 @@ Answer these in Play Console:
 **YES**
 
 ### Can users request data deletion?
-**YES** — via support@out-in-zmb.com
+**YES** — via support@rollout-plus.com
 
 ---
 
@@ -116,8 +116,8 @@ Expected rating: **PEGI 12** or **Teen**
 - [ ] Set category: Social
 - [ ] Set content rating (fill questionnaire above)
 - [ ] Fill data safety form (answers above)
-- [ ] Set privacy policy URL: https://out-in-zmb.com/privacy-policy.html
-- [ ] Set app website: https://out-in-zmb.com
-- [ ] Set support email: support@out-in-zmb.com
+- [ ] Set privacy policy URL: https://rollout-plus.com/privacy-policy.html
+- [ ] Set app website: https://rollout-plus.com
+- [ ] Set support email: support@rollout-plus.com
 - [ ] Set target age group: 18+
 - [ ] Pricing: Free

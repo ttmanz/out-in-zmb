@@ -96,6 +96,11 @@ export const getMyPendingCreditRedemptions = (userId) =>
 
 // --- Venue owner ---
 
+// Venues start unapproved: they can set an offer, but aren't listed to
+// customers and can't confirm anything until an admin approves them.
+export const getMyVenueApproval = (venueOwnerId) =>
+  supabase.from('profiles').select('venue_approved').eq('id', venueOwnerId).single();
+
 export const getMyVenueOffer = (venueOwnerId) =>
   supabase.from('venue_cashback_offers').select('cash_percent, credit_percent, discount_percent').eq('venue_owner_id', venueOwnerId).maybeSingle();
 
@@ -132,6 +137,18 @@ export const resolveCreditRedemption = (redemptionId, approve) =>
 export const getVenueCreditOutstanding = () => supabase.rpc('venue_credit_outstanding');
 
 // --- Admin ---
+
+// Every venue account, unapproved ones first, with enough detail to vet them.
+export const getVenueOwners = () =>
+  supabase
+    .from('profiles')
+    .select('id, full_name, city, phone, instagram, venue_approved, created_at')
+    .eq('account_type', 'venue_owner')
+    .order('venue_approved', { ascending: true })
+    .order('created_at', { ascending: false });
+
+export const setVenueApproved = (venueOwnerId, approved) =>
+  supabase.rpc('set_venue_approved', { p_venue_owner_id: venueOwnerId, p_approved: approved });
 
 export const getCashbackSettings = () =>
   supabase.from('cashback_settings').select('*').eq('id', true).single();

@@ -152,7 +152,7 @@ const resolveActivityEventRoute = async (eventId) => {
   };
 };
 
-// --- Shared-post deep links (out-in-zmb.com/p/:type/:id -> outandaround://post/:type/:id) ---
+// --- Shared-post deep links (rollout-plus.com/p/:type/:id -> outandaround://post/:type/:id) ---
 // Reuses the same per-type route resolvers as reply notifications above.
 export const resolvePostDeepLink = async (type, id) => {
   if (type === 'story') return { stack: 'HomeTab', screen: ROUTES.STORY_FEED, params: { focusItemId: id } };
@@ -200,7 +200,8 @@ export const resolveNotificationRoute = async (item, fallbackName = 'Someone') =
     return { stack: 'HomeTab', screen: ROUTES.VENUE_CASHBACK };
   }
   if (item.type === 'cashback_result') {
-    return { stack: 'HomeTab', screen: ROUTES.MY_CASHBACK };
+    const forVenue = item.reference_type?.startsWith('venue_');
+    return { stack: 'HomeTab', screen: forVenue ? ROUTES.VENUE_CASHBACK : ROUTES.MY_CASHBACK };
   }
   if (item.type === 'new_post') {
     const screen = NEW_POST_TARGETS[item.reference_type];

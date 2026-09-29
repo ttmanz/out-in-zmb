@@ -7,7 +7,7 @@ import { KeyboardAvoidingView } from 'react-native-keyboard-controller';
 import { useFocusEffect } from '@react-navigation/native';
 import { COLORS } from '../../constants/colors';
 import {
-  getMyVenueOffer, setVenueCashbackOffer, getCashbackSettings, getVenueClaims, resolveCashbackClaim,
+  getMyVenueApproval, getMyVenueOffer, setVenueCashbackOffer, getCashbackSettings, getVenueClaims, resolveCashbackClaim,
   getVenuePendingRedemptions, resolveCreditRedemption, getVenueCreditOutstanding,
   formatZmw, CLAIM_STATUS_LABEL, REWARD_LABEL,
 } from '../../lib/cashback';
@@ -24,6 +24,7 @@ const VenueCashbackScreen = ({ navigation }) => {
   const [cashDraft, setCashDraft] = useState('');
   const [creditDraft, setCreditDraft] = useState('');
   const [discountDraft, setDiscountDraft] = useState('');
+  const [approved, setApproved] = useState(true);
   const [maxCash, setMaxCash] = useState(0);
   const [claims, setClaims] = useState([]);
   const [redemptions, setRedemptions] = useState([]);
@@ -37,7 +38,8 @@ const VenueCashbackScreen = ({ navigation }) => {
   const load = useCallback(async () => {
     if (!profile?.id) return;
     setLoading(true);
-    const [offerRes, settingsRes, claimsRes, redemptionsRes, outstandingRes] = await Promise.all([
+    const [approvalRes, offerRes, settingsRes, claimsRes, redemptionsRes, outstandingRes] = await Promise.all([
+      getMyVenueApproval(profile.id),
       getMyVenueOffer(profile.id),
       getCashbackSettings(),
       getVenueClaims(profile.id),
@@ -45,6 +47,7 @@ const VenueCashbackScreen = ({ navigation }) => {
       getVenueCreditOutstanding(),
     ]);
     const claimsData = claimsRes.data ?? [];
+    setApproved(approvalRes.data?.venue_approved === true);
     setCashDraft(String(offerRes.data?.cash_percent ?? 0));
     setCreditDraft(String(offerRes.data?.credit_percent ?? 0));
     setDiscountDraft(String(offerRes.data?.discount_percent ?? 0));
@@ -128,6 +131,18 @@ const VenueCashbackScreen = ({ navigation }) => {
       <BackHeader title="Cash Back" onBack={() => navigation.goBack()} />
 
       <ScrollView contentContainerStyle={styles.scroll} keyboardShouldPersistTaps="handled">
+        {!loading && !approved && (
+          <GradientBorder radius={14} style={styles.bannerOuter}>
+            <View style={styles.banner}>
+              <Text style={styles.bannerTitle}>Waiting for approval</Text>
+              <Text style={styles.bannerText}>
+                An admin needs to approve your venue before customers can see it or send you receipts.
+                You can set your offer now so it's ready.
+              </Text>
+            </View>
+          </GradientBorder>
+        )}
+
         <Text style={styles.sectionLabel}>Your offer</Text>
         <Text style={styles.sectionHint}>
           Choose any mix of rewards; set one to 0 to not offer it. Cash back (up to {maxCash}%) is paid to the customer
@@ -267,6 +282,10 @@ const VenueCashbackScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: COLORS.background },
   scroll: { padding: 20, paddingBottom: 48 },
+  bannerOuter: { marginBottom: 20 },
+  banner: { backgroundColor: COLORS.surface, borderRadius: 13.5, padding: 14 },
+  bannerTitle: { fontSize: 14, fontWeight: '800', color: COLORS.textSecondary, marginBottom: 4 },
+  bannerText: { fontSize: 12, color: COLORS.textLight, lineHeight: 17 },
   sectionLabel: {
     fontSize: 13, fontWeight: '700', color: COLORS.primary,
     textTransform: 'uppercase', letterSpacing: 0.8, marginBottom: 6,

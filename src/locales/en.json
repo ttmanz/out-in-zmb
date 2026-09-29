@@ -1,6 +1,6 @@
 {
   "common": {
-    "appName": "Out-in-Zmb",
+    "appName": "Rollout Plus",
     "error": "Something went wrong",
     "or": "or",
     "and": "and",
@@ -14,7 +14,7 @@
     "liveVideo": "Video",
     "cameraPermissionNeeded": "Allow camera access to capture a live photo or video.",
     "featureUnavailable": "This feature isn't available right now.",
-    "shareFallback": "Check out this post on Out-in-Zmb!",
+    "shareFallback": "Check out this post on Rollout Plus!",
     "noSavedItems": "You haven't saved anything here yet — tap the bookmark on a post to keep it.",
     "delete": "Delete",
     "deletePostTitle": "Delete post?",
@@ -250,7 +250,7 @@
     "deleteAccountConfirm": "Delete",
     "deleteAccountFinalWarning": "Are you absolutely sure? Your account and all your data will be gone forever.",
     "deleteAccountFinalConfirm": "Yes, delete everything",
-    "deleteAccountFailed": "Could not delete your account. Please try again or contact support@out-in-zmb.com."
+    "deleteAccountFailed": "Could not delete your account. Please try again or contact support@rollout-plus.com."
   },
   "venues": {
     "title": "Where to Go",
@@ -291,6 +291,8 @@
       "claim_rejected": "{{name}} rejected your K{{amount}} receipt",
       "discount_confirmed": "{{name}} confirmed your discount — K{{amount}} off",
       "discount_rejected": "{{name}} declined your K{{amount}} discount",
+      "venue_approved": "Your venue was approved — customers can now claim rewards with you",
+      "venue_revoked": "Your venue's approval was removed — customers can't claim rewards with you for now",
       "redemption_confirmed": "{{name}} confirmed your use of K{{amount}} store credit",
       "redemption_rejected": "{{name}} declined your request to use K{{amount}} store credit"
     }
@@ -348,7 +350,7 @@
     "replyPlaceholder": "Write a reply...",
     "send": "Send",
     "errorReplyFailed": "Could not send your reply. Please try again.",
-    "shareFallback": "Check out this story on Out-in-Zmb!",
+    "shareFallback": "Check out this story on Rollout Plus!",
     "errors": {
       "contentRequired": "Please add some text or a photo/video",
       "mediaFailed": "Media upload failed. Post without media?",
@@ -532,7 +534,7 @@
     "detailsPlaceholder": "Add details (optional)",
     "submit": "Submit report",
     "thanksTitle": "Report received",
-    "thanksBody": "Thank you for helping keep Out-in-Zmb safe. Our team will review this report within 24 hours.",
+    "thanksBody": "Thank you for helping keep Rollout Plus safe. Our team will review this report within 24 hours.",
     "reportMember": "Report member"
   }
 }

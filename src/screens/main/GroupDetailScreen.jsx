@@ -162,7 +162,7 @@ const GroupDetailScreen = ({ navigation, route }) => {
   };
 
   const handleShare = async (post) => {
-    const shareUrl = `https://out-in-zmb.com/p/group_post/${post.id}`;
+    const shareUrl = `https://rollout-plus.com/p/group_post/${post.id}`;
     const message = [post.text || t('common.shareFallback'), post.link_url, shareUrl].filter(Boolean).join('\n\n');
     try {
       await Share.share({ message, url: shareUrl });
