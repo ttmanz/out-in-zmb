@@ -13,7 +13,7 @@ Notifications.setNotificationHandler({
   handleNotification: async (notification) => {
     const data = notification.request.content.data ?? {};
     const isOpenConversationMessage =
-      data.type === 'message' && data.reference_id === getOpenConversationId();
+      data.type === 'message' && data.reference_id === openConversationId;
     return {
       shouldShowAlert: !isOpenConversationMessage,
       shouldPlaySound: !isOpenConversationMessage,
@@ -27,7 +27,6 @@ Notifications.setNotificationHandler({
 // --- Currently-open conversation tracking (foreground suppression) ---
 let openConversationId = null;
 export const setOpenConversationId = (id) => { openConversationId = id; };
-export const getOpenConversationId = () => openConversationId;
 
 // --- Device token registration ---
 let currentToken = null;

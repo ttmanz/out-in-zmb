@@ -30,8 +30,7 @@
     "adminNote": "You will be the administrator of this club and can approve or reject member requests.",
     "submit": "Create Club",
     "nameRequired": "Please enter a club name.",
-    "createFailed": "Could not create club. Please try again.",
-    "subscriptionRequired": "Subscribe to create clubs and connect with members."
+    "createFailed": "Could not create club. Please try again."
   },
   "subscription": {
     "title": "My Subscription",
@@ -46,9 +45,6 @@
     "expiredTitle": "Subscription Expired",
     "expiredSub": "Choose a plan below to continue enjoying full access.",
     "footerNote": "Manage or cancel your subscription anytime in your App Store or Google Play account settings.",
-    "requiredTitle": "Subscription Required",
-    "requiredBody": "Subscribe to post content and connect with other members.",
-    "requiredBodyPriced": "Posting here costs K{{price}}, or subscribe for unlimited posting.",
     "notAvailable": "This plan isn't available for purchase yet.",
     "restorePurchases": "Restore Purchases",
     "restoreDoneTitle": "Restored",
@@ -75,15 +71,12 @@
     "signUpHere": "Sign up here",
     "loginHere": "Log in here",
     "continueWithGoogle": "Continue with Google",
-    "continueWithFacebook": "Continue with Facebook",
-    "continueWithApple": "Continue with Apple",
     "emailPlaceholder": "Enter your email",
     "passwordPlaceholder": "Enter your password",
     "confirmPasswordPlaceholder": "Confirm your password",
     "fullNamePlaceholder": "Enter your full name",
     "referralCode": "Referral Code (optional)",
     "referralCodePlaceholder": "Got a friend's code? Enter it here",
-    "registerSuccess": "Account created! Please check your email.",
     "errors": {
       "invalidEmail": "Please enter a valid email",
       "passwordTooShort": "Password must be at least 6 characters",
@@ -157,8 +150,7 @@
   "atVenue": {
     "locationRequired": "Location access is required to see members nearby.",
     "noMembers": "No other members detected at this venue right now. Please refresh.",
-    "viewProfile": "View Profile",
-    "private": "Private profile"
+    "viewProfile": "View Profile"
   },
   "openChat": {
     "title": "Open Chat",
@@ -269,8 +261,7 @@
     "catBars": "Bars",
     "catClubs": "Clubs",
     "catBeaches": "Beaches",
-    "catCoffee": "Coffee Shops",
-    "noCategoryVenues": "No venues found for this category"
+    "catCoffee": "Coffee Shops"
   },
   "messages": {
     "title": "Messages",
@@ -350,8 +341,7 @@
     "errors": {
       "contentRequired": "Please add some text or a photo/video",
       "mediaFailed": "Media upload failed. Post without media?",
-      "postFailed": "Could not post your story. Please try again.",
-      "loadFailed": "Could not load stories"
+      "postFailed": "Could not post your story. Please try again."
     }
   },
   "market": {
@@ -417,12 +407,10 @@
     "post": "Post a Plan",
     "labelTitle": "What's the plan?",
     "labelVenue": "Where?",
-    "labelWhen": "When?",
     "labelDescription": "More details",
     "placeholderTitle": "e.g. Drinks at Finos Bar",
     "placeholderVenue": "e.g. Ocean Bar, Lusaka",
     "placeholderDescription": "Optional note for your friends",
-    "locationNote": "Your location will be tagged to this post",
     "submitPost": "Post",
     "viewReplies": "View replies",
     "hideReplies": "Hide replies",
@@ -431,8 +419,6 @@
     "send": "Send",
     "errors": {
       "titleRequired": "Please add a title for your plan",
-      "whenRequired": "Please select when",
-      "locationDenied": "Location permission denied — needed for Nearby posts",
       "postFailed": "Could not post your plan",
       "replyFailed": "Could not send reply"
     }
@@ -536,7 +522,6 @@
     "submit": "Submit report",
     "thanksTitle": "Report received",
     "thanksBody": "Thank you for helping keep Out-in-Zmb safe. Our team will review this report within 24 hours.",
-    "reportPost": "Report post",
     "reportMember": "Report member"
   }
 }

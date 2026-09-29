@@ -15,7 +15,6 @@ import BackHeader from '../../components/common/BackHeader';
 const formatZmw = (amount) => `K${Number(amount ?? 0).toFixed(2)}`;
 
 const AdminCashbackScreen = ({ navigation }) => {
-  const [settings, setSettings] = useState(null);
   const [percentDraft, setPercentDraft] = useState('');
   const [minSpendDraft, setMinSpendDraft] = useState('');
   const [savingSettings, setSavingSettings] = useState(false);
@@ -33,7 +32,6 @@ const AdminCashbackScreen = ({ navigation }) => {
       getRecentCashbackPayoutRequests(),
       getRecentCashbackClaims(),
     ]);
-    setSettings(settingsData ?? null);
     setPercentDraft(String(settingsData?.percent ?? ''));
     setMinSpendDraft(String(settingsData?.min_spend ?? ''));
     setPending(pendingData ?? []);

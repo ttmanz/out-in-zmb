@@ -51,7 +51,7 @@ const CreateClubScreen = ({ navigation }) => {
       photo_url = url;
     }
 
-    const { data, error } = await createClub(session.user.id, {
+    const { error } = await createClub(session.user.id, {
       name: name.trim(),
       description: description.trim(),
       photo_url,

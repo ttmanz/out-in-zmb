@@ -25,14 +25,6 @@ export const updateMembershipTier = (tierKey, fields) =>
 
 // How many posts this member has made today, against their tier's limit —
 // for display only; the real cap is enforced by the DB trigger.
-export const getMyTodayPostCount = (userId) =>
-  supabase
-    .from('daily_post_counts')
-    .select('count')
-    .eq('user_id', userId)
-    .eq('post_date', new Date().toISOString().slice(0, 10))
-    .maybeSingle();
-
 // A venue owner sees their own price where the admin has set one;
 // otherwise everyone sees the regular member price.
 export const planPriceFor = (plan, profile) =>

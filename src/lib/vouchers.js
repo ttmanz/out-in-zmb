@@ -52,9 +52,6 @@ export const getVoucherByCode = (code) =>
     .eq('code', code.toUpperCase().trim())
     .maybeSingle();
 
-export const setVoucherPointsPrice = (id, pointsPrice) =>
-  supabase.from('venue_vouchers').update({ points_price: pointsPrice }).eq('id', id);
-
 // Member-facing catalog: every active, points-priced voucher across every
 // venue, cheapest first.
 export const getRedeemableVouchers = () =>

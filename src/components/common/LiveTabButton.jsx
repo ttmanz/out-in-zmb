@@ -61,5 +61,3 @@ const styles = StyleSheet.create({
   liveBtn: { flexDirection: 'row', gap: 6 },
   liveText: { color: COLORS.primary },
 });
-
-export default LiveTabButton;

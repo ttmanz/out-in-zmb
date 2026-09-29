@@ -8,7 +8,7 @@ const ICON_GRADIENT = ['#fdd07d', '#fc8a03']; // light gold → deep gold
 const RING_GRADIENT = ['#fdd07d', '#fdab53', '#fc8a03']; // stroke gradient, reversed
 
 // An Ionicon filled with a linear gradient.
-export const GradientIcon = ({
+const GradientIcon = ({
   name,
   size = 24,
   colors = ICON_GRADIENT,
@@ -60,5 +60,3 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
 });
-
-export default GradientIcon;
