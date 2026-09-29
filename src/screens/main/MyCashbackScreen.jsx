@@ -11,7 +11,7 @@ import {
   getMyCashbackBalance, getMyCashbackHistory, getMyCashbackPayoutRequests, requestCashbackPayout,
   getMyCashbackClaims, cancelCashbackClaim, getMyVenueCredits, requestCreditRedemption,
   getMyPendingCreditRedemptions, cancelCreditRedemption,
-  formatZmw, CASHBACK_REASON_LABEL, CLAIM_STATUS_LABEL, REWARD_LABEL,
+  formatAmount, CASHBACK_REASON_LABEL, CLAIM_STATUS_LABEL, REWARD_LABEL,
 } from '../../lib/cashback';
 import { formatAgo } from '../../utils/format';
 import { useUser } from '../../contexts/UserContext';
@@ -120,7 +120,7 @@ const MyCashbackScreen = ({ navigation }) => {
       <GradientBorder radius={18} style={styles.balanceOuter}>
         <View style={styles.balanceCard}>
           <Text style={styles.balanceLabel}>Your cash back balance</Text>
-          <Text style={styles.balanceValue}>{formatZmw(balance)}</Text>
+          <Text style={styles.balanceValue}>{formatAmount(balance)}</Text>
           <Text style={styles.balanceHint}>real money, paid via Mobile Money</Text>
         </View>
       </GradientBorder>
@@ -153,7 +153,7 @@ const MyCashbackScreen = ({ navigation }) => {
                       <Text style={styles.reason}>{c.venue_name}</Text>
                       <Text style={styles.time}>Spend it at this venue only</Text>
                     </View>
-                    <Text style={styles.credit}>{formatZmw(c.balance)}</Text>
+                    <Text style={styles.credit}>{formatAmount(c.balance)}</Text>
                     <TouchableOpacity
                       style={styles.useBtn}
                       onPress={() => { setCreditTarget(c); setCreditDraft(String(c.balance)); }}
@@ -171,8 +171,8 @@ const MyCashbackScreen = ({ navigation }) => {
                 {pendingClaims.map((c) => (
                   <View key={c.id} style={styles.pendingRow}>
                     <View style={styles.rowText}>
-                      <Text style={styles.reason}>{c.venue?.full_name ?? 'Venue'} — {formatZmw(c.spend_amount)} {c.reward_type === 'discount' ? 'bill' : 'receipt'}</Text>
-                      <Text style={styles.time}>{formatZmw(c.cashback_amount)} {REWARD_LABEL[c.reward_type]} · {formatAgo(c.created_at)}</Text>
+                      <Text style={styles.reason}>{c.venue?.full_name ?? 'Venue'} — {formatAmount(c.spend_amount)} {c.reward_type === 'discount' ? 'bill' : 'receipt'}</Text>
+                      <Text style={styles.time}>{formatAmount(c.cashback_amount)} {REWARD_LABEL[c.reward_type]} · {formatAgo(c.created_at)}</Text>
                     </View>
                     <TouchableOpacity onPress={() => handleCancel(c.id, cancelCashbackClaim)} disabled={busyId === c.id}>
                       <Text style={styles.cancelText}>Cancel</Text>
@@ -182,7 +182,7 @@ const MyCashbackScreen = ({ navigation }) => {
                 {redemptions.map((r) => (
                   <View key={r.id} style={styles.pendingRow}>
                     <View style={styles.rowText}>
-                      <Text style={styles.reason}>Using {formatZmw(r.amount)} credit at {r.venue?.full_name ?? 'venue'}</Text>
+                      <Text style={styles.reason}>Using {formatAmount(r.amount)} credit at {r.venue?.full_name ?? 'venue'}</Text>
                       <Text style={styles.time}>Ask the venue to confirm · {formatAgo(r.created_at)}</Text>
                     </View>
                     <TouchableOpacity onPress={() => handleCancel(r.id, cancelCreditRedemption)} disabled={busyId === r.id}>
@@ -199,8 +199,8 @@ const MyCashbackScreen = ({ navigation }) => {
                 {doneClaims.map((c) => (
                   <View key={c.id} style={styles.row}>
                     <View style={styles.rowText}>
-                      <Text style={styles.reason}>{c.venue?.full_name ?? 'Venue'} — {formatZmw(c.spend_amount)}</Text>
-                      <Text style={styles.time}>{formatZmw(c.cashback_amount)} {REWARD_LABEL[c.reward_type]} · {formatAgo(c.created_at)}</Text>
+                      <Text style={styles.reason}>{c.venue?.full_name ?? 'Venue'} — {formatAmount(c.spend_amount)}</Text>
+                      <Text style={styles.time}>{formatAmount(c.cashback_amount)} {REWARD_LABEL[c.reward_type]} · {formatAgo(c.created_at)}</Text>
                     </View>
                     <Text style={[styles.statusBadge, { color: STATUS_COLOR[c.status] }]}>{CLAIM_STATUS_LABEL[c.status]}</Text>
                   </View>
@@ -214,7 +214,7 @@ const MyCashbackScreen = ({ navigation }) => {
                 {requests.map((r) => (
                   <View key={r.id} style={styles.requestRow}>
                     <View style={styles.rowText}>
-                      <Text style={styles.reason}>{formatZmw(r.amount)} to {r.mobile_money_number}</Text>
+                      <Text style={styles.reason}>{formatAmount(r.amount)} to {r.mobile_money_number}</Text>
                       <Text style={styles.time}>{formatAgo(r.requested_at)}</Text>
                     </View>
                     <Text style={[styles.statusBadge, { color: STATUS_COLOR[r.status] }]}>{PAYOUT_STATUS_LABEL[r.status]}</Text>
@@ -233,7 +233,7 @@ const MyCashbackScreen = ({ navigation }) => {
               <Text style={styles.time}>{formatAgo(item.created_at)}</Text>
             </View>
             <Text style={[styles.amount, item.amount < 0 && styles.amountNegative]}>
-              {item.amount > 0 ? '+' : ''}{formatZmw(item.amount)}
+              {item.amount > 0 ? '+' : ''}{formatAmount(item.amount)}
             </Text>
           </View>
         )}
@@ -245,7 +245,7 @@ const MyCashbackScreen = ({ navigation }) => {
             <Text style={styles.modalTitle}>Cash Out</Text>
             <Text style={styles.modalHint}>We'll send this to your Mobile Money number — admin fulfils requests manually for now, usually within a day or two.</Text>
 
-            <Text style={styles.modalLabel}>Amount (max {formatZmw(balance)})</Text>
+            <Text style={styles.modalLabel}>Amount (max {formatAmount(balance)})</Text>
             <TextInput
               style={styles.modalInput}
               value={amountDraft}
@@ -286,7 +286,7 @@ const MyCashbackScreen = ({ navigation }) => {
             <Text style={styles.modalTitle}>Use credit at {creditTarget?.venue_name}</Text>
             <Text style={styles.modalHint}>Ask the venue to confirm on their phone. Your credit is only spent once they do.</Text>
 
-            <Text style={styles.modalLabel}>Amount (max {formatZmw(creditTarget?.balance)})</Text>
+            <Text style={styles.modalLabel}>Amount (max {formatAmount(creditTarget?.balance)})</Text>
             <TextInput
               style={styles.modalInput}
               value={creditDraft}

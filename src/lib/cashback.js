@@ -8,7 +8,7 @@ import { supabase } from './supabase';
 // supabase/migrations/20260929000000_cashback_receipts_credits.sql. The app
 // only reads, and calls those functions.
 
-export const formatZmw = (amount) => `K${Number(amount ?? 0).toFixed(2)}`;
+export const formatAmount = (amount) => Number(amount ?? 0).toFixed(2);
 
 export const CASHBACK_REASON_LABEL = {
   venue_spend: 'Cash back from a venue',

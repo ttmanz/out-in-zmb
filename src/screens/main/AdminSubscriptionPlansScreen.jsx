@@ -175,7 +175,7 @@ const AdminSubscriptionPlansScreen = ({ navigation }) => {
                       value={d.price_display ?? ''}
                       onChangeText={(v) => setField(plan.id, 'price_display', v)}
                       placeholderTextColor={COLORS.textMuted}
-                      placeholder="e.g. K99 / month"
+                      placeholder="e.g. 99 / month"
                     />
 
                     <Text style={styles.fieldLabel}>Badge (optional)</Text>
@@ -217,7 +217,7 @@ const AdminSubscriptionPlansScreen = ({ navigation }) => {
                         value={d.venue_price_display ?? ''}
                         onChangeText={(v) => setField(plan.id, 'venue_price_display', v)}
                         placeholderTextColor={COLORS.textMuted}
-                        placeholder="e.g. K199 / month"
+                        placeholder="e.g. 199 / month"
                       />
 
                       <Text style={styles.fieldLabel}>RevenueCat Product ID (venue-owner price)</Text>

@@ -7,7 +7,7 @@ import { KeyboardAvoidingView } from 'react-native-keyboard-controller';
 import { useFocusEffect } from '@react-navigation/native';
 import * as ImagePicker from 'expo-image-picker';
 import { COLORS } from '../../constants/colors';
-import { getCashbackVenues, getCashbackSettings, submitCashbackClaim, formatZmw } from '../../lib/cashback';
+import { getCashbackVenues, getCashbackSettings, submitCashbackClaim, formatAmount } from '../../lib/cashback';
 import { uploadReceipt } from '../../lib/storage';
 import { resizeForUpload } from '../../lib/imageResize';
 import { useUser } from '../../contexts/UserContext';
@@ -90,7 +90,7 @@ const SubmitReceiptScreen = ({ navigation }) => {
     if (!rewardType) return Alert.alert('Missing info', 'Choose what you\'d like from this venue.');
     if (!isDiscount && !receiptUri) return Alert.alert('Missing info', 'Add a photo of your receipt.');
     if (!spend || spend <= 0) return Alert.alert('Missing info', isDiscount ? 'Enter your bill total.' : 'Enter the total on your receipt.');
-    if (spend < minSpend) return Alert.alert('Too small', `The minimum is ${formatZmw(minSpend)}.`);
+    if (spend < minSpend) return Alert.alert('Too small', `The minimum is ${formatAmount(minSpend)}.`);
 
     setSubmitting(true);
     let path = null;
@@ -154,7 +154,7 @@ const SubmitReceiptScreen = ({ navigation }) => {
             <Text style={styles.sectionLabel}>What would you like?</Text>
             {offers.map((o) => {
               const selected = o.type === rewardType;
-              const value = spend > 0 ? ` — ${formatZmw(Math.round(spend * o.percent) / 100)}` : '';
+              const value = spend > 0 ? ` — ${formatAmount(Math.round(spend * o.percent) / 100)}` : '';
               return (
                 <TouchableOpacity
                   key={o.type}
@@ -197,12 +197,12 @@ const SubmitReceiptScreen = ({ navigation }) => {
           style={styles.input}
           value={amount}
           onChangeText={(v) => setAmount(v.replace(/[^0-9.]/g, ''))}
-          placeholder="Amount (ZMW)"
+          placeholder="Amount"
           placeholderTextColor={COLORS.textMuted}
           keyboardType="decimal-pad"
         />
         <Text style={styles.hint}>
-          {minSpend > 0 ? `Minimum ${formatZmw(minSpend)}. ` : ''}
+          {minSpend > 0 ? `Minimum ${formatAmount(minSpend)}. ` : ''}
           {isDiscount ? 'Do this before you pay — the venue takes the discount off your bill.' : 'The venue will check this against your photo.'}
         </Text>
 
@@ -211,8 +211,8 @@ const SubmitReceiptScreen = ({ navigation }) => {
             <View style={styles.summary}>
               <Text style={styles.summaryText}>
                 {isDiscount
-                  ? `You'll get ${formatZmw(reward)} off your ${formatZmw(spend)} bill once ${venue.venue_name} confirms.`
-                  : `You'll get ${formatZmw(reward)} ${chosen.type === 'cash' ? 'cash back' : `store credit at ${venue.venue_name}`} once they confirm.`}
+                  ? `You'll get ${formatAmount(reward)} off your ${formatAmount(spend)} bill once ${venue.venue_name} confirms.`
+                  : `You'll get ${formatAmount(reward)} ${chosen.type === 'cash' ? 'cash back' : `store credit at ${venue.venue_name}`} once they confirm.`}
               </Text>
             </View>
           </GradientBorder>

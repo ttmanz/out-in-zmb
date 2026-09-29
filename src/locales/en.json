@@ -283,18 +283,18 @@
     "message": "{{name}} sent you a message",
     "newPost": "{{name}} posted something new",
     "contentReport": "🚩 New report: {{reason}} — tap to review",
-    "cashbackClaimPending": "{{name}} sent a K{{amount}} receipt — tap to confirm it",
-    "cashbackRedemptionPending": "{{name}} wants to use K{{amount}} store credit — tap to confirm",
-    "cashbackDiscountPending": "{{name}} wants a discount on a K{{amount}} bill — tap to confirm",
+    "cashbackClaimPending": "{{name}} sent a {{amount}} receipt — tap to confirm it",
+    "cashbackRedemptionPending": "{{name}} wants to use {{amount}} store credit — tap to confirm",
+    "cashbackDiscountPending": "{{name}} wants a discount on a {{amount}} bill — tap to confirm",
     "cashbackResult": {
-      "claim_confirmed": "{{name}} confirmed your receipt — K{{amount}} added",
-      "claim_rejected": "{{name}} rejected your K{{amount}} receipt",
-      "discount_confirmed": "{{name}} confirmed your discount — K{{amount}} off",
-      "discount_rejected": "{{name}} declined your K{{amount}} discount",
+      "claim_confirmed": "{{name}} confirmed your receipt — {{amount}} added",
+      "claim_rejected": "{{name}} rejected your {{amount}} receipt",
+      "discount_confirmed": "{{name}} confirmed your discount — {{amount}} off",
+      "discount_rejected": "{{name}} declined your {{amount}} discount",
       "venue_approved": "Your venue was approved — customers can now claim rewards with you",
       "venue_revoked": "Your venue's approval was removed — customers can't claim rewards with you for now",
-      "redemption_confirmed": "{{name}} confirmed your use of K{{amount}} store credit",
-      "redemption_rejected": "{{name}} declined your request to use K{{amount}} store credit"
+      "redemption_confirmed": "{{name}} confirmed your use of {{amount}} store credit",
+      "redemption_rejected": "{{name}} declined your request to use {{amount}} store credit"
     }
   },
   "venueHub": {

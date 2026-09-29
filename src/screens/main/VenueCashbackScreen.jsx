@@ -9,7 +9,7 @@ import { COLORS } from '../../constants/colors';
 import {
   getMyVenueApproval, getMyVenueOffer, setVenueCashbackOffer, getCashbackSettings, getVenueClaims, resolveCashbackClaim,
   getVenuePendingRedemptions, resolveCreditRedemption, getVenueCreditOutstanding,
-  formatZmw, CLAIM_STATUS_LABEL, REWARD_LABEL,
+  formatAmount, CLAIM_STATUS_LABEL, REWARD_LABEL,
 } from '../../lib/cashback';
 import { getSignedUrl } from '../../lib/storage';
 import { useUser } from '../../contexts/UserContext';
@@ -90,8 +90,8 @@ const VenueCashbackScreen = ({ navigation }) => {
       approve ? `Confirm this ${what}?` : `Reject this ${what}?`,
       approve
         ? isDiscount
-          ? `Take ${formatZmw(claim.cashback_amount)} off ${name}'s ${formatZmw(claim.spend_amount)} bill, then confirm. This can't be undone.`
-          : `Does the photo show ${formatZmw(claim.spend_amount)} spent at your venue? ${name} will get ${formatZmw(claim.cashback_amount)} ${REWARD_LABEL[claim.reward_type]}. This can't be undone.`
+          ? `Take ${formatAmount(claim.cashback_amount)} off ${name}'s ${formatAmount(claim.spend_amount)} bill, then confirm. This can't be undone.`
+          : `Does the photo show ${formatAmount(claim.spend_amount)} spent at your venue? ${name} will get ${formatAmount(claim.cashback_amount)} ${REWARD_LABEL[claim.reward_type]}. This can't be undone.`
         : `${name} won't get anything for this ${what}.`,
       [
         { text: 'Cancel', style: 'cancel' },
@@ -109,7 +109,7 @@ const VenueCashbackScreen = ({ navigation }) => {
     Alert.alert(
       approve ? 'Confirm store credit use?' : 'Reject this request?',
       approve
-        ? `Take ${formatZmw(redemption.amount)} off ${name}'s bill, then confirm. This can't be undone.`
+        ? `Take ${formatAmount(redemption.amount)} off ${name}'s bill, then confirm. This can't be undone.`
         : `${name} keeps their credit.`,
       [
         { text: 'Cancel', style: 'cancel' },
@@ -180,7 +180,7 @@ const VenueCashbackScreen = ({ navigation }) => {
         <TouchableOpacity style={styles.saveBtn} onPress={handleSaveOffer} disabled={savingOffer}>
           {savingOffer ? <ActivityIndicator color={COLORS.black} /> : <Text style={styles.saveBtnText}>Save offer</Text>}
         </TouchableOpacity>
-        <Text style={styles.outstanding}>Store credit you owe customers: {formatZmw(outstanding)}</Text>
+        <Text style={styles.outstanding}>Store credit you owe customers: {formatAmount(outstanding)}</Text>
 
         <Text style={[styles.sectionLabel, { marginTop: 28 }]}>Waiting for you ({waiting})</Text>
         {loading ? (
@@ -207,9 +207,9 @@ const VenueCashbackScreen = ({ navigation }) => {
                       <View style={styles.cardText}>
                         <Text style={styles.cardName}>{claim.member?.full_name ?? 'Customer'}</Text>
                         <Text style={styles.cardMeta}>
-                          {claim.reward_type === 'discount' ? `Bill ${formatZmw(claim.spend_amount)}` : `Spent ${formatZmw(claim.spend_amount)}`}
+                          {claim.reward_type === 'discount' ? `Bill ${formatAmount(claim.spend_amount)}` : `Spent ${formatAmount(claim.spend_amount)}`}
                         </Text>
-                        <Text style={styles.cardMeta}>{formatZmw(claim.cashback_amount)} {REWARD_LABEL[claim.reward_type]}</Text>
+                        <Text style={styles.cardMeta}>{formatAmount(claim.cashback_amount)} {REWARD_LABEL[claim.reward_type]}</Text>
                         <Text style={styles.cardTime}>{formatAgo(claim.created_at)}{url ? ' · tap photo to enlarge' : ''}</Text>
                       </View>
                     </View>
@@ -232,7 +232,7 @@ const VenueCashbackScreen = ({ navigation }) => {
                 <GradientBorder key={r.id} radius={14} style={styles.cardOuter}>
                   <View style={styles.card}>
                     <Text style={styles.cardName}>{r.member?.full_name ?? 'Customer'} wants to use store credit</Text>
-                    <Text style={styles.cardMeta}>{formatZmw(r.amount)} off their bill</Text>
+                    <Text style={styles.cardMeta}>{formatAmount(r.amount)} off their bill</Text>
                     <Text style={styles.cardTime}>{formatAgo(r.created_at)}</Text>
                     <View style={styles.actions}>
                       <TouchableOpacity style={styles.confirmBtn} onPress={() => confirmRedemption(r, true)} disabled={busy}>
@@ -257,7 +257,7 @@ const VenueCashbackScreen = ({ navigation }) => {
                 <View style={styles.cardText}>
                   <Text style={styles.cardName}>{c.member?.full_name ?? 'Customer'}</Text>
                   <Text style={styles.cardTime}>
-                    {formatZmw(c.spend_amount)} → {formatZmw(c.cashback_amount)} {REWARD_LABEL[c.reward_type]} · {formatAgo(c.created_at)}
+                    {formatAmount(c.spend_amount)} → {formatAmount(c.cashback_amount)} {REWARD_LABEL[c.reward_type]} · {formatAgo(c.created_at)}
                   </Text>
                 </View>
                 <Text style={[styles.status, { color: STATUS_COLOR[c.status] }]}>{CLAIM_STATUS_LABEL[c.status]}</Text>

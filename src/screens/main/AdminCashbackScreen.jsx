@@ -9,7 +9,7 @@ import {
   getCashbackSettings, updateCashbackSettings, getPendingCashbackPayoutRequests,
   getRecentCashbackPayoutRequests, resolveCashbackPayout, getRecentCashbackClaims,
   getVenueOwners, setVenueApproved,
-  formatZmw, CLAIM_STATUS_LABEL, REWARD_LABEL,
+  formatAmount, CLAIM_STATUS_LABEL, REWARD_LABEL,
 } from '../../lib/cashback';
 import { formatAgo } from '../../utils/format';
 import BackHeader from '../../components/common/BackHeader';
@@ -94,7 +94,7 @@ const AdminCashbackScreen = ({ navigation }) => {
     Alert.alert(
       verb,
       approve
-        ? `Confirm you've sent ${formatZmw(request.amount)} to ${request.mobile_money_number} via Mobile Money.`
+        ? `Confirm you've sent ${formatAmount(request.amount)} to ${request.mobile_money_number} via Mobile Money.`
         : `${request.member?.full_name ?? 'This member'}'s balance will be refunded.`,
       [
         { text: 'Cancel', style: 'cancel' },
@@ -175,7 +175,7 @@ const AdminCashbackScreen = ({ navigation }) => {
                 />
               </View>
               <View style={styles.settingsField}>
-                <Text style={styles.ruleLabel}>Min spend (ZMW)</Text>
+                <Text style={styles.ruleLabel}>Min spend</Text>
                 <TextInput
                   style={styles.settingsInput}
                   value={minSpendDraft}
@@ -198,7 +198,7 @@ const AdminCashbackScreen = ({ navigation }) => {
             <View style={styles.requestRow}>
               <View style={styles.info}>
                 <Text style={styles.name}>{item.member?.full_name ?? 'Member'}</Text>
-                <Text style={styles.meta}>{formatZmw(item.amount)} → {item.mobile_money_number}</Text>
+                <Text style={styles.meta}>{formatAmount(item.amount)} → {item.mobile_money_number}</Text>
                 <Text style={styles.time}>{formatAgo(item.requested_at)}</Text>
               </View>
               <View style={styles.requestActions}>
@@ -223,7 +223,7 @@ const AdminCashbackScreen = ({ navigation }) => {
                   <Text style={styles.activityTime}>{formatAgo(r.resolved_at ?? r.requested_at)}</Text>
                 </View>
                 <Text style={[styles.activityAmount, r.status === 'rejected' && styles.activityAmountNegative]}>
-                  {formatZmw(r.amount)} · {r.status === 'paid' ? 'Paid' : 'Declined'}
+                  {formatAmount(r.amount)} · {r.status === 'paid' ? 'Paid' : 'Declined'}
                 </Text>
               </View>
             ))}
@@ -237,7 +237,7 @@ const AdminCashbackScreen = ({ navigation }) => {
                   <Text style={styles.activityTime}>{CLAIM_STATUS_LABEL[c.status]} · {formatAgo(c.created_at)}</Text>
                 </View>
                 <Text style={[styles.activityAmount, c.status !== 'confirmed' && styles.activityAmountNegative]}>
-                  {formatZmw(c.spend_amount)} → {formatZmw(c.cashback_amount)} {REWARD_LABEL[c.reward_type]}
+                  {formatAmount(c.spend_amount)} → {formatAmount(c.cashback_amount)} {REWARD_LABEL[c.reward_type]}
                 </Text>
               </View>
             ))}

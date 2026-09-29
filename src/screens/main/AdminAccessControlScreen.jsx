@@ -198,7 +198,6 @@ const AdminAccessControlScreen = ({ navigation }) => {
             </View>
             {f.is_paid && (
               <View style={styles.priceRow}>
-                <Text style={styles.priceCurrency}>K</Text>
                 <TextInput
                   style={styles.priceInput}
                   value={f.one_off_price_draft}
@@ -278,7 +277,6 @@ const styles = StyleSheet.create({
   paidToggleText: { fontSize: 12, fontWeight: '700', color: COLORS.textMuted },
   paidToggleTextActive: { color: COLORS.black },
   priceRow: { flexDirection: 'row', alignItems: 'center', marginTop: 10, gap: 6 },
-  priceCurrency: { fontSize: 14, color: COLORS.text, fontWeight: '700' },
   priceInput: {
     borderWidth: 1, borderColor: COLORS.borderAccent, borderRadius: 8,
     paddingHorizontal: 10, paddingVertical: 6, fontSize: 14,
