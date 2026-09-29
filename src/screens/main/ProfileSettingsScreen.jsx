@@ -10,6 +10,7 @@ import { ROUTES } from '../../constants/routes';
 import { getProfile, updateProfileSettings } from '../../lib/profile';
 import { getFriends, getCloseFriendIds, addCloseFriend, removeCloseFriend, getMyBlockedProfiles, unblockMember } from '../../lib/friends';
 import { useUser } from '../../contexts/UserContext';
+import { participationSummary } from '../../lib/cashback';
 import AdBanner from '../../components/common/AdBanner';
 import ProfileBanner from '../../components/common/ProfileBanner';
 import BackHeader from '../../components/common/BackHeader';
@@ -245,6 +246,21 @@ const ProfileSettingsScreen = ({ navigation }) => {
             <View style={styles.editProfileText}>
               <Text style={styles.editProfileLabel}>Cash Back</Text>
               <Text style={styles.editProfileDesc}>Snap a receipt, earn cash back or store credit</Text>
+            </View>
+            <Text style={styles.editProfileChevron}>›</Text>
+          </TouchableOpacity>
+        )}
+
+        {myProfile?.account_type !== 'venue_owner' && (
+          <TouchableOpacity
+            style={styles.editProfileBtn}
+            onPress={() => navigation.navigate(ROUTES.PARTICIPATION)}
+            activeOpacity={0.8}
+          >
+            <Text style={styles.editProfileEmoji}>🎁</Text>
+            <View style={styles.editProfileText}>
+              <Text style={styles.editProfileLabel}>Participation</Text>
+              <Text style={styles.editProfileDesc}>{participationSummary(myProfile?.participation)}</Text>
             </View>
             <Text style={styles.editProfileChevron}>›</Text>
           </TouchableOpacity>

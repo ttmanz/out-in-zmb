@@ -30,6 +30,19 @@ export const CLAIM_STATUS_LABEL = {
 
 export const REWARD_LABEL = { cash: 'cash back', credit: 'store credit', discount: 'discount' };
 
+// What a member can opt into on their profile ("participation").
+export const PARTICIPATION_OPTIONS = [
+  { key: 'cash', emoji: '💸', label: 'Cash back', desc: 'Get part of what you spend back as real money.' },
+  { key: 'credit', emoji: '🎟️', label: 'Store credit', desc: 'Earn credit you can redeem at that venue later.' },
+  { key: 'discount', emoji: '🏷️', label: 'Discount', desc: 'Take a percentage off your bill at the till.' },
+];
+
+export const participationSummary = (participation) => {
+  if (participation == null) return "Choose which rewards you'd like";
+  if (participation.length === 0) return 'Not taking part';
+  return PARTICIPATION_OPTIONS.filter((o) => participation.includes(o.key)).map((o) => o.label).join(', ');
+};
+
 // --- Member: cash balances and payouts ---
 
 // One row per currency the member holds cash back in.

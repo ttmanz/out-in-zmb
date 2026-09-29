@@ -10,6 +10,7 @@ import { getProfile, updateFullProfile } from '../../lib/profile';
 import { uploadAvatar } from '../../lib/storage';
 import { resizeForUpload } from '../../lib/imageResize';
 import { useUser } from '../../contexts/UserContext';
+import { PARTICIPATION_OPTIONS } from '../../lib/cashback';
 
 const GENDERS = ['Male', 'Female', 'Non-binary', 'Prefer not to say'];
 const ACCOUNT_TYPES = [
@@ -21,6 +22,7 @@ const INTERESTS = [
   '🎮 Gaming', '🎭 Events', '🏖️ Outdoor', '🎨 Arts & Culture', '✏️ Other',
 ];
 const OTHER_KEY = '✏️ Other';
+const ALL_REWARDS = PARTICIPATION_OPTIONS.map((o) => o.key);
 
 const formatDob = (text) => {
   const digits = text.replace(/\D/g, '').slice(0, 8);
@@ -58,6 +60,7 @@ const CompleteProfileScreen = ({ navigation }) => {
   const [phone, setPhone] = useState('');
   const [instagram, setInstagram] = useState('');
   const [accountType, setAccountType] = useState('member');
+  const [participation, setParticipation] = useState(ALL_REWARDS);
   // profiles.account_type defaults to 'member' in the database, so the
   // loaded value is never actually empty — this tracks whether the person
   // has deliberately picked one, so first-time setup can require a real
@@ -91,6 +94,7 @@ const CompleteProfileScreen = ({ navigation }) => {
         setPhone(data.phone ?? '');
         setInstagram(data.instagram ?? '');
         setAccountType(data.account_type ?? 'member');
+        setParticipation(data.participation ?? ALL_REWARDS);
         setAccountTypeTouched(data.profile_completed === true);
         setWasAlreadyCompleted(data.profile_completed === true);
       }
@@ -124,6 +128,9 @@ const CompleteProfileScreen = ({ navigation }) => {
     setPhotoUri(url);
   };
 
+  const toggleReward = (key) =>
+    setParticipation((prev) => ALL_REWARDS.filter((k) => (k === key ? !prev.includes(k) : prev.includes(k))));
+
   const toggleInterest = (item) => {
     setSelectedInterests((prev) =>
       prev.includes(item) ? prev.filter((i) => i !== item) : [...prev, item]
@@ -152,6 +159,7 @@ const CompleteProfileScreen = ({ navigation }) => {
       phone: phone.trim(),
       instagram: instagram.trim().replace(/^@/, ''),
       account_type: accountType,
+      participation: accountType === 'venue_owner' ? null : participation,
     });
     setSaving(false);
     if (error) { Alert.alert('Error', error.message); return; }
@@ -214,6 +222,25 @@ const CompleteProfileScreen = ({ navigation }) => {
             ))}
           </View>
         </Field>
+
+        {accountType !== 'venue_owner' && (
+          <Field label="Rewards you'd like" hint="you can change this any time under Participation">
+            <View style={styles.chipRow}>
+              {PARTICIPATION_OPTIONS.map((o) => {
+                const active = participation.includes(o.key);
+                return (
+                  <TouchableOpacity
+                    key={o.key}
+                    style={[styles.chip, active && styles.chipActive]}
+                    onPress={() => toggleReward(o.key)}
+                  >
+                    <Text style={[styles.chipText, active && styles.chipTextActive]}>{o.emoji} {o.label}</Text>
+                  </TouchableOpacity>
+                );
+              })}
+            </View>
+          </Field>
+        )}
 
         <Field label="Date of Birth" hint="DD/MM/YYYY">
           <TextInput
