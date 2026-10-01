@@ -48,15 +48,22 @@ Deno.serve(async (req) => {
 
   // Delete all uploaded media first — storage objects have no FK to the user,
   // so nothing would cascade them.
-  for (const bucket of ['avatars', 'post-photos', 'story-media']) {
+  // `receipts` is the private bucket holding reward receipt photos.
+  for (const bucket of ['avatars', 'post-photos', 'story-media', 'receipts']) {
     await removeUserFolder(admin, bucket, user.id);
   }
 
   // Rows that deleting the auth user would NOT clean up:
   // - club_blocks.blocked_by has ON DELETE NO ACTION and would abort the delete
   // - events.created_by has no FK at all and would orphan
+  // - profiles.referred_by is ON DELETE NO ACTION: deleting someone who referred
+  //   other members would abort, so detach them first
+  // - cashback_payout_requests.resolved_by is ON DELETE NO ACTION (admins who
+  //   resolved a payout)
   await admin.from('club_blocks').delete().eq('blocked_by', user.id);
   await admin.from('events').delete().eq('created_by', user.id);
+  await admin.from('profiles').update({ referred_by: null }).eq('referred_by', user.id);
+  await admin.from('cashback_payout_requests').update({ resolved_by: null }).eq('resolved_by', user.id);
 
   // auth.users → profiles → all content tables are ON DELETE CASCADE,
   // so this single call erases the account and everything it owns.
