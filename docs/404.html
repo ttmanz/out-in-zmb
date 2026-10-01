@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex" />
+  <meta name="description" content="Someone shared something with you on Rollout Plus. Open it in the app." />
+  <meta property="og:title" content="Open this on Rollout Plus" />
+  <meta property="og:description" content="Someone shared something with you on Rollout Plus, the social app for going out." />
+  <meta property="og:url" content="https://rollout-plus.com" />
+  <title>Rollout Plus</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --gold: #c8800a;
+      --gold-light: #e09a20;
+      --bg: #0d0a03;
+      --surface: #140f02;
+      --border-accent: #3a2800;
+      --text: #e8e0cc;
+      --text-muted: #9a8060;
+    }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 32px 24px; }
+    .logo { font-size: 1.3rem; font-weight: 800; color: var(--gold); margin-bottom: 36px; text-decoration: none; }
+    .card { background: var(--surface); border: 1px solid var(--border-accent); border-radius: 20px; padding: 36px 28px; max-width: 440px; width: 100%; }
+    h1 { font-size: 1.6rem; font-weight: 800; letter-spacing: -0.5px; line-height: 1.2; margin-bottom: 12px; }
+    p { color: var(--text-muted); font-size: 1rem; margin-bottom: 24px; }
+    .btn { display: block; background: var(--gold); color: #0d0a03; font-weight: 700; padding: 14px 24px; border-radius: 28px; text-decoration: none; margin-bottom: 14px; }
+    .btn:hover { background: var(--gold-light); }
+    .btn-secondary { background: transparent; color: var(--gold); border: 1px solid var(--border-accent); }
+    .btn-secondary:hover { background: transparent; border-color: var(--gold); }
+    .note { font-size: 0.8rem; margin: 6px 0 0; }
+    [hidden] { display: none !important; }
+  </style>
+</head>
+<body>
+  <a class="logo" href="/">Rollout Plus</a>
+
+  <!-- Shown for a shared link: rollout-plus.com/p/:type/:id -->
+  <div class="card" id="share" hidden>
+    <h1 id="share-title">Someone shared this with you</h1>
+    <p id="share-text">Open it in the Rollout Plus app to see it.</p>
+    <a class="btn" id="open-app" href="#">Open in Rollout Plus</a>
+    <a class="btn btn-secondary" href="/#download">Get the app</a>
+    <p class="note" id="share-note">You'll need to be signed in to Rollout Plus to view it.</p>
+  </div>
+
+  <!-- Shown for any other missing page -->
+  <div class="card" id="missing" hidden>
+    <h1>Page not found</h1>
+    <p>We couldn't find that page.</p>
+    <a class="btn" href="/">Go to Rollout Plus</a>
+  </div>
+
+  <script>
+    // The app registers this scheme and routes outandaround://post/:type/:id
+    // (see App.js flushQueuedDeepLink).
+    var APP_SCHEME = 'outandaround';
+    var LABELS = { story: 'a story', event: 'an event', group_post: 'a group post', club_post: 'a club post' };
+
+    var match = location.pathname.match(/^\/p\/([a-z_]+)\/([A-Za-z0-9-]{8,64})\/?$/);
+    var type = match && match[1];
+    var id = match && match[2];
+
+    if (match && Object.prototype.hasOwnProperty.call(LABELS, type)) {
+      var label = LABELS[type];
+      var appUrl = APP_SCHEME + '://post/' + type + '/' + id;
+      var isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+
+      document.getElementById('share-title').textContent = 'Someone shared ' + label + ' with you';
+      document.getElementById('open-app').href = appUrl;
+      document.getElementById('share').hidden = false;
+
+      if (isMobile) {
+        // Try the app straight away; if it isn't installed the page stays put
+        // and the buttons above are the fallback.
+        setTimeout(function () { location.href = appUrl; }, 400);
+      } else {
+        document.getElementById('share-text').textContent = 'Open this link on your phone with Rollout Plus installed to see it.';
+        document.getElementById('open-app').hidden = true;
+      }
+    } else {
+      document.getElementById('missing').hidden = false;
+    }
+  </script>
+</body>
+</html>
