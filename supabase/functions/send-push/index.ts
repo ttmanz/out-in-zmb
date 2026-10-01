@@ -16,9 +16,11 @@ const TITLE_BODY: Record<string, (actor: string, excerpt: string | null) => { ti
   friend_request: (actor) => ({ title: 'New friend request', body: `${actor} wants to be your friend` }),
   reply: (actor, excerpt) => ({ title: 'New reply', body: `${actor} replied${excerpt ? `: ${excerpt}` : ''}` }),
   club_join_request: (actor) => ({ title: 'Club join request', body: `${actor} wants to join your club` }),
-  admin_message: (actor) => ({ title: 'Message from Find-Mee', body: `${actor} sent you a message` }),
+  admin_message: (actor) => ({ title: 'Message from Rollout Plus', body: `${actor} sent you a message` }),
   content_report: () => ({ title: 'New report', body: 'A member submitted a content report' }),
   message: (actor, excerpt) => ({ title: actor, body: excerpt ?? 'Sent you a message' }),
+  cashback_pending: (actor) => ({ title: 'Reward to confirm', body: `${actor} sent you a claim to confirm` }),
+  cashback_result: (_actor, excerpt) => ({ title: 'Reward update', body: excerpt ? `Your claim for ${excerpt} has been answered` : 'A venue has answered your claim' }),
   new_post: (actor, excerpt) => ({ title: 'New post from a friend', body: `${actor} posted${excerpt ? `: ${excerpt}` : ''}` }),
 };
 
