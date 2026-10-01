@@ -14,6 +14,7 @@ import {
   formatAmount, CASHBACK_REASON_LABEL, CLAIM_STATUS_LABEL, REWARD_LABEL,
 } from '../../lib/cashback';
 import { formatAgo } from '../../utils/format';
+import { useCashBackEnabled } from '../../hooks/useCashBackEnabled';
 import { useUser } from '../../contexts/UserContext';
 import BackHeader from '../../components/common/BackHeader';
 import GradientBorder from '../../components/common/GradientBorder';
@@ -26,6 +27,7 @@ const STATUS_COLOR = {
 
 const MyCashbackScreen = ({ navigation }) => {
   const { profile } = useUser();
+  const cashEnabled = useCashBackEnabled();
   const [balances, setBalances] = useState([]);
   const [history, setHistory] = useState([]);
   const [requests, setRequests] = useState([]);
@@ -129,6 +131,10 @@ const MyCashbackScreen = ({ navigation }) => {
     load();
   };
 
+  // Cash back is hidden while it is switched off — unless this member already has
+  // some, so money they hold is never out of sight or out of reach.
+  const showCash = cashEnabled || balances.length > 0 || history.length > 0 || requests.length > 0;
+
   const pendingClaims = claims.filter((c) => c.status === 'pending');
   const doneClaims = claims.filter((c) => c.status !== 'pending').slice(0, 5);
 
@@ -142,8 +148,9 @@ const MyCashbackScreen = ({ navigation }) => {
 
   return (
     <View style={styles.safe}>
-      <BackHeader title="Cash Back" onBack={() => navigation.goBack()} />
+      <BackHeader title={showCash ? 'Cash Back' : 'Rewards'} onBack={() => navigation.goBack()} />
 
+      {showCash && (
       <GradientBorder radius={18} style={styles.balanceOuter}>
         <View style={styles.balanceCard}>
           <Text style={styles.balanceLabel}>Your cash back balance</Text>
@@ -155,22 +162,25 @@ const MyCashbackScreen = ({ navigation }) => {
           <Text style={styles.balanceHint}>real money, paid out to you</Text>
         </View>
       </GradientBorder>
+      )}
 
       <View style={styles.actionRow}>
         <TouchableOpacity style={[styles.primaryBtn, styles.actionHalf]} onPress={() => navigation.navigate(ROUTES.SUBMIT_RECEIPT)}>
           <Text style={styles.primaryBtnText}>🧾 Submit receipt</Text>
         </TouchableOpacity>
-        <TouchableOpacity
-          style={[styles.outlineBtn, styles.actionHalf, balances.length === 0 && styles.btnDisabled]}
-          onPress={openCashOut}
-          disabled={balances.length === 0}
-        >
-          <Text style={styles.outlineBtnText}>💸 Cash out</Text>
-        </TouchableOpacity>
+        {showCash && (
+          <TouchableOpacity
+            style={[styles.outlineBtn, styles.actionHalf, balances.length === 0 && styles.btnDisabled]}
+            onPress={openCashOut}
+            disabled={balances.length === 0}
+          >
+            <Text style={styles.outlineBtnText}>💸 Cash out</Text>
+          </TouchableOpacity>
+        )}
       </View>
 
       <FlatList
-        data={history}
+        data={showCash ? history : []}
         keyExtractor={(item) => item.id}
         contentContainerStyle={styles.list}
         ListHeaderComponent={
@@ -253,10 +263,16 @@ const MyCashbackScreen = ({ navigation }) => {
                 ))}
               </>
             )}
-            <Text style={styles.sectionLabel}>History</Text>
+            {showCash && <Text style={styles.sectionLabel}>History</Text>}
           </>
         }
-        ListEmptyComponent={<Text style={styles.empty}>No cash back yet — submit a receipt from a partner venue to start earning.</Text>}
+        ListEmptyComponent={
+          showCash
+            ? <Text style={styles.empty}>No cash back yet — submit a receipt from a partner venue to start earning.</Text>
+            : credits.length + claims.length + redemptions.length === 0
+              ? <Text style={styles.empty}>Submit a receipt from a partner venue to earn store credit or a discount.</Text>
+              : null
+        }
         renderItem={({ item }) => (
           <View style={styles.row}>
             <View style={styles.rowText}>

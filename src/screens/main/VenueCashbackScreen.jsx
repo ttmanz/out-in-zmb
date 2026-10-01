@@ -9,8 +9,9 @@ import { COLORS } from '../../constants/colors';
 import {
   getCountries, getMyVenueStatus, getMyVenueOffer, setVenueCashbackOffer, getCashbackSettings, getVenueClaims, resolveCashbackClaim,
   getVenuePendingRedemptions, resolveCreditRedemption, getVenueCreditOutstanding,
-  formatAmount, PARTICIPATION_OPTIONS, CLAIM_STATUS_LABEL, REWARD_LABEL,
+  formatAmount, PARTICIPATION_OPTIONS, rewardOptions, CLAIM_STATUS_LABEL, REWARD_LABEL,
 } from '../../lib/cashback';
+import { useCashBackEnabled } from '../../hooks/useCashBackEnabled';
 import { getSignedUrl } from '../../lib/storage';
 import { useUser } from '../../contexts/UserContext';
 import { formatAgo } from '../../utils/format';
@@ -21,6 +22,7 @@ const STATUS_COLOR = { confirmed: COLORS.success, rejected: COLORS.error, cancel
 
 const VenueCashbackScreen = ({ navigation }) => {
   const { profile } = useUser();
+  const cashEnabled = useCashBackEnabled();
   const [offered, setOffered] = useState([]);
   const [percents, setPercents] = useState({ cash: '', credit: '', discount: '' });
   const [approved, setApproved] = useState(true);
@@ -147,7 +149,7 @@ const VenueCashbackScreen = ({ navigation }) => {
 
   return (
     <KeyboardAvoidingView style={styles.safe} behavior="padding">
-      <BackHeader title="Cash Back" onBack={() => navigation.goBack()} />
+      <BackHeader title={cashEnabled ? 'Cash Back' : 'Rewards'} onBack={() => navigation.goBack()} />
 
       <ScrollView contentContainerStyle={styles.scroll} keyboardShouldPersistTaps="handled">
         {!loading && !approved && (
@@ -164,8 +166,7 @@ const VenueCashbackScreen = ({ navigation }) => {
 
         <Text style={styles.sectionLabel}>Your offer</Text>
         <Text style={styles.sectionHint}>
-          Tick the rewards you take part in, then give each a percentage. Customers only see what you tick. Cash back
-          is paid to the customer in money, store credit can only be spent at your venue, and a discount comes off
+          Tick the rewards you take part in, then give each a percentage. Customers only see what you tick. {cashEnabled ? 'Cash back is paid to the customer in money, store credit' : 'Store credit'} can only be spent at your venue, and a discount comes off
           the customer's bill at the till.
         </Text>
         <Text style={styles.fieldLabel}>Your country</Text>
@@ -178,7 +179,7 @@ const VenueCashbackScreen = ({ navigation }) => {
           It sets the currency for your customers' rewards and can't be changed once customers have claimed with you.
         </Text>
         <Text style={[styles.fieldLabel, { marginTop: 10 }]}>Participation</Text>
-        {PARTICIPATION_OPTIONS.map((o) => {
+        {rewardOptions(cashEnabled).map((o) => {
           const on = offered.includes(o.key);
           return (
             <View key={o.key} style={[styles.rewardCard, on && styles.rewardCardOn]}>

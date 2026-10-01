@@ -11,6 +11,7 @@ import { getProfile, updateProfileSettings } from '../../lib/profile';
 import { getFriends, getCloseFriendIds, addCloseFriend, removeCloseFriend, getMyBlockedProfiles, unblockMember } from '../../lib/friends';
 import { useUser } from '../../contexts/UserContext';
 import { participationSummary } from '../../lib/cashback';
+import { useCashBackEnabled } from '../../hooks/useCashBackEnabled';
 import AdBanner from '../../components/common/AdBanner';
 import ProfileBanner from '../../components/common/ProfileBanner';
 import BackHeader from '../../components/common/BackHeader';
@@ -33,6 +34,7 @@ const VENUE_VISIBILITY_OPTIONS = [
 const ProfileSettingsScreen = ({ navigation }) => {
   const { t } = useTranslation();
   const { profile: myProfile } = useUser();
+  const cashEnabled = useCashBackEnabled();
   const [userId, setUserId] = useState(null);
   const [fullName, setFullName] = useState('');
   const [visibility, setVisibility] = useState('everyone');
@@ -229,9 +231,9 @@ const ProfileSettingsScreen = ({ navigation }) => {
             onPress={() => navigation.navigate(ROUTES.VENUE_CASHBACK)}
             activeOpacity={0.8}
           >
-            <Text style={styles.editProfileEmoji}>💸</Text>
+            <Text style={styles.editProfileEmoji}>{cashEnabled ? '💸' : '🏷️'}</Text>
             <View style={styles.editProfileText}>
-              <Text style={styles.editProfileLabel}>Cash Back & Credit</Text>
+              <Text style={styles.editProfileLabel}>{cashEnabled ? 'Cash Back & Credit' : 'Rewards'}</Text>
               <Text style={styles.editProfileDesc}>Set your offer and confirm customer receipts</Text>
             </View>
             <Text style={styles.editProfileChevron}>›</Text>
@@ -242,10 +244,12 @@ const ProfileSettingsScreen = ({ navigation }) => {
             onPress={() => navigation.navigate(ROUTES.MY_CASHBACK)}
             activeOpacity={0.8}
           >
-            <Text style={styles.editProfileEmoji}>💸</Text>
+            <Text style={styles.editProfileEmoji}>{cashEnabled ? '💸' : '🏷️'}</Text>
             <View style={styles.editProfileText}>
-              <Text style={styles.editProfileLabel}>Cash Back</Text>
-              <Text style={styles.editProfileDesc}>Snap a receipt, earn cash back or store credit</Text>
+              <Text style={styles.editProfileLabel}>{cashEnabled ? 'Cash Back' : 'Venue Rewards'}</Text>
+              <Text style={styles.editProfileDesc}>
+                {cashEnabled ? 'Snap a receipt, earn cash back or store credit' : 'Snap a receipt, earn store credit or a discount'}
+              </Text>
             </View>
             <Text style={styles.editProfileChevron}>›</Text>
           </TouchableOpacity>
@@ -260,7 +264,7 @@ const ProfileSettingsScreen = ({ navigation }) => {
             <Text style={styles.editProfileEmoji}>🎁</Text>
             <View style={styles.editProfileText}>
               <Text style={styles.editProfileLabel}>Participation</Text>
-              <Text style={styles.editProfileDesc}>{participationSummary(myProfile?.participation)}</Text>
+              <Text style={styles.editProfileDesc}>{participationSummary(myProfile?.participation, cashEnabled)}</Text>
             </View>
             <Text style={styles.editProfileChevron}>›</Text>
           </TouchableOpacity>

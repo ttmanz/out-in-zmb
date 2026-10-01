@@ -38,10 +38,28 @@ export const PARTICIPATION_OPTIONS = [
   { key: 'discount', emoji: '🏷️', label: 'Discount', desc: 'Take a percentage off the customer\'s bill at the till.' },
 ];
 
-export const participationSummary = (participation) => {
+// Cash back is switched off in the database until there's market feedback
+// (cashback_settings.cash_enabled, flipped by an admin). While it's off the app
+// hides it everywhere, and the server refuses it too — see
+// supabase/migrations/20261001000000_cash_back_switch.sql. Nothing is deleted.
+// Defaults to hidden if the answer can't be fetched.
+export const getCashBackEnabled = async () => {
+  const { data, error } = await supabase.rpc('cash_back_enabled');
+  return !error && data === true;
+};
+
+export const setCashBackEnabled = (enabled) =>
+  supabase.rpc('set_cash_back_enabled', { p_enabled: enabled });
+
+// The rewards a venue can currently choose from.
+export const rewardOptions = (cashEnabled) =>
+  cashEnabled ? PARTICIPATION_OPTIONS : PARTICIPATION_OPTIONS.filter((o) => o.key !== 'cash');
+
+export const participationSummary = (participation, cashEnabled = false) => {
   if (participation == null) return 'Choose which rewards you offer';
-  if (participation.length === 0) return 'No rewards offered';
-  return PARTICIPATION_OPTIONS.filter((o) => participation.includes(o.key)).map((o) => o.label).join(', ');
+  const shown = rewardOptions(cashEnabled).filter((o) => participation.includes(o.key));
+  if (shown.length === 0) return 'No rewards offered';
+  return shown.map((o) => o.label).join(', ');
 };
 
 // --- Member: cash balances and payouts ---

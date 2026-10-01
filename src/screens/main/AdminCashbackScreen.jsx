@@ -1,7 +1,7 @@
 import React, { useState, useCallback } from 'react';
 import {
   View, Text, FlatList, TouchableOpacity, TextInput, StyleSheet,
-  ActivityIndicator, Alert,
+  ActivityIndicator, Alert, Switch,
 } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import { COLORS } from '../../constants/colors';
@@ -9,7 +9,7 @@ import { ROUTES } from '../../constants/routes';
 import {
   getCashbackSettings, updateCashbackSettings, getPendingCashbackPayoutRequests,
   getRecentCashbackPayoutRequests, resolveCashbackPayout, getRecentCashbackClaims,
-  getVenueOwners, getVenueCountries, getCountries, setVenueApproved,
+  getVenueOwners, getVenueCountries, getCountries, setVenueApproved, getCashBackEnabled, setCashBackEnabled,
   formatAmount, CLAIM_STATUS_LABEL, REWARD_LABEL,
 } from '../../lib/cashback';
 import { formatAgo } from '../../utils/format';
@@ -25,10 +25,12 @@ const AdminCashbackScreen = ({ navigation }) => {
   const [countryOf, setCountryOf] = useState({});
   const [loading, setLoading] = useState(true);
   const [busyId, setBusyId] = useState(null);
+  const [cashEnabled, setCashEnabled] = useState(false);
+  const [savingCash, setSavingCash] = useState(false);
 
   const load = useCallback(async () => {
     setLoading(true);
-    const [{ data: settingsData }, { data: pendingData }, { data: resolvedData }, { data: claimsData }, { data: venuesData }, { data: venueCountries }, { data: countriesData }] = await Promise.all([
+    const [{ data: settingsData }, { data: pendingData }, { data: resolvedData }, { data: claimsData }, { data: venuesData }, { data: venueCountries }, { data: countriesData }, cashOn] = await Promise.all([
       getCashbackSettings(),
       getPendingCashbackPayoutRequests(),
       getRecentCashbackPayoutRequests(),
@@ -36,7 +38,9 @@ const AdminCashbackScreen = ({ navigation }) => {
       getVenueOwners(),
       getVenueCountries(),
       getCountries(),
+      getCashBackEnabled(),
     ]);
+    setCashEnabled(cashOn);
     setVenues(venuesData ?? []);
     setPercentDraft(String(settingsData?.max_cash_percent ?? ''));
     const names = Object.fromEntries((countriesData ?? []).map((c) => [c.code, `${c.name} · ${c.currency_code}`]));
@@ -65,12 +69,37 @@ const AdminCashbackScreen = ({ navigation }) => {
     load();
   };
 
+  const handleToggleCash = (next) => {
+    Alert.alert(
+      next ? 'Switch cash back on?' : 'Switch cash back off?',
+      next
+        ? 'Venues that have ticked cash back will offer it again, and customers can claim it. You pay members by hand, so only switch this on when you are ready to handle payouts.'
+        : 'Customers can no longer claim cash back and venues stop offering it. Their saved cash back settings are kept. Members who already hold a cash back balance can still cash it out.',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: next ? 'Switch on' : 'Switch off',
+          onPress: async () => {
+            setSavingCash(true);
+            const { error } = await setCashBackEnabled(next);
+            setSavingCash(false);
+            if (error) {
+              Alert.alert('Error', error.message ?? 'Could not change this. Please try again.');
+              return;
+            }
+            setCashEnabled(next);
+          },
+        },
+      ],
+    );
+  };
+
   const handleVenue = (venue, approve) => {
     const name = venue.full_name ?? 'this venue';
     Alert.alert(
       approve ? `Approve ${name}?` : `Remove approval for ${name}?`,
       approve
-        ? 'Customers will see this venue and can send it receipts. It will be able to confirm cash back, which you then pay out — only approve venues you trust.'
+        ? 'Customers will see this venue and can send it receipts. It will be able to confirm its customers\' rewards — only approve venues you trust.'
         : 'It will disappear from customers\' lists and can\'t confirm anything until approved again. Store credit customers already hold stays on their account.',
       [
         { text: 'Cancel', style: 'cancel' },
@@ -129,7 +158,7 @@ const AdminCashbackScreen = ({ navigation }) => {
 
   return (
     <View style={styles.safe}>
-      <BackHeader title="Cash Back" onBack={() => navigation.goBack()} />
+      <BackHeader title={cashEnabled ? 'Cash Back' : 'Rewards'} onBack={() => navigation.goBack()} />
 
       <FlatList
         data={pending}
@@ -163,6 +192,17 @@ const AdminCashbackScreen = ({ navigation }) => {
               </View>
             ))}
 
+            <Text style={[styles.sectionLabel, { marginTop: 24 }]}>Cash back</Text>
+            <Text style={styles.sectionHint}>
+              Off for now, until there is market feedback: customers can't claim cash back and venues don't offer it. Store credit and discounts are not affected. Nothing is deleted, so switching it back on restores venues' saved cash back settings.
+            </Text>
+            <View style={styles.switchRow}>
+              <Text style={styles.ruleLabel}>{cashEnabled ? 'Cash back is ON' : 'Cash back is OFF'}</Text>
+              <Switch value={cashEnabled} onValueChange={handleToggleCash} disabled={savingCash} />
+            </View>
+
+            {cashEnabled && (
+              <>
             <Text style={[styles.sectionLabel, { marginTop: 24 }]}>Cash Back Rate</Text>
             <Text style={styles.sectionHint}>
               Venues set their own cash back and store credit rates. This caps how much cash back any venue can offer (you pay members before recovering it from the venue). Minimum receipt size is set per country.
@@ -181,6 +221,8 @@ const AdminCashbackScreen = ({ navigation }) => {
             <TouchableOpacity style={styles.saveBtn} onPress={handleSaveSettings} disabled={savingSettings}>
               {savingSettings ? <ActivityIndicator color={COLORS.black} /> : <Text style={styles.saveBtnText}>Save Rate</Text>}
             </TouchableOpacity>
+              </>
+            )}
 
             <Text style={[styles.sectionLabel, { marginTop: 24 }]}>Countries and payout methods</Text>
             <Text style={styles.sectionHint}>
@@ -261,6 +303,7 @@ const styles = StyleSheet.create({
   },
   sectionHint: { fontSize: 12, color: COLORS.textLight, lineHeight: 17, marginHorizontal: 20, marginBottom: 12 },
   list: { paddingBottom: 48 },
+  switchRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginHorizontal: 20, marginBottom: 6 },
   settingsRow: { flexDirection: 'row', gap: 10, marginHorizontal: 20, marginBottom: 10 },
   settingsField: { flex: 1 },
   ruleLabel: { fontSize: 12, color: COLORS.textMuted, marginBottom: 4 },

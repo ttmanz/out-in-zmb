@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, ScrollView, ActivityIndicator, Alert } from 'react-native';
 import { COLORS } from '../../constants/colors';
-import { PARTICIPATION_OPTIONS } from '../../lib/cashback';
+import { PARTICIPATION_OPTIONS, rewardOptions } from '../../lib/cashback';
+import { useCashBackEnabled } from '../../hooks/useCashBackEnabled';
 import { setParticipation } from '../../lib/profile';
 import { useUser } from '../../contexts/UserContext';
 import BackHeader from '../../components/common/BackHeader';
@@ -11,6 +12,7 @@ const ALL_KEYS = PARTICIPATION_OPTIONS.map((o) => o.key);
 
 const ParticipationScreen = ({ navigation }) => {
   const { profile, refreshProfile } = useUser();
+  const cashEnabled = useCashBackEnabled();
   const [selected, setSelected] = useState(profile?.participation ?? []);
   const [saving, setSaving] = useState(false);
 
@@ -40,10 +42,10 @@ const ParticipationScreen = ({ navigation }) => {
       <ScrollView contentContainerStyle={styles.scroll}>
         <Text style={styles.intro}>
           Choose which rewards your venue offers. Customers only see the ones you tick. You set the percentage for each
-          under Cash Back & Credit, and you can change this any time.
+          under {cashEnabled ? 'Cash Back & Credit' : 'Rewards'}, and you can change this any time.
         </Text>
 
-        {PARTICIPATION_OPTIONS.map((o) => {
+        {rewardOptions(cashEnabled).map((o) => {
           const on = selected.includes(o.key);
           return (
             <TouchableOpacity key={o.key} onPress={() => toggle(o.key)} activeOpacity={0.85}>

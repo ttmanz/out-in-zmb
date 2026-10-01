@@ -10,7 +10,8 @@ import { getProfile, updateFullProfile } from '../../lib/profile';
 import { uploadAvatar } from '../../lib/storage';
 import { resizeForUpload } from '../../lib/imageResize';
 import { useUser } from '../../contexts/UserContext';
-import { PARTICIPATION_OPTIONS } from '../../lib/cashback';
+import { PARTICIPATION_OPTIONS, rewardOptions } from '../../lib/cashback';
+import { useCashBackEnabled } from '../../hooks/useCashBackEnabled';
 
 const GENDERS = ['Male', 'Female', 'Non-binary', 'Prefer not to say'];
 const ACCOUNT_TYPES = [
@@ -61,6 +62,7 @@ const CompleteProfileScreen = ({ navigation }) => {
   const [instagram, setInstagram] = useState('');
   const [accountType, setAccountType] = useState('member');
   const [participation, setParticipation] = useState([]);
+  const cashEnabled = useCashBackEnabled();
   // profiles.account_type defaults to 'member' in the database, so the
   // loaded value is never actually empty — this tracks whether the person
   // has deliberately picked one, so first-time setup can require a real
@@ -224,9 +226,9 @@ const CompleteProfileScreen = ({ navigation }) => {
         </Field>
 
         {accountType === 'venue_owner' && (
-          <Field label="Rewards you'll offer" hint="you set the percentages later under Cash Back & Credit">
+          <Field label="Rewards you'll offer" hint={`you set the percentages later under ${cashEnabled ? 'Cash Back & Credit' : 'Rewards'}`}>
             <View style={styles.chipRow}>
-              {PARTICIPATION_OPTIONS.map((o) => {
+              {rewardOptions(cashEnabled).map((o) => {
                 const active = participation.includes(o.key);
                 return (
                   <TouchableOpacity
