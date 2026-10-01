@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="Rollout Plus — the social app for going out. See who's nearby, plan your night, discover venues, and connect with people around you." />
+  <meta name="description" content="Rollout Plus — the social app for going out. See who's nearby, plan your outing, discover venues, and connect with people around you." />
   <meta property="og:title" content="Rollout Plus" />
   <meta property="og:description" content="Explore. Connect. Experience. The social app for going out." />
   <meta property="og:url" content="https://rollout-plus.com" />
@@ -35,12 +35,19 @@
     .nav-cta:hover { background: var(--gold-light); color: #0d0a03; }
 
     /* HERO */
-    .hero { min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 120px 24px 80px; position: relative; overflow: hidden; }
+    .hero {
+      min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 120px 24px 80px; position: relative; overflow: hidden;
+      /* darken the photo so the text stays readable, then fade into the page colour below */
+      background:
+        linear-gradient(to bottom, rgba(13,10,3,0.30) 0%, rgba(13,10,3,0.50) 60%, #0d0a03 100%),
+        url('rollout-bg.png') 70% top / cover no-repeat,
+        var(--bg);
+    }
     .hero-glow { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -60%); width: 600px; height: 600px; background: radial-gradient(circle, rgba(200,128,10,0.12) 0%, transparent 70%); pointer-events: none; }
     .hero-badge { display: inline-flex; align-items: center; gap: 8px; background: rgba(200,128,10,0.12); border: 1px solid rgba(200,128,10,0.3); border-radius: 20px; padding: 6px 14px; font-size: 0.8rem; color: var(--gold); margin-bottom: 28px; }
     .hero h1 { font-size: clamp(3rem, 8vw, 5.5rem); font-weight: 800; color: var(--text); letter-spacing: -2px; line-height: 1.05; margin-bottom: 20px; }
     .hero h1 span { color: var(--gold); }
-    .hero p { font-size: clamp(1rem, 2.5vw, 1.2rem); color: var(--text-muted); max-width: 560px; margin-bottom: 44px; line-height: 1.65; }
+    .hero p { font-size: clamp(1rem, 2.5vw, 1.2rem); color: #c9bfa6; max-width: 560px; margin-bottom: 44px; line-height: 1.65; }
     .hero-tagline { font-size: 0.85rem; letter-spacing: 3px; color: var(--gold); font-weight: 600; margin-bottom: 16px; text-transform: uppercase; }
     .store-btns { display: flex; gap: 14px; flex-wrap: wrap; justify-content: center; margin-bottom: 20px; }
     .store-btn { display: flex; align-items: center; gap: 10px; background: var(--surface2); border: 1px solid var(--border-accent); border-radius: 14px; padding: 12px 22px; text-decoration: none; transition: border-color 0.2s, transform 0.15s; }
@@ -50,7 +57,7 @@
     .store-btn-sub { font-size: 0.68rem; color: var(--text-muted); display: block; }
     .store-btn-name { font-size: 0.92rem; font-weight: 700; color: var(--text); display: block; }
     .hero-note { font-size: 0.78rem; color: var(--text-dim); }
-    .scroll-hint { margin-top: 60px; color: var(--text-dim); font-size: 0.8rem; display: flex; flex-direction: column; align-items: center; gap: 6px; }
+    .scroll-hint { margin-top: 60px; color: var(--text-muted); font-size: 0.8rem; display: flex; flex-direction: column; align-items: center; gap: 6px; }
     .scroll-arrow { font-size: 1.2rem; animation: bounce 2s infinite; }
     @keyframes bounce { 0%,100%{transform:translateY(0)} 50%{transform:translateY(6px)} }
 
@@ -80,11 +87,9 @@
     .step-title { font-size: 1rem; font-weight: 700; color: var(--text); margin-bottom: 8px; }
     .step-desc { font-size: 0.88rem; color: var(--text-muted); line-height: 1.6; }
 
-    /* STATS */
-    .stats-band { background: var(--surface); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); padding: 56px 24px; }
-    .stats-inner { max-width: 800px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 24px; text-align: center; }
-    .stat-num { font-size: 2.4rem; font-weight: 800; color: var(--gold); letter-spacing: -1px; }
-    .stat-label { font-size: 0.85rem; color: var(--text-muted); margin-top: 4px; }
+    /* REWARDS — alternates with the features section above it */
+    .rewards { background: var(--bg); }
+    .rewards .feature-card { background: var(--surface); }
 
     /* LOCATION HIGHLIGHT */
     .location-highlight { max-width: 900px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 56px; align-items: center; }
@@ -151,7 +156,7 @@
   <div class="hero-badge">✦ Now available on iOS &amp; Android</div>
   <p class="hero-tagline">Explore · Connect · Experience</p>
   <h1>Go out.<br><span>Find your people.</span></h1>
-  <p>Rollout Plus is the social app for going out. See who's nearby, plan your night, discover venues, and connect with members around you — in real time.</p>
+  <p>Rollout Plus is the social app for going out. See who's nearby, plan your outing, discover venues, and connect with members around you — in real time.</p>
   <div class="store-btns" id="download">
     <a href="#" class="store-btn">
       <span class="store-btn-icon">🍎</span>
@@ -168,7 +173,7 @@
       </span>
     </a>
   </div>
-  <p class="hero-note">Free · Ages 17+</p>
+  <p class="hero-note"><strong>Free</strong></p>
   <div class="scroll-hint">
     <span>Scroll to explore</span>
     <span class="scroll-arrow">↓</span>
@@ -180,7 +185,7 @@
   <div class="features-inner">
     <div class="centered features-header">
       <p class="section-label">Everything in one place</p>
-      <h2 class="section-title">Built for your night out</h2>
+      <h2 class="section-title">Built for your outing</h2>
       <p class="section-sub">Every feature is designed around the way people actually go out — spontaneous, social, and local.</p>
     </div>
     <div class="features-grid">
@@ -202,7 +207,7 @@
       <div class="feature-card">
         <div class="feature-icon">💬</div>
         <div class="feature-title">Open Chat</div>
-        <div class="feature-desc">A public chat feed for your area. Start a conversation, reply to others, and discover what's going on around you tonight.</div>
+        <div class="feature-desc">A public chat feed for your area. Start a conversation, reply to others, and discover what's going on around you.</div>
       </div>
       <div class="feature-card">
         <div class="feature-icon">🌙</div>
@@ -222,33 +227,44 @@
       <div class="feature-card">
         <div class="feature-icon">🏛️</div>
         <div class="feature-title">Club Groups</div>
-        <div class="feature-desc">Create or join interest-based groups — bar crawls, running clubs, brunch squads. Build your social circle around what you love.</div>
+        <div class="feature-desc">Create or join interest-based groups — bar crawls, football clubs, brunch squads. Build your social circle around what you love.</div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- STATS -->
-<div class="stats-band">
-  <div class="stats-inner">
-    <div>
-      <div class="stat-num">300m</div>
-      <div class="stat-label">At Venue proximity radius</div>
+<!-- REWARDS -->
+<section class="features rewards" id="rewards">
+  <div class="features-inner">
+    <div class="centered features-header">
+      <p class="section-label">Get rewarded for going out</p>
+      <h2 class="section-title">Rewards at your favourite venues</h2>
+      <p class="section-sub">Every venue chooses which rewards it offers, so you always know what you'll get before you go.</p>
     </div>
-    <div>
-      <div class="stat-num">3h</div>
-      <div class="stat-label">Location visibility window</div>
-    </div>
-    <div>
-      <div class="stat-num">24h</div>
-      <div class="stat-label">Auto-delete for photo posts</div>
-    </div>
-    <div>
-      <div class="stat-num">3</div>
-      <div class="stat-label">Languages — EN, EL, RU</div>
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon">⭐</div>
+        <div class="feature-title">Loyalty Points</div>
+        <div class="feature-desc">Earn points for checking in at venues and sharing your outings. Spend them in the Rewards catalogue on offers from venues.</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🎟️</div>
+        <div class="feature-title">Venue Points</div>
+        <div class="feature-desc">Some venues give you credit to spend with them on your next visit. It's yours to use at that venue.</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🏷️</div>
+        <div class="feature-title">Discounts</div>
+        <div class="feature-desc">Venues can take a percentage off your bill at the till. Show your Rollout Plus code to staff and save.</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">💸</div>
+        <div class="feature-title">Cash-Back</div>
+        <div class="feature-desc">Submit your receipt and get part of your spend back as real money, paid out to your mobile money or bank account.</div>
+      </div>
     </div>
   </div>
-</div>
+</section>
 
 <!-- HOW IT WORKS -->
 <section id="how">
@@ -302,7 +318,7 @@
   <div class="cta-section">
     <p class="section-label">Ready to go?</p>
     <h2 class="section-title">Download Rollout Plus free</h2>
-    <p class="section-sub" style="margin-bottom:40px;">Available on iOS and Android. Ages 17+.</p>
+    <p class="section-sub" style="margin-bottom:40px;">Available on iOS and Android.</p>
     <div class="cta-btns">
       <a href="#download" class="btn-primary">🍎 App Store</a>
       <a href="#download" class="btn-secondary">▶ Google Play</a>
