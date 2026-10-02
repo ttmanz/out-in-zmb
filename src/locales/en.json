@@ -58,7 +58,14 @@
     "unlockFor": "Unlock for {{price}}",
     "unlockDesc": "Your current plan doesn't include this feature. Unlock it with a one-time purchase.",
     "upcomingCharge": "From {{date}}, a {{price}} subscription will be required to keep posting.",
-    "upcomingChargeNoPrice": "From {{date}}, a subscription will be required to keep posting."
+    "upcomingChargeNoPrice": "From {{date}}, a subscription will be required to keep posting.",
+    "memberFreeTitle": "Free for members",
+    "memberFreeSub": "Rollout Plus is free for members. Only venues have a paid plan.",
+    "venueTrialSub": "{{days}} day(s) left of your free venue trial",
+    "venueLockedTitle": "Free trial ended",
+    "venueLockedSub": "Subscribe to a venue plan to keep using venue tools: offering rewards, confirming claims and vouchers.",
+    "venueBannerTrial": "Venue free trial: {{days}} day(s) left — tap to see plans",
+    "venueBannerLocked": "Your venue free trial has ended — tap to subscribe and keep using venue tools"
   },
   "auth": {
     "login": "Log In",

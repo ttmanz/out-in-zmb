@@ -12,6 +12,7 @@ import {
   redeemVoucher, getVoucherStatus,
 } from '../../lib/vouchers';
 import { useUser } from '../../contexts/UserContext';
+import { useVenueToolsGate } from '../../hooks/useVenueToolsGate';
 import BackHeader from '../../components/common/BackHeader';
 import GradientBorder from '../../components/common/GradientBorder';
 
@@ -23,6 +24,7 @@ const STATUS_COLOR = {
 };
 
 const VenueVouchersScreen = ({ navigation }) => {
+  useVenueToolsGate();
   const { profile } = useUser();
   const [vouchers, setVouchers] = useState([]);
   const [loading, setLoading] = useState(true);

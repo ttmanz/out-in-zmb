@@ -15,12 +15,14 @@ import { useCashBackEnabled } from '../../hooks/useCashBackEnabled';
 import { getSignedUrl } from '../../lib/storage';
 import { useUser } from '../../contexts/UserContext';
 import { formatAgo } from '../../utils/format';
+import { useVenueToolsGate } from '../../hooks/useVenueToolsGate';
 import BackHeader from '../../components/common/BackHeader';
 import GradientBorder from '../../components/common/GradientBorder';
 
 const STATUS_COLOR = { confirmed: COLORS.success, rejected: COLORS.error, cancelled: COLORS.textMuted };
 
 const VenueCashbackScreen = ({ navigation }) => {
+  useVenueToolsGate();
   const { profile } = useUser();
   const cashEnabled = useCashBackEnabled();
   const [offered, setOffered] = useState([]);

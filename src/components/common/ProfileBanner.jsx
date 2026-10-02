@@ -2,13 +2,36 @@ import React from 'react';
 import { View, TouchableOpacity, Text, StyleSheet } from 'react-native';
 import { COLORS } from '../../constants/colors';
 import { ROUTES } from '../../constants/routes';
+import { useTranslation } from 'react-i18next';
 import { useUser } from '../../contexts/UserContext';
+
+// Venue Plan mode: tells a venue how long its free trial has left, or that it has
+// ended — until it subscribes.
+const VenueTrialBanner = ({ navigation }) => {
+  const { t } = useTranslation();
+  const { venueAccess } = useUser();
+  if (!venueAccess?.applies || venueAccess.subscribed) return null;
+  return (
+    <TouchableOpacity
+      style={styles.banner}
+      onPress={() => navigation.navigate(ROUTES.SUBSCRIPTION)}
+      activeOpacity={0.85}
+    >
+      <Text style={styles.text}>
+        {venueAccess.locked
+          ? t('subscription.venueBannerLocked')
+          : t('subscription.venueBannerTrial', { days: venueAccess.trialDaysLeft })}
+      </Text>
+    </TouchableOpacity>
+  );
+};
 
 const ProfileBanner = ({ navigation }) => {
   const { profile } = useUser();
 
   return (
     <View>
+      <VenueTrialBanner navigation={navigation} />
       {profile && !profile.profile_completed && (
         <TouchableOpacity
           style={styles.banner}

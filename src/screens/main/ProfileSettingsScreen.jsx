@@ -33,7 +33,7 @@ const VENUE_VISIBILITY_OPTIONS = [
 
 const ProfileSettingsScreen = ({ navigation }) => {
   const { t } = useTranslation();
-  const { profile: myProfile } = useUser();
+  const { profile: myProfile, isVenuePlan } = useUser();
   const cashEnabled = useCashBackEnabled();
   const [userId, setUserId] = useState(null);
   const [fullName, setFullName] = useState('');
@@ -184,18 +184,20 @@ const ProfileSettingsScreen = ({ navigation }) => {
           <Text style={styles.editProfileChevron}>›</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity
-          style={styles.editProfileBtn}
-          onPress={() => navigation.navigate(ROUTES.SUBSCRIPTION)}
-          activeOpacity={0.8}
-        >
-          <Text style={styles.editProfileEmoji}>⭐</Text>
-          <View style={styles.editProfileText}>
-            <Text style={styles.editProfileLabel}>{t('subscription.title')}</Text>
-            <Text style={styles.editProfileDesc}>{t('subscription.manageDesc')}</Text>
-          </View>
-          <Text style={styles.editProfileChevron}>›</Text>
-        </TouchableOpacity>
+        {(!isVenuePlan || myProfile?.account_type === 'venue_owner') && (
+          <TouchableOpacity
+            style={styles.editProfileBtn}
+            onPress={() => navigation.navigate(ROUTES.SUBSCRIPTION)}
+            activeOpacity={0.8}
+          >
+            <Text style={styles.editProfileEmoji}>⭐</Text>
+            <View style={styles.editProfileText}>
+              <Text style={styles.editProfileLabel}>{t('subscription.title')}</Text>
+              <Text style={styles.editProfileDesc}>{t('subscription.manageDesc')}</Text>
+            </View>
+            <Text style={styles.editProfileChevron}>›</Text>
+          </TouchableOpacity>
+        )}
 
         <TouchableOpacity
           style={styles.editProfileBtn}

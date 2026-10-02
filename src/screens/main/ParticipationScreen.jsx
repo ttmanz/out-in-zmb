@@ -5,12 +5,14 @@ import { PARTICIPATION_OPTIONS, rewardOptions } from '../../lib/cashback';
 import { useCashBackEnabled } from '../../hooks/useCashBackEnabled';
 import { setParticipation } from '../../lib/profile';
 import { useUser } from '../../contexts/UserContext';
+import { useVenueToolsGate } from '../../hooks/useVenueToolsGate';
 import BackHeader from '../../components/common/BackHeader';
 import GradientBorder from '../../components/common/GradientBorder';
 
 const ALL_KEYS = PARTICIPATION_OPTIONS.map((o) => o.key);
 
 const ParticipationScreen = ({ navigation }) => {
+  useVenueToolsGate();
   const { profile, refreshProfile } = useUser();
   const cashEnabled = useCashBackEnabled();
   const [selected, setSelected] = useState(profile?.participation ?? []);

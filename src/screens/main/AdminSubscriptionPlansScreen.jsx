@@ -90,6 +90,100 @@ const AdminSubscriptionPlansScreen = ({ navigation }) => {
     else load();
   };
 
+  const renderPlan = (plan) => {
+  const d = drafts[plan.id] ?? {};
+  const isSaving = saving === plan.id;
+  return (
+    <View key={plan.id} style={styles.card}>
+      <Text style={styles.planId}>{plan.id.toUpperCase()}</Text>
+
+      <Text style={styles.fieldLabel}>Label</Text>
+      <TextInput
+        style={styles.input}
+        value={d.label ?? ''}
+        onChangeText={(v) => setField(plan.id, 'label', v)}
+        placeholderTextColor={COLORS.textMuted}
+        placeholder="e.g. Monthly"
+      />
+
+      <Text style={styles.fieldLabel}>Price Display</Text>
+      <TextInput
+        style={styles.input}
+        value={d.price_display ?? ''}
+        onChangeText={(v) => setField(plan.id, 'price_display', v)}
+        placeholderTextColor={COLORS.textMuted}
+        placeholder="e.g. 99 / month"
+      />
+
+      <Text style={styles.fieldLabel}>Badge (optional)</Text>
+      <TextInput
+        style={styles.input}
+        value={d.badge ?? ''}
+        onChangeText={(v) => setField(plan.id, 'badge', v)}
+        placeholderTextColor={COLORS.textMuted}
+        placeholder="e.g. Best Value"
+      />
+
+      <Text style={styles.fieldLabel}>Description (optional)</Text>
+      <TextInput
+        style={[styles.input, styles.inputMulti]}
+        value={d.description ?? ''}
+        onChangeText={(v) => setField(plan.id, 'description', v)}
+        placeholderTextColor={COLORS.textMuted}
+        placeholder="Short description..."
+        multiline
+      />
+
+      <Text style={styles.fieldLabel}>{plan.audience === 'venue' ? 'RevenueCat Product ID' : 'RevenueCat Product ID (member price)'}</Text>
+      <TextInput
+        style={styles.input}
+        value={d.revenuecat_product_id ?? ''}
+        onChangeText={(v) => setField(plan.id, 'revenuecat_product_id', v)}
+        placeholderTextColor={COLORS.textMuted}
+        placeholder="e.g. gold_monthly"
+        autoCapitalize="none"
+      />
+
+      {plan.audience !== 'venue' && (
+<View style={styles.venueSection}>
+        <Text style={styles.venueSectionTitle}>🍸 Venue Owner Pricing</Text>
+        <Text style={styles.venueSectionHint}>Leave blank to charge venue owners the same as regular members.</Text>
+
+        <Text style={styles.fieldLabel}>Venue Owner Price Display</Text>
+        <TextInput
+          style={styles.input}
+          value={d.venue_price_display ?? ''}
+          onChangeText={(v) => setField(plan.id, 'venue_price_display', v)}
+          placeholderTextColor={COLORS.textMuted}
+          placeholder="e.g. 199 / month"
+        />
+
+        <Text style={styles.fieldLabel}>RevenueCat Product ID (venue-owner price)</Text>
+        <TextInput
+          style={styles.input}
+          value={d.venue_revenuecat_product_id ?? ''}
+          onChangeText={(v) => setField(plan.id, 'venue_revenuecat_product_id', v)}
+          placeholderTextColor={COLORS.textMuted}
+          placeholder="e.g. gold_monthly_venue"
+          autoCapitalize="none"
+        />
+      </View>
+)}
+
+      <TouchableOpacity
+        style={styles.saveBtn}
+        onPress={() => handleSave(plan)}
+        disabled={isSaving}
+      >
+        {isSaving
+          ? <ActivityIndicator color={COLORS.black} size="small" />
+          : <Text style={styles.saveBtnText}>Save</Text>
+        }
+      </TouchableOpacity>
+    </View>
+  );
+  };
+
   return (
     <KeyboardAvoidingView style={styles.safe} behavior="padding">
       <BackHeader title="Subscription Plans" onBack={() => navigation.goBack()} />
@@ -153,99 +247,16 @@ const AdminSubscriptionPlansScreen = ({ navigation }) => {
           {tiers.filter((t) => t.tier_key !== 'free').map((tier) => (
             <View key={tier.tier_key}>
               <Text style={styles.tierGroupTitle}>{tier.label}</Text>
-              {plans.filter((p) => p.tier_key === tier.tier_key).map((plan) => {
-                const d = drafts[plan.id] ?? {};
-                const isSaving = saving === plan.id;
-                return (
-                  <View key={plan.id} style={styles.card}>
-                    <Text style={styles.planId}>{plan.id.toUpperCase()}</Text>
-
-                    <Text style={styles.fieldLabel}>Label</Text>
-                    <TextInput
-                      style={styles.input}
-                      value={d.label ?? ''}
-                      onChangeText={(v) => setField(plan.id, 'label', v)}
-                      placeholderTextColor={COLORS.textMuted}
-                      placeholder="e.g. Monthly"
-                    />
-
-                    <Text style={styles.fieldLabel}>Price Display</Text>
-                    <TextInput
-                      style={styles.input}
-                      value={d.price_display ?? ''}
-                      onChangeText={(v) => setField(plan.id, 'price_display', v)}
-                      placeholderTextColor={COLORS.textMuted}
-                      placeholder="e.g. 99 / month"
-                    />
-
-                    <Text style={styles.fieldLabel}>Badge (optional)</Text>
-                    <TextInput
-                      style={styles.input}
-                      value={d.badge ?? ''}
-                      onChangeText={(v) => setField(plan.id, 'badge', v)}
-                      placeholderTextColor={COLORS.textMuted}
-                      placeholder="e.g. Best Value"
-                    />
-
-                    <Text style={styles.fieldLabel}>Description (optional)</Text>
-                    <TextInput
-                      style={[styles.input, styles.inputMulti]}
-                      value={d.description ?? ''}
-                      onChangeText={(v) => setField(plan.id, 'description', v)}
-                      placeholderTextColor={COLORS.textMuted}
-                      placeholder="Short description..."
-                      multiline
-                    />
-
-                    <Text style={styles.fieldLabel}>RevenueCat Product ID (member price)</Text>
-                    <TextInput
-                      style={styles.input}
-                      value={d.revenuecat_product_id ?? ''}
-                      onChangeText={(v) => setField(plan.id, 'revenuecat_product_id', v)}
-                      placeholderTextColor={COLORS.textMuted}
-                      placeholder="e.g. gold_monthly"
-                      autoCapitalize="none"
-                    />
-
-                    <View style={styles.venueSection}>
-                      <Text style={styles.venueSectionTitle}>🍸 Venue Owner Pricing</Text>
-                      <Text style={styles.venueSectionHint}>Leave blank to charge venue owners the same as regular members.</Text>
-
-                      <Text style={styles.fieldLabel}>Venue Owner Price Display</Text>
-                      <TextInput
-                        style={styles.input}
-                        value={d.venue_price_display ?? ''}
-                        onChangeText={(v) => setField(plan.id, 'venue_price_display', v)}
-                        placeholderTextColor={COLORS.textMuted}
-                        placeholder="e.g. 199 / month"
-                      />
-
-                      <Text style={styles.fieldLabel}>RevenueCat Product ID (venue-owner price)</Text>
-                      <TextInput
-                        style={styles.input}
-                        value={d.venue_revenuecat_product_id ?? ''}
-                        onChangeText={(v) => setField(plan.id, 'venue_revenuecat_product_id', v)}
-                        placeholderTextColor={COLORS.textMuted}
-                        placeholder="e.g. gold_monthly_venue"
-                        autoCapitalize="none"
-                      />
-                    </View>
-
-                    <TouchableOpacity
-                      style={styles.saveBtn}
-                      onPress={() => handleSave(plan)}
-                      disabled={isSaving}
-                    >
-                      {isSaving
-                        ? <ActivityIndicator color={COLORS.black} size="small" />
-                        : <Text style={styles.saveBtnText}>Save</Text>
-                      }
-                    </TouchableOpacity>
-                  </View>
-                );
-              })}
+              {plans.filter((p) => p.tier_key === tier.tier_key).map(renderPlan)}
             </View>
           ))}
+          <Text style={[styles.sectionTitle, { marginTop: 28 }]}>Venue Plan</Text>
+          <Text style={styles.sectionHint}>
+            Used when Access Control is set to "Venue Plan": members are free with no levels, and
+            venues pay these prices after their free trial. Fill in the price text and the store
+            product id for each.
+          </Text>
+          {plans.filter((p) => p.audience === 'venue').map(renderPlan)}
         </ScrollView>
       )}
     </KeyboardAvoidingView>

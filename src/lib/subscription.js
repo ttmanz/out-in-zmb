@@ -3,7 +3,7 @@ import { supabase } from './supabase';
 export const getSubscriptionPlans = () =>
   supabase
     .from('subscription_plans')
-    .select('id, tier_key, label, price_display, venue_price_display, duration_months, badge, description, sort_order, revenuecat_product_id, venue_revenuecat_product_id')
+    .select('id, tier_key, label, price_display, venue_price_display, duration_months, badge, description, sort_order, revenuecat_product_id, venue_revenuecat_product_id, audience')
     .eq('is_active', true)
     .order('sort_order');
 
@@ -11,7 +11,7 @@ export const getSubscriptionPlans = () =>
 export const getAllSubscriptionPlans = () =>
   supabase
     .from('subscription_plans')
-    .select('id, tier_key, label, price_display, venue_price_display, duration_months, badge, description, sort_order, revenuecat_product_id, venue_revenuecat_product_id')
+    .select('id, tier_key, label, price_display, venue_price_display, duration_months, badge, description, sort_order, revenuecat_product_id, venue_revenuecat_product_id, audience')
     .order('sort_order');
 
 // Membership tiers (Free/Silver/Gold/Platinum) — each carries the daily
@@ -93,4 +93,20 @@ export const subscriptionStatus = (profile) => {
     return { hasAccess: true, isActive: true, daysLeft, planId: profile.subscription_plan };
   }
   return { hasAccess: true, isActive: false, daysLeft: 0, planId: null };
+};
+
+const DAY_MS = 24 * 60 * 60 * 1000;
+
+// Venue Plan mode: members are free, with no levels. A venue account has a free
+// trial (settings.venue_trial_days from signup, editable by an admin) and then
+// needs a paid venue plan to use the venue tools. This mirrors venue_has_access()
+// in the database, which is what actually enforces it — this is for the screens.
+export const venueAccessStatus = (profile, settings) => {
+  const none = { applies: false, locked: false, inTrial: false, subscribed: false, trialDaysLeft: 0 };
+  if (settings?.mode !== 'venue_plan' || profile?.account_type !== 'venue_owner' || isBypassRole(profile)) return none;
+  if (hasActivePlan(profile)) return { applies: true, locked: false, inTrial: false, subscribed: true, trialDaysLeft: 0 };
+  const trialDays = settings?.venue_trial_days ?? 30;
+  const trialEnd = new Date(profile.created_at).getTime() + trialDays * DAY_MS;
+  const trialDaysLeft = Math.max(0, Math.ceil((trialEnd - Date.now()) / DAY_MS));
+  return { applies: true, locked: trialDaysLeft <= 0, inTrial: trialDaysLeft > 0, subscribed: false, trialDaysLeft };
 };

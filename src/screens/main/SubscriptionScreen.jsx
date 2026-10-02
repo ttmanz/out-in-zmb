@@ -27,7 +27,7 @@ const packageForPlan = (offering, productId) => {
 
 const SubscriptionScreen = ({ navigation }) => {
   const { t } = useTranslation();
-  const { profile, refreshProfile } = useUser();
+  const { profile, refreshProfile, venueAccess, isVenuePlan } = useUser();
   const [plans, setPlans] = useState([]);
   const [offering, setOffering] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -36,6 +36,11 @@ const SubscriptionScreen = ({ navigation }) => {
   const [restoring, setRestoring] = useState(false);
 
   const status = subscriptionStatus(profile);
+  const isVenue = profile?.account_type === 'venue_owner';
+  // Levels mode: the level plans. Venue Plan mode: members are free (no plans at
+  // all), and venues see only the venue plans.
+  const visiblePlans = plans.filter((p) => (isVenuePlan ? p.audience === 'venue' : p.audience !== 'venue'));
+  const showPlans = !isVenuePlan || isVenue;
 
   useEffect(() => {
     getSession().then(({ data: { session } }) => {
@@ -88,6 +93,30 @@ const SubscriptionScreen = ({ navigation }) => {
 
   const statusBanner = () => {
     if (!profile) return null;
+    if (isVenuePlan && !isVenue) {
+      return (
+        <View style={[styles.trialBanner, styles.activeBanner]}>
+          <Text style={styles.trialTitle}>🎉 {t('subscription.memberFreeTitle')}</Text>
+          <Text style={styles.trialSub}>{t('subscription.memberFreeSub')}</Text>
+        </View>
+      );
+    }
+    if (venueAccess.inTrial) {
+      return (
+        <View style={styles.trialBanner}>
+          <Text style={styles.trialTitle}>🎉 {t('subscription.trialActive')}</Text>
+          <Text style={styles.trialSub}>{t('subscription.venueTrialSub', { days: venueAccess.trialDaysLeft })}</Text>
+        </View>
+      );
+    }
+    if (venueAccess.locked) {
+      return (
+        <View style={[styles.trialBanner, styles.expiredBanner]}>
+          <Text style={styles.trialTitle}>⚠️ {t('subscription.venueLockedTitle')}</Text>
+          <Text style={styles.trialSub}>{t('subscription.venueLockedSub')}</Text>
+        </View>
+      );
+    }
     if (status.isActive) {
       return (
         <View style={[styles.trialBanner, styles.activeBanner]}>
@@ -116,14 +145,14 @@ const SubscriptionScreen = ({ navigation }) => {
       <ScrollView contentContainerStyle={styles.scroll}>
         {statusBanner()}
 
-        <Text style={styles.sectionLabel}>{t('subscription.choosePlan')}</Text>
+        {showPlans && <Text style={styles.sectionLabel}>{t('subscription.choosePlan')}</Text>}
 
-        {loading ? (
+        {!showPlans ? null : loading ? (
           <ActivityIndicator color={COLORS.primary} style={{ marginTop: 40 }} />
         ) : (
           (() => {
             let lastTier = null;
-            return plans.map((plan) => {
+            return visiblePlans.map((plan) => {
               const isCurrentPlan = status.isActive && status.planId === plan.id;
               const showTierHeader = plan.tier_key !== lastTier;
               lastTier = plan.tier_key;
@@ -199,6 +228,7 @@ const styles = StyleSheet.create({
     borderWidth: 1, borderColor: COLORS.borderAccent,
     borderRadius: 14, padding: 16, marginBottom: 24,
   },
+  expiredBanner: { backgroundColor: 'rgba(231,76,60,0.1)', borderColor: '#e74c3c' },
   activeBanner: { backgroundColor: 'rgba(46,204,113,0.1)', borderColor: '#2ecc71' },
   trialTitle: { fontSize: 16, fontWeight: '800', color: COLORS.text, marginBottom: 4 },
   trialSub: { fontSize: 13, color: COLORS.textMuted, lineHeight: 19 },

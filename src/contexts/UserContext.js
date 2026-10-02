@@ -2,7 +2,7 @@ import React, { createContext, useContext, useState, useEffect, useCallback } fr
 import { Alert } from 'react-native';
 import { getSession, onAuthStateChange, signOut } from '../lib/auth';
 import { getProfile } from '../lib/profile';
-import { subscriptionStatus, getSubscriptionSettings, getSubscriptionPlans, getFeatureAccess, canAccessFeature, isFeatureEnabled, resolveTierKey } from '../lib/subscription';
+import { subscriptionStatus, getSubscriptionSettings, getSubscriptionPlans, getFeatureAccess, canAccessFeature, isFeatureEnabled, resolveTierKey, venueAccessStatus } from '../lib/subscription';
 import { configurePurchases } from '../lib/purchases';
 import { registerForPushNotificationsAsync } from '../lib/pushNotifications';
 
@@ -12,6 +12,8 @@ const UserContext = createContext({
   hasAccess: true,
   canAccessFeature: () => ({ allowed: true }),
   isFeatureEnabled: () => true,
+  venueAccess: { applies: false, locked: false, inTrial: false, subscribed: false, trialDaysLeft: 0 },
+  isVenuePlan: false,
 });
 
 export const UserProvider = ({ children }) => {
@@ -73,6 +75,8 @@ export const UserProvider = ({ children }) => {
 
   const { hasAccess } = subscriptionStatus(profile);
   const myTier = resolveTierKey(profile, plans);
+  const venueAccess = venueAccessStatus(profile, settings);
+  const isVenuePlan = settings?.mode === 'venue_plan';
 
   const checkFeature = useCallback(
     (featureKey) => canAccessFeature(featureKey, { featureMap }),
@@ -85,7 +89,7 @@ export const UserProvider = ({ children }) => {
   );
 
   return (
-    <UserContext.Provider value={{ profile, refreshProfile, refreshFeatureConfig, hasAccess, canAccessFeature: checkFeature, isFeatureEnabled: checkFeatureEnabled, settings, monthlyPlan, plans, myTier }}>
+    <UserContext.Provider value={{ profile, refreshProfile, refreshFeatureConfig, hasAccess, canAccessFeature: checkFeature, isFeatureEnabled: checkFeatureEnabled, settings, monthlyPlan, plans, myTier, venueAccess, isVenuePlan }}>
       {children}
     </UserContext.Provider>
   );
