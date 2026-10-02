@@ -3,7 +3,7 @@ import { supabase } from './supabase';
 export const getSubscriptionPlans = () =>
   supabase
     .from('subscription_plans')
-    .select('id, tier_key, label, price_display, venue_price_display, duration_months, badge, description, sort_order, revenuecat_product_id, venue_revenuecat_product_id, audience')
+    .select('id, tier_key, label, price_display, venue_price_display, duration_months, badge, description, sort_order, revenuecat_product_id, venue_revenuecat_product_id, audience, venue_available')
     .eq('is_active', true)
     .order('sort_order');
 
@@ -11,7 +11,7 @@ export const getSubscriptionPlans = () =>
 export const getAllSubscriptionPlans = () =>
   supabase
     .from('subscription_plans')
-    .select('id, tier_key, label, price_display, venue_price_display, duration_months, badge, description, sort_order, revenuecat_product_id, venue_revenuecat_product_id, audience')
+    .select('id, tier_key, label, price_display, venue_price_display, duration_months, badge, description, sort_order, revenuecat_product_id, venue_revenuecat_product_id, audience, venue_available')
     .order('sort_order');
 
 // Membership tiers (Free/Silver/Gold/Platinum) — each carries the daily

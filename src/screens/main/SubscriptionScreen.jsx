@@ -39,7 +39,9 @@ const SubscriptionScreen = ({ navigation }) => {
   const isVenue = profile?.account_type === 'venue_owner';
   // Levels mode: the level plans. Venue Plan mode: members are free (no plans at
   // all), and venues see only the venue plans.
-  const visiblePlans = plans.filter((p) => (isVenuePlan ? p.audience === 'venue' : p.audience !== 'venue'));
+  // A plan can be switched off for venue owners (under Levels, venues get only Platinum).
+  const visiblePlans = plans.filter((p) => (isVenuePlan ? p.audience === 'venue' : p.audience !== 'venue')
+    && !(isVenue && p.venue_available === false));
   const showPlans = !isVenuePlan || isVenue;
 
   useEffect(() => {

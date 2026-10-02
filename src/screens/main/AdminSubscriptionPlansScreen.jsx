@@ -39,7 +39,7 @@ const AdminSubscriptionPlansScreen = ({ navigation }) => {
     if (!plansRes.error && plansRes.data) {
       setPlans(plansRes.data);
       const initial = {};
-      plansRes.data.forEach((p) => { initial[p.id] = { label: p.label, price_display: p.price_display, badge: p.badge ?? '', description: p.description ?? '', revenuecat_product_id: p.revenuecat_product_id ?? '', venue_price_display: p.venue_price_display ?? '', venue_revenuecat_product_id: p.venue_revenuecat_product_id ?? '' }; });
+      plansRes.data.forEach((p) => { initial[p.id] = { label: p.label, price_display: p.price_display, badge: p.badge ?? '', description: p.description ?? '', revenuecat_product_id: p.revenuecat_product_id ?? '', venue_price_display: p.venue_price_display ?? '', venue_revenuecat_product_id: p.venue_revenuecat_product_id ?? '', venue_available: p.venue_available !== false }; });
       setDrafts(initial);
     }
     setLoading(false);
@@ -83,6 +83,7 @@ const AdminSubscriptionPlansScreen = ({ navigation }) => {
       description: d.description.trim() || null,
       revenuecat_product_id: d.revenuecat_product_id.trim() || null,
       venue_price_display: d.venue_price_display.trim() || null,
+      venue_available: d.venue_available !== false,
       venue_revenuecat_product_id: d.venue_revenuecat_product_id.trim() || null,
     });
     setSaving(null);
@@ -146,7 +147,19 @@ const AdminSubscriptionPlansScreen = ({ navigation }) => {
 
       {plan.audience !== 'venue' && (
 <View style={styles.venueSection}>
-        <Text style={styles.venueSectionTitle}>🍸 Venue Owner Pricing</Text>
+        <Text style={styles.venueSectionTitle}>🍸 Venue Owners</Text>
+                <View style={styles.venueAvailRow}>
+                  <Text style={styles.venueAvailLabel}>Offered to venue owners</Text>
+                  <TouchableOpacity
+                    style={[styles.venueAvailToggle, d.venue_available !== false && styles.venueAvailToggleOn]}
+                    onPress={() => setField(plan.id, 'venue_available', d.venue_available === false)}
+                  >
+                    <Text style={[styles.venueAvailToggleText, d.venue_available !== false && styles.venueAvailToggleTextOn]}>
+                      {d.venue_available !== false ? 'Yes' : 'No'}
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+                <Text style={styles.venueSectionHint}>Under Levels, a plan switched to No is hidden from venue accounts, so venues choose between Free and the plans left on.</Text>
         <Text style={styles.venueSectionHint}>Leave blank to charge venue owners the same as regular members.</Text>
 
         <Text style={styles.fieldLabel}>Venue Owner Price Display</Text>
@@ -306,6 +319,15 @@ const styles = StyleSheet.create({
     borderTopWidth: 1, borderTopColor: COLORS.border,
   },
   venueSectionTitle: { fontSize: 13, fontWeight: '700', color: COLORS.primary, marginBottom: 4 },
+  venueAvailRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 },
+  venueAvailLabel: { fontSize: 13, fontWeight: '600', color: COLORS.text },
+  venueAvailToggle: {
+    borderWidth: 1, borderColor: COLORS.borderAccent, borderRadius: 16,
+    paddingHorizontal: 14, paddingVertical: 6,
+  },
+  venueAvailToggleOn: { backgroundColor: COLORS.primary, borderColor: COLORS.primary },
+  venueAvailToggleText: { fontSize: 12, fontWeight: '700', color: COLORS.textMuted },
+  venueAvailToggleTextOn: { color: COLORS.black },
   venueSectionHint: { fontSize: 11, color: COLORS.textLight, lineHeight: 15, marginBottom: 4 },
   saveBtn: {
     backgroundColor: COLORS.primary, borderRadius: 10,
