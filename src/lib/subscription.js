@@ -40,9 +40,6 @@ export const updateSubscriptionPlan = (id, fields) =>
 // It's set exclusively by the revenuecat-webhook Edge Function once
 // RevenueCat confirms a real purchase.
 
-export const getMyFeatureUnlocks = (userId) =>
-  supabase.from('user_feature_unlocks').select('feature_key').eq('user_id', userId);
-
 export const getSubscriptionSettings = () =>
   supabase.from('subscription_settings').select('*').eq('id', 'global').single();
 
@@ -77,91 +74,23 @@ export const resolveTierKey = (profile, plans) => {
   return plan?.tier_key ?? 'free';
 };
 
-// Under 'free_except_venue' mode only: venue accounts get a trial window
-// from signup (timed off profiles.created_at, since there's no separate
-// trial-start column), then need an active subscription for the whole app.
-const VENUE_TRIAL_DAYS = 30;
 const isBypassRole = (profile) => profile?.is_staff || profile?.is_admin;
 
-const venueDaysLeftInTrial = (profile) => {
-  if (!profile?.created_at) return 0;
-  const trialEnd = new Date(profile.created_at).getTime() + VENUE_TRIAL_DAYS * 24 * 60 * 60 * 1000;
-  return Math.max(0, Math.ceil((trialEnd - Date.now()) / (1000 * 60 * 60 * 24)));
+// Membership is "Levels" only: every member has full access to every feature,
+// and the only thing that differs by tier is the daily post limit (enforced by
+// the enforce_daily_post_limit() DB trigger, independent of this function).
+// The only way a feature can be unavailable is an admin switching it off.
+export const canAccessFeature = (featureKey, { featureMap }) => {
+  if (featureMap?.[featureKey]?.enabled === false) return { allowed: false, disabled: true };
+  return { allowed: true };
 };
 
-const isVenueLocked = (profile) =>
-  profile?.account_type === 'venue_owner'
-  && !hasActivePlan(profile)
-  && venueDaysLeftInTrial(profile) <= 0;
-
-// Resolves whether a member can currently post/write to a given feature,
-// given the global subscription mode + that feature's paid flag.
-//
-// - 'free': everyone has full access everywhere.
-// - 'free_except': everyone has full access, except the features on the
-//   paid list, which cost their one-off price unless subscribed. Any
-//   active subscription (any account type) fully bypasses this.
-// - 'free_until': full access for everyone until the date. Once it passes,
-//   any active subscription (any plan, any tier) is the sole requirement
-//   for everything — no subscription, no posting anywhere, full stop.
-//   The per-feature paid list does not apply in this mode.
-// - 'free_except_venue': members have full free access, same as 'free'.
-//   Venue accounts (account_type = 'venue_owner') get a 30-day trial from
-//   signup, then need an active subscription for the whole app.
-// - 'levels': the Free/Silver/Gold/Platinum plan is in effect, but the only
-//   thing that differs by tier is the daily post limit (enforced by the
-//   enforce_daily_post_limit() DB trigger, independent of this mode) — no
-//   feature is blocked outright, same as 'free'.
-export const canAccessFeature = (featureKey, { profile, settings, featureMap, unlockedFeatureKeys }) => {
-  // Admin-disabled feature: hidden for everyone, staff/admin included.
-  const feature = featureMap?.[featureKey];
-  if (feature?.enabled === false) return { allowed: false, disabled: true };
-
-  if (isBypassRole(profile)) return { allowed: true };
-
-  const mode = settings?.mode ?? 'free';
-
-  if (mode === 'free_except_venue') {
-    if (profile?.account_type !== 'venue_owner') return { allowed: true };
-    return isVenueLocked(profile) ? { allowed: false, venueLocked: true } : { allowed: true };
+// Display only: whether the member currently has a paid level, and for how long.
+export const subscriptionStatus = (profile) => {
+  if (isBypassRole(profile)) return { hasAccess: true, isActive: true, daysLeft: 0, planId: 'staff' };
+  if (hasActivePlan(profile)) {
+    const daysLeft = Math.max(0, Math.ceil((new Date(profile.subscription_expires_at) - new Date()) / (1000 * 60 * 60 * 24)));
+    return { hasAccess: true, isActive: true, daysLeft, planId: profile.subscription_plan };
   }
-
-  if (mode === 'free' || mode === 'levels') return { allowed: true };
-
-  if (mode === 'free_until') {
-    const stillFree = settings?.free_until && new Date(settings.free_until) > new Date();
-    if (stillFree) return { allowed: true };
-    return hasActivePlan(profile) ? { allowed: true } : { allowed: false };
-  }
-
-  // mode === 'free_except' — any active subscription bypasses the paid list entirely
-  if (hasActivePlan(profile)) return { allowed: true };
-  if (!feature?.is_paid) return { allowed: true };
-  if (unlockedFeatureKeys?.has(featureKey)) return { allowed: true };
-  return { allowed: false, featureKey, price: feature.one_off_price };
-};
-
-export const subscriptionStatus = (profile, settings) => {
-  if (isBypassRole(profile)) return { hasAccess: true, isOnTrial: false, isActive: true, daysLeft: 0, planId: 'staff' };
-
-  const plan = profile?.subscription_plan;
-  const expires = profile?.subscription_expires_at;
-  const activePlan = hasActivePlan(profile);
-  const activeDaysLeft = activePlan
-    ? Math.max(0, Math.ceil((new Date(expires) - new Date()) / (1000 * 60 * 60 * 24)))
-    : 0;
-
-  const mode = settings?.mode ?? 'free';
-  if (mode === 'free_except_venue' && profile?.account_type === 'venue_owner') {
-    if (activePlan) return { hasAccess: true, isOnTrial: false, isActive: true, daysLeft: activeDaysLeft, planId: plan };
-    const trialDaysLeft = venueDaysLeftInTrial(profile);
-    if (trialDaysLeft > 0) return { hasAccess: true, isOnTrial: true, isActive: false, daysLeft: trialDaysLeft, planId: null };
-    return { hasAccess: false, isOnTrial: false, isActive: false, daysLeft: 0, planId: null };
-  }
-
-  // Everyone else: v1 free rollout — full access either way, this just
-  // reports plan status for display (e.g. "Current Plan" badge if they
-  // happen to have one).
-  if (activePlan) return { hasAccess: true, isOnTrial: false, isActive: true, daysLeft: activeDaysLeft, planId: plan };
-  return { hasAccess: true, isOnTrial: false, isActive: false, daysLeft: 0, planId: null };
+  return { hasAccess: true, isActive: false, daysLeft: 0, planId: null };
 };

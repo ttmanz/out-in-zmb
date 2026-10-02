@@ -9,7 +9,6 @@ import { supabase } from '../lib/supabase';
 import { getSession } from '../lib/auth';
 import { getUnreadNotificationCount } from '../lib/notifications';
 import { getUnreadMessageCount } from '../lib/messages';
-import { subscriptionStatus } from '../lib/subscription';
 import { useUser } from '../contexts/UserContext';
 
 import HomeScreen from '../screens/main/HomeScreen';
@@ -52,7 +51,6 @@ import AdminScreen from '../screens/main/AdminScreen';
 import AdminSubscriptionPlansScreen from '../screens/main/AdminSubscriptionPlansScreen';
 import AdminTopVenuesScreen from '../screens/main/AdminTopVenuesScreen';
 import SubscriptionScreen from '../screens/main/SubscriptionScreen';
-import PaywallScreen from '../screens/main/PaywallScreen';
 import CompleteProfileScreen from '../screens/main/CompleteProfileScreen';
 import ActivitiesScreen from '../screens/main/ActivitiesScreen';
 import ActivityEventsScreen from '../screens/main/ActivityEventsScreen';
@@ -130,7 +128,6 @@ const HomeStackNavigator = () => (
     <HomeStack.Screen name={ROUTES.CREATE_STORY}      component={CreateStoryScreen} />
     <HomeStack.Screen name={ROUTES.CLIP_OF_DAY}       component={ClipOfDayScreen} />
     <HomeStack.Screen name={ROUTES.SUBSCRIPTION}            component={SubscriptionScreen} />
-    <HomeStack.Screen name={ROUTES.PAYWALL}                 component={PaywallScreen} />
     <HomeStack.Screen name={ROUTES.MARKET}                  component={MarketScreen} />
     <HomeStack.Screen name={ROUTES.CREATE_MARKET_LISTING}   component={CreateMarketListingScreen} />
     <HomeStack.Screen name={ROUTES.OPEN_GROUPS}             component={OpenGroupsScreen} />
@@ -143,7 +140,6 @@ const MessagesStackNavigator = () => (
     <MessagesStack.Screen name={ROUTES.MESSAGES} component={MessagesScreen} />
     <MessagesStack.Screen name={ROUTES.CHAT} component={ChatScreen} />
     <MessagesStack.Screen name={ROUTES.MEMBER_PROFILE} component={MemberProfileScreen} />
-    <MessagesStack.Screen name={ROUTES.PAYWALL} component={PaywallScreen} />
   </MessagesStack.Navigator>
 );
 
@@ -174,18 +170,13 @@ const MainNavigator = () => {
   const [notifCount, setNotifCount] = useState(0);
   const [msgCount, setMsgCount] = useState(0);
   const insets = useSafeAreaInsets();
-  const { profile, settings } = useUser();
+  const { profile } = useUser();
 
   const isRestricted = profile?.status === 'restricted';
   const isAdmin = profile?.is_admin === true;
-  // Under 'free_except_venue' mode, venue accounts get a 30-day trial from
-  // signup, then need an active subscription for the whole app — checked
-  // here, before any tab/stack is reachable, rather than per-feature like
-  // the member-facing modes.
-  const venueLocked = profile?.account_type === 'venue_owner' && !subscriptionStatus(profile, settings).hasAccess;
 
   useEffect(() => {
-    if (isRestricted || venueLocked) return;
+    if (isRestricted) return;
     let notifChannel, msgChannel;
     getSession().then(({ data: { session } }) => {
       if (!session) return;
@@ -222,11 +213,7 @@ const MainNavigator = () => {
     return () => {
       [notifChannel, msgChannel].forEach((c) => c && supabase.removeChannel(c));
     };
-  }, [isRestricted, venueLocked]);
-
-  if (venueLocked) {
-    return <SubscriptionScreen standalone />;
-  }
+  }, [isRestricted]);
 
   return (
     <Tab.Navigator

@@ -46,7 +46,6 @@ export const ROUTES = {
   REWARDS: 'Rewards',
   INVITE_FRIENDS: 'InviteFriends',
   SUBSCRIPTION: 'Subscription',
-  PAYWALL: 'Paywall',
   ADMIN_SUBSCRIPTION_PLANS: 'AdminSubscriptionPlans',
   ADMIN_TOP_VENUES: 'AdminTopVenues',
   MARKET: 'Market',

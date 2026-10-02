@@ -5,7 +5,7 @@ import {
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { COLORS } from '../../constants/colors';
-import { getSession, signOut } from '../../lib/auth';
+import { getSession } from '../../lib/auth';
 import { getSubscriptionPlans, subscriptionStatus, planPriceFor } from '../../lib/subscription';
 import { getOfferings, purchasePackage, restorePurchases } from '../../lib/purchases';
 import { useUser } from '../../contexts/UserContext';
@@ -25,9 +25,9 @@ const packageForPlan = (offering, productId) => {
   return offering.availablePackages?.find((pkg) => pkg.product?.identifier === productId) ?? null;
 };
 
-const SubscriptionScreen = ({ navigation, standalone = false }) => {
+const SubscriptionScreen = ({ navigation }) => {
   const { t } = useTranslation();
-  const { profile, refreshProfile, settings } = useUser();
+  const { profile, refreshProfile } = useUser();
   const [plans, setPlans] = useState([]);
   const [offering, setOffering] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -35,7 +35,7 @@ const SubscriptionScreen = ({ navigation, standalone = false }) => {
   const [subscribing, setSubscribing] = useState(null);
   const [restoring, setRestoring] = useState(false);
 
-  const status = subscriptionStatus(profile, settings);
+  const status = subscriptionStatus(profile);
 
   useEffect(() => {
     getSession().then(({ data: { session } }) => {
@@ -65,7 +65,7 @@ const SubscriptionScreen = ({ navigation, standalone = false }) => {
         await new Promise((resolve) => setTimeout(resolve, 1500));
         await refreshProfile();
       }
-      if (!standalone && navigation) navigation.goBack();
+      if (navigation) navigation.goBack();
     } catch (e) {
       if (!e.userCancelled) Alert.alert(t('common.error'), e.message);
     } finally {
@@ -88,16 +88,6 @@ const SubscriptionScreen = ({ navigation, standalone = false }) => {
 
   const statusBanner = () => {
     if (!profile) return null;
-    if (status.isOnTrial && status.daysLeft > 0) {
-      return (
-        <View style={styles.trialBanner}>
-          <Text style={styles.trialTitle}>🎉 {t('subscription.trialActive')}</Text>
-          <Text style={styles.trialSub}>
-            {t('subscription.trialDaysLeft', { days: status.daysLeft })}
-          </Text>
-        </View>
-      );
-    }
     if (status.isActive) {
       return (
         <View style={[styles.trialBanner, styles.activeBanner]}>
@@ -108,18 +98,10 @@ const SubscriptionScreen = ({ navigation, standalone = false }) => {
         </View>
       );
     }
-    if (status.hasAccess) {
-      return (
-        <View style={[styles.trialBanner, styles.activeBanner]}>
-          <Text style={styles.trialTitle}>🎉 {t('subscription.freeAccessTitle')}</Text>
-          <Text style={styles.trialSub}>{t('subscription.freeAccessSub')}</Text>
-        </View>
-      );
-    }
     return (
-      <View style={[styles.trialBanner, styles.expiredBanner]}>
-        <Text style={styles.trialTitle}>⚠️ {t('subscription.expiredTitle')}</Text>
-        <Text style={styles.trialSub}>{t('subscription.expiredSub')}</Text>
+      <View style={[styles.trialBanner, styles.activeBanner]}>
+        <Text style={styles.trialTitle}>🎉 {t('subscription.freeAccessTitle')}</Text>
+        <Text style={styles.trialSub}>{t('subscription.freeAccessSub')}</Text>
       </View>
     );
   };
@@ -128,7 +110,7 @@ const SubscriptionScreen = ({ navigation, standalone = false }) => {
     <View style={styles.safe}>
       <BackHeader
         title={t('subscription.title')}
-        onBack={!standalone && navigation ? () => navigation.goBack() : undefined}
+        onBack={navigation ? () => navigation.goBack() : undefined}
       />
 
       <ScrollView contentContainerStyle={styles.scroll}>
@@ -193,12 +175,6 @@ const SubscriptionScreen = ({ navigation, standalone = false }) => {
           }
         </TouchableOpacity>
 
-        {standalone && (
-          <TouchableOpacity style={styles.restoreBtn} onPress={signOut}>
-            <Text style={styles.signOutText}>{t('auth.logout')}</Text>
-          </TouchableOpacity>
-        )}
-
         <Text style={styles.footerNote}>{t('subscription.footerNote')}</Text>
         <Text style={styles.legalNote}>
           {t('subscription.legalNote')}{' '}
@@ -224,7 +200,6 @@ const styles = StyleSheet.create({
     borderRadius: 14, padding: 16, marginBottom: 24,
   },
   activeBanner: { backgroundColor: 'rgba(46,204,113,0.1)', borderColor: '#2ecc71' },
-  expiredBanner: { backgroundColor: 'rgba(231,76,60,0.1)', borderColor: '#e74c3c' },
   trialTitle: { fontSize: 16, fontWeight: '800', color: COLORS.text, marginBottom: 4 },
   trialSub: { fontSize: 13, color: COLORS.textMuted, lineHeight: 19 },
   sectionLabel: {
@@ -263,7 +238,6 @@ const styles = StyleSheet.create({
   currentBadgeText: { color: '#2ecc71', fontWeight: '700', fontSize: 14 },
   restoreBtn: { alignItems: 'center', marginTop: 20, paddingVertical: 8 },
   restoreBtnText: { color: COLORS.primary, fontWeight: '700', fontSize: 14 },
-  signOutText: { color: COLORS.textMuted, fontWeight: '600', fontSize: 13 },
   footerNote: {
     fontSize: 11, color: COLORS.textMuted, textAlign: 'center',
     marginTop: 10, lineHeight: 17, paddingHorizontal: 16,

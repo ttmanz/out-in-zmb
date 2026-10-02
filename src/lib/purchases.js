@@ -35,11 +35,3 @@ export const getOfferings = async (accountType) => {
 export const purchasePackage = (pkg) => Purchases.purchasePackage(pkg);
 
 export const restorePurchases = () => Purchases.restorePurchases();
-
-// One-off feature unlocks aren't bundled into an Offering — fetched
-// directly by product id using the unlock_<feature_key> convention.
-export const purchaseFeatureUnlock = async (featureKey) => {
-  const [product] = await Purchases.getProducts([`unlock_${featureKey}`]);
-  if (!product) throw new Error(`No store product found for unlock_${featureKey}`);
-  return Purchases.purchaseStoreProduct(product);
-};

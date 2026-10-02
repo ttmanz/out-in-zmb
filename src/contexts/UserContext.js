@@ -2,7 +2,7 @@ import React, { createContext, useContext, useState, useEffect, useCallback } fr
 import { Alert } from 'react-native';
 import { getSession, onAuthStateChange, signOut } from '../lib/auth';
 import { getProfile } from '../lib/profile';
-import { subscriptionStatus, getSubscriptionSettings, getSubscriptionPlans, getFeatureAccess, getMyFeatureUnlocks, canAccessFeature, isFeatureEnabled, resolveTierKey } from '../lib/subscription';
+import { subscriptionStatus, getSubscriptionSettings, getSubscriptionPlans, getFeatureAccess, canAccessFeature, isFeatureEnabled, resolveTierKey } from '../lib/subscription';
 import { configurePurchases } from '../lib/purchases';
 import { registerForPushNotificationsAsync } from '../lib/pushNotifications';
 
@@ -20,16 +20,14 @@ export const UserProvider = ({ children }) => {
   const [monthlyPlan, setMonthlyPlan] = useState(null);
   const [plans, setPlans] = useState([]);
   const [featureMap, setFeatureMap] = useState({});
-  const [unlockedFeatureKeys, setUnlockedFeatureKeys] = useState(new Set());
 
-  // Global subscription mode + per-feature paid list — small, admin-edited
-  // tables, loaded once and re-checked alongside the profile.
-  const refreshAccessConfig = useCallback(async (userId) => {
-    const [{ data: settingsData }, { data: plansData }, { data: featuresData }, { data: unlocksData }] = await Promise.all([
+  // Level plans + per-feature on/off flags — small, admin-edited tables,
+  // loaded once and re-checked alongside the profile.
+  const refreshAccessConfig = useCallback(async () => {
+    const [{ data: settingsData }, { data: plansData }, { data: featuresData }] = await Promise.all([
       getSubscriptionSettings(),
       getSubscriptionPlans(),
       getFeatureAccess(),
-      userId ? getMyFeatureUnlocks(userId) : Promise.resolve({ data: [] }),
     ]);
     setSettings(settingsData ?? null);
     setPlans(plansData ?? []);
@@ -37,7 +35,6 @@ export const UserProvider = ({ children }) => {
     const map = {};
     (featuresData ?? []).forEach((f) => { map[f.feature_key] = f; });
     setFeatureMap(map);
-    setUnlockedFeatureKeys(new Set((unlocksData ?? []).map((u) => u.feature_key)));
   }, []);
 
   // Checked on every auth state change (fresh login, token refresh, app
@@ -57,7 +54,7 @@ export const UserProvider = ({ children }) => {
     setProfile(data ?? null);
     configurePurchases(session.user.id);
     registerForPushNotificationsAsync(session.user.id);
-    refreshAccessConfig(session.user.id);
+    refreshAccessConfig();
   }, [refreshAccessConfig]);
 
   // Load on mount and again on every auth change (fresh login, token refresh),
@@ -69,17 +66,17 @@ export const UserProvider = ({ children }) => {
     return () => subscription.unsubscribe();
   }, [refreshProfile, refreshAccessConfig]);
 
-  // Lightweight re-pull of just the access config (subscription mode + feature
+  // Lightweight re-pull of just the access config (level plans + feature
   // flags) — called after an admin edits it in Admin → Access so the change
   // lands app-wide without waiting for the next auth refresh.
   const refreshFeatureConfig = useCallback(() => refreshAccessConfig(), [refreshAccessConfig]);
 
-  const { hasAccess } = subscriptionStatus(profile, settings);
+  const { hasAccess } = subscriptionStatus(profile);
   const myTier = resolveTierKey(profile, plans);
 
   const checkFeature = useCallback(
-    (featureKey) => canAccessFeature(featureKey, { profile, settings, featureMap, unlockedFeatureKeys }),
-    [profile, settings, featureMap, unlockedFeatureKeys]
+    (featureKey) => canAccessFeature(featureKey, { featureMap }),
+    [featureMap]
   );
 
   const checkFeatureEnabled = useCallback(
