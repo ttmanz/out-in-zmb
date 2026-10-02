@@ -7,8 +7,11 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 //   Open Chat and Spur of the Moment posts — shown 3 hours  -> deleted after 24 hours
 //   Stories                                — shown 5 days   -> deleted after 6 days
 //   At Venue check-in location             — shown 2 hours  -> deleted after 24 hours
+//   Clip of the Day (not approved by an admin) -> deleted every Monday 03:00 UTC, video file included
+//     (this replaces the old SQL job 'purge-unapproved-clips', which deleted the rows but left
+//      the video files in storage — see 20261001030000_clip_purge_with_files.sql)
 //
-// Nothing else is touched: What's Happening posts, Market listings, Clips and
+// Nothing else is touched: What's Happening posts, Market listings, approved Clips and
 // everything a member owns are kept until the member deletes them or their account.
 // Replies, likes and saves go with their post (ON DELETE CASCADE).
 //
@@ -38,12 +41,30 @@ const mediaOf = (row: Record<string, string | null>, columns: string[]) => {
   return found;
 };
 
-type Job = { table: string; timeColumn: string; maxAgeMs: number; mediaColumns: string[] };
+// The most recent Monday 03:00 UTC that has already happened. A clip created before
+// it belongs to a week that has ended (exactly what the old Monday 03:00 job removed).
+const lastMondayPurge = () => {
+  const now = new Date();
+  const d = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), 3, 0, 0));
+  d.setUTCDate(d.getUTCDate() - ((d.getUTCDay() + 6) % 7)); // back to Monday
+  if (d.getTime() > now.getTime()) d.setUTCDate(d.getUTCDate() - 7);
+  return d.toISOString();
+};
+
+type Job = {
+  table: string;
+  timeColumn: string;
+  mediaColumns: string[];
+  cutoff: () => string;
+  onlyWhere?: Record<string, boolean>;
+};
+const ago = (ms: number) => () => new Date(Date.now() - ms).toISOString();
 const JOBS: Job[] = [
-  { table: 'open_chat_posts', timeColumn: 'created_at', maxAgeMs: 1 * DAY, mediaColumns: ['photo_url'] },
-  { table: 'spur_posts', timeColumn: 'created_at', maxAgeMs: 1 * DAY, mediaColumns: ['photo_url', 'video_url'] },
-  { table: 'stories', timeColumn: 'created_at', maxAgeMs: 6 * DAY, mediaColumns: ['photo_url', 'video_url'] },
-  { table: 'member_checkins', timeColumn: 'updated_at', maxAgeMs: 1 * DAY, mediaColumns: [] },
+  { table: 'open_chat_posts', timeColumn: 'created_at', cutoff: ago(1 * DAY), mediaColumns: ['photo_url'] },
+  { table: 'spur_posts', timeColumn: 'created_at', cutoff: ago(1 * DAY), mediaColumns: ['photo_url', 'video_url'] },
+  { table: 'stories', timeColumn: 'created_at', cutoff: ago(6 * DAY), mediaColumns: ['photo_url', 'video_url'] },
+  { table: 'member_checkins', timeColumn: 'updated_at', cutoff: ago(1 * DAY), mediaColumns: [] },
+  { table: 'daily_clips', timeColumn: 'created_at', cutoff: lastMondayPurge, mediaColumns: ['video_url'], onlyWhere: { is_approved: false } },
 ];
 
 Deno.serve(async (req) => {
@@ -54,16 +75,14 @@ Deno.serve(async (req) => {
 
   const report: Record<string, unknown> = { dry };
   for (const job of JOBS) {
-    const cutoff = new Date(Date.now() - job.maxAgeMs).toISOString();
+    const cutoff = job.cutoff();
     // member_checkins has no id column (its key is user_id).
     const idColumn = job.table === 'member_checkins' ? 'user_id' : 'id';
     const columns = [idColumn, ...job.mediaColumns].join(', ');
 
-    const { data: rows, error } = await supabase
-      .from(job.table)
-      .select(columns)
-      .lt(job.timeColumn, cutoff)
-      .limit(BATCH);
+    let query = supabase.from(job.table).select(columns).lt(job.timeColumn, cutoff);
+    for (const [column, value] of Object.entries(job.onlyWhere ?? {})) query = query.eq(column, value);
+    const { data: rows, error } = await query.limit(BATCH);
     if (error) {
       report[job.table] = { error: error.message };
       continue;
@@ -89,10 +108,10 @@ Deno.serve(async (req) => {
     const ids = expired.map((row) => row[idColumn]);
     let deleted = 0;
     if (ids.length > 0) {
-      const { error: deleteError, count } = await supabase
-        .from(job.table)
-        .delete({ count: 'exact' })
-        .in(idColumn, ids);
+      let del = supabase.from(job.table).delete({ count: 'exact' }).in(idColumn, ids);
+      // Same filter again, so a clip approved a moment ago is never deleted.
+      for (const [column, value] of Object.entries(job.onlyWhere ?? {})) del = del.eq(column, value);
+      const { error: deleteError, count } = await del;
       if (deleteError) {
         report[job.table] = { error: deleteError.message };
         continue;
