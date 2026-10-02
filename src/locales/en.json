@@ -42,6 +42,8 @@
     "trialDaysLeft": "{{days}} day(s) remaining in your free trial",
     "activeTitle": "Subscription Active",
     "activeDaysLeft": "{{days}} day(s) until renewal",
+    "freeAccessTitle": "Free Access",
+    "freeAccessSub": "You currently have full access to every feature. A plan is optional.",
     "expiredTitle": "Subscription Expired",
     "expiredSub": "Choose a plan below to continue enjoying full access.",
     "footerNote": "Manage or cancel your subscription anytime in your App Store or Google Play account settings.",

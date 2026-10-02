@@ -108,6 +108,14 @@ const SubscriptionScreen = ({ navigation, standalone = false }) => {
         </View>
       );
     }
+    if (status.hasAccess) {
+      return (
+        <View style={[styles.trialBanner, styles.activeBanner]}>
+          <Text style={styles.trialTitle}>🎉 {t('subscription.freeAccessTitle')}</Text>
+          <Text style={styles.trialSub}>{t('subscription.freeAccessSub')}</Text>
+        </View>
+      );
+    }
     return (
       <View style={[styles.trialBanner, styles.expiredBanner]}>
         <Text style={styles.trialTitle}>⚠️ {t('subscription.expiredTitle')}</Text>
