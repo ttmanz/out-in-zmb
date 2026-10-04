@@ -1,7 +1,7 @@
 import React, { useState, useCallback } from 'react';
 import {
   View, Text, StyleSheet, TouchableOpacity, TextInput,
-  ScrollView, ActivityIndicator, Alert,
+  ScrollView, ActivityIndicator, Alert, Modal,
 } from 'react-native';
 import { KeyboardAvoidingView } from 'react-native-keyboard-controller';
 import { useFocusEffect } from '@react-navigation/native';
@@ -10,11 +10,15 @@ import {
   getAgentSettings, updateAgentSettings, getAgentRate, setAgentRate,
   getAgentOverview, setAgent, setAgentBonus, evaluateAllAgents,
 } from '../../lib/agents';
+import { getOrCreateConversation, sendMessage } from '../../lib/messages';
+import { ROUTES } from '../../constants/routes';
+import { useUser } from '../../contexts/UserContext';
 import { formatAgo } from '../../utils/format';
 import BackHeader from '../../components/common/BackHeader';
 import Avatar from '../../components/common/Avatar';
 
 const AdminAgentsScreen = ({ navigation }) => {
+  const { profile } = useUser();
   const [enabled, setEnabled] = useState(true);
   const [requiredDraft, setRequiredDraft] = useState('10');
   const [required, setRequired] = useState(10);
@@ -25,6 +29,9 @@ const AdminAgentsScreen = ({ navigation }) => {
   const [loading, setLoading] = useState(true);
   const [savingSettings, setSavingSettings] = useState(false);
   const [busyId, setBusyId] = useState(null);
+  const [composing, setComposing] = useState(false);
+  const [draft, setDraft] = useState('');
+  const [sending, setSending] = useState(false);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -121,6 +128,53 @@ const AdminAgentsScreen = ({ navigation }) => {
     run(row.user_id, () => setAgentBonus(row.user_id, amount), 'Could not save this bonus.');
   };
 
+  // Opens the normal chat with one agent (the first message also alerts them).
+  const handleMessage = async (row) => {
+    if (row.user_id === profile?.id) return;
+    setBusyId(row.user_id);
+    const { data, error } = await getOrCreateConversation(profile.id, row.user_id);
+    setBusyId(null);
+    if (error || !data) {
+      Alert.alert('Error', 'Could not start a conversation.');
+      return;
+    }
+    navigation.navigate('MessagesTab', {
+      screen: ROUTES.CHAT,
+      params: { conversationId: data.id, friendName: row.full_name ?? 'Agent', friendIsAdmin: false },
+    });
+  };
+
+  // One message to every agent, each in their own chat with you.
+  const handleSendToAll = async () => {
+    const text = draft.trim();
+    const targets = rows.filter((r) => r.is_agent && r.user_id !== profile?.id);
+    if (!text) {
+      Alert.alert('Write a message', 'Type the message you want to send to your agents.');
+      return;
+    }
+    if (targets.length === 0) {
+      Alert.alert('No agents', 'There are no agents to message yet.');
+      return;
+    }
+    setSending(true);
+    let sent = 0;
+    for (const agent of targets) {
+      const { data } = await getOrCreateConversation(profile.id, agent.user_id);
+      if (!data) continue;
+      const { error } = await sendMessage(data.id, profile.id, text);
+      if (!error) sent += 1;
+    }
+    setSending(false);
+    setComposing(false);
+    setDraft('');
+    Alert.alert(
+      sent === targets.length ? 'Sent' : 'Partly sent',
+      sent === targets.length
+        ? `Your message went to ${sent} agent${sent === 1 ? '' : 's'}.`
+        : `Sent to ${sent} of ${targets.length} agents. The rest could not be reached — try again.`,
+    );
+  };
+
   const agents = rows.filter((r) => r.is_agent);
   const others = rows.filter((r) => !r.is_agent);
 
@@ -187,6 +241,11 @@ const AdminAgentsScreen = ({ navigation }) => {
         </View>
 
         <Text style={[styles.sectionLabel, { marginTop: 28 }]}>Agents ({agents.length})</Text>
+        {agents.length > 0 && (
+          <TouchableOpacity style={styles.broadcastBtn} onPress={() => setComposing(true)}>
+            <Text style={styles.broadcastBtnText}>✉️  Message all agents</Text>
+          </TouchableOpacity>
+        )}
         {agents.length === 0 && <Text style={styles.empty}>No agents yet.</Text>}
         {agents.map((row) => {
           const busy = busyId === row.user_id;
@@ -221,9 +280,14 @@ const AdminAgentsScreen = ({ navigation }) => {
                 </TouchableOpacity>
               </View>
 
-              <TouchableOpacity style={styles.removeBtn} onPress={() => handleRemoveAgent(row)} disabled={busy}>
-                <Text style={styles.removeBtnText}>Remove agent</Text>
-              </TouchableOpacity>
+              <View style={styles.actionRow}>
+                <TouchableOpacity style={styles.messageBtn} onPress={() => handleMessage(row)} disabled={busy}>
+                  <Text style={styles.messageBtnText}>✉️  Message</Text>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => handleRemoveAgent(row)} disabled={busy}>
+                  <Text style={styles.removeBtnText}>Remove agent</Text>
+                </TouchableOpacity>
+              </View>
             </View>
           );
         })}
@@ -250,6 +314,35 @@ const AdminAgentsScreen = ({ navigation }) => {
           );
         })}
       </ScrollView>
+
+      <Modal visible={composing} transparent animationType="fade" onRequestClose={() => !sending && setComposing(false)}>
+        <KeyboardAvoidingView style={styles.modalBackdrop} behavior="padding">
+          <View style={styles.modalCard}>
+            <Text style={styles.modalTitle}>Message all agents</Text>
+            <Text style={styles.modalHint}>
+              Sent to {agents.filter((a) => a.user_id !== profile?.id).length} agent(s), each in their own chat with you. They can reply there.
+            </Text>
+            <TextInput
+              style={[styles.input, styles.modalInput]}
+              value={draft}
+              onChangeText={setDraft}
+              placeholder="Write your message…"
+              placeholderTextColor={COLORS.textMuted}
+              multiline
+              maxLength={1000}
+              editable={!sending}
+            />
+            <View style={styles.modalActions}>
+              <TouchableOpacity style={styles.modalCancel} onPress={() => setComposing(false)} disabled={sending}>
+                <Text style={styles.modalCancelText}>Cancel</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.modalConfirm} onPress={handleSendToAll} disabled={sending}>
+                {sending ? <ActivityIndicator color={COLORS.black} /> : <Text style={styles.modalConfirmText}>Send</Text>}
+              </TouchableOpacity>
+            </View>
+          </View>
+        </KeyboardAvoidingView>
+      </Modal>
     </KeyboardAvoidingView>
   );
 };
@@ -298,8 +391,25 @@ const styles = StyleSheet.create({
   bonusInput: { width: 100 },
   smallBtn: { backgroundColor: COLORS.primary, borderRadius: 16, paddingHorizontal: 14, paddingVertical: 8 },
   smallBtnText: { fontSize: 12, fontWeight: '800', color: COLORS.black },
-  removeBtn: { alignSelf: 'flex-start', marginTop: 14 },
+  actionRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 14 },
+  messageBtn: { borderWidth: 1, borderColor: COLORS.primary, borderRadius: 16, paddingHorizontal: 14, paddingVertical: 8 },
+  messageBtnText: { fontSize: 12, fontWeight: '800', color: COLORS.primary },
   removeBtnText: { fontSize: 13, fontWeight: '700', color: COLORS.error },
+  broadcastBtn: {
+    borderWidth: 1, borderColor: COLORS.primary, borderRadius: 12,
+    paddingVertical: 12, alignItems: 'center', marginBottom: 12,
+  },
+  broadcastBtnText: { fontSize: 14, fontWeight: '800', color: COLORS.primary },
+  modalBackdrop: { flex: 1, backgroundColor: 'rgba(0,0,0,0.6)', justifyContent: 'center', padding: 24 },
+  modalCard: { backgroundColor: COLORS.surface, borderRadius: 16, padding: 20 },
+  modalTitle: { fontSize: 16, fontWeight: '700', color: COLORS.text, marginBottom: 8 },
+  modalHint: { fontSize: 12, color: COLORS.textLight, lineHeight: 17, marginBottom: 12 },
+  modalInput: { minHeight: 110, textAlignVertical: 'top' },
+  modalActions: { flexDirection: 'row', gap: 10, marginTop: 16 },
+  modalCancel: { flex: 1, paddingVertical: 12, alignItems: 'center', borderRadius: 10, borderWidth: 1, borderColor: COLORS.borderAccent },
+  modalCancelText: { color: COLORS.textMuted, fontWeight: '700' },
+  modalConfirm: { flex: 1, paddingVertical: 12, alignItems: 'center', borderRadius: 10, backgroundColor: COLORS.primary },
+  modalConfirmText: { color: COLORS.black, fontWeight: '800' },
 });
 
 export default AdminAgentsScreen;
