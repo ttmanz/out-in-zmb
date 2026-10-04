@@ -8,7 +8,7 @@ export const getMyReferralCode = (userId) =>
 export const getMyReferrals = (userId) =>
   supabase
     .from('profiles')
-    .select('id, full_name, photo_url, created_at')
+    .select('id, full_name, photo_url, created_at, profile_completed')
     .eq('referred_by', userId)
     .order('created_at', { ascending: false });
 

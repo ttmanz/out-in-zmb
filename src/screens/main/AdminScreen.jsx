@@ -257,6 +257,14 @@ const AdminScreen = ({ navigation }) => {
           <Text style={styles.navCardEmoji}>💸</Text>
           <Text style={styles.navCardText}>Cash Back</Text>
         </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.navCard}
+          onPress={() => navigation.navigate(ROUTES.ADMIN_AGENTS)}
+          activeOpacity={0.75}
+        >
+          <Text style={styles.navCardEmoji}>🎖️</Text>
+          <Text style={styles.navCardText}>Agents</Text>
+        </TouchableOpacity>
       </View>
       <Text style={styles.count}>{members.length} members</Text>
 
