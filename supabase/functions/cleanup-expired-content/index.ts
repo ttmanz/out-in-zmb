@@ -5,7 +5,8 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 // (see supabase/migrations/20261001010000_cleanup_schedule.sql).
 //
 //   Open Chat and Spur of the Moment posts — shown 3 hours  -> deleted after 24 hours
-//   Stories                                — shown 15 days  -> deleted after 16 days
+//   Stories                                — shown 15 days  -> deleted after 16 days,
+//     unless a paid member saved it to Memory (stories.memory_until, 3 months from the save)
 //   What's Happening posts                 — deleted after 15 days
 //   Events and Activity events             — hidden after their date -> deleted 24 hours after event_date
 //     (events with no date are kept)
@@ -60,12 +61,14 @@ type Job = {
   mediaColumns: string[];
   cutoff: () => string;
   onlyWhere?: Record<string, boolean>;
+  // A timestamp column that, while still in the future, keeps the row (Memory stories).
+  keepUntilColumn?: string;
 };
 const ago = (ms: number) => () => new Date(Date.now() - ms).toISOString();
 const JOBS: Job[] = [
   { table: 'open_chat_posts', timeColumn: 'created_at', cutoff: ago(1 * DAY), mediaColumns: ['photo_url'] },
   { table: 'spur_posts', timeColumn: 'created_at', cutoff: ago(1 * DAY), mediaColumns: ['photo_url', 'video_url'] },
-  { table: 'stories', timeColumn: 'created_at', cutoff: ago(16 * DAY), mediaColumns: ['photo_url', 'video_url'] },
+  { table: 'stories', timeColumn: 'created_at', cutoff: ago(16 * DAY), mediaColumns: ['photo_url', 'video_url'], keepUntilColumn: 'memory_until' },
   { table: 'happenings', timeColumn: 'created_at', cutoff: ago(15 * DAY), mediaColumns: ['photo_url', 'video_url'] },
   { table: 'events', timeColumn: 'event_date', cutoff: ago(1 * DAY), mediaColumns: ['photo_url', 'video_url'] },
   { table: 'activity_events', timeColumn: 'event_date', cutoff: ago(1 * DAY), mediaColumns: ['photo_url', 'video_url'] },
@@ -88,6 +91,7 @@ Deno.serve(async (req) => {
 
     let query = supabase.from(job.table).select(columns).lt(job.timeColumn, cutoff);
     for (const [column, value] of Object.entries(job.onlyWhere ?? {})) query = query.eq(column, value);
+    if (job.keepUntilColumn) query = query.or(`${job.keepUntilColumn}.is.null,${job.keepUntilColumn}.lt.${new Date().toISOString()}`);
     const { data: rows, error } = await query.limit(BATCH);
     if (error) {
       report[job.table] = { error: error.message };
@@ -117,6 +121,7 @@ Deno.serve(async (req) => {
       let del = supabase.from(job.table).delete({ count: 'exact' }).in(idColumn, ids);
       // Same filter again, so a clip approved a moment ago is never deleted.
       for (const [column, value] of Object.entries(job.onlyWhere ?? {})) del = del.eq(column, value);
+      if (job.keepUntilColumn) del = del.or(`${job.keepUntilColumn}.is.null,${job.keepUntilColumn}.lt.${new Date().toISOString()}`);
       const { error: deleteError, count } = await del;
       if (deleteError) {
         report[job.table] = { error: deleteError.message };

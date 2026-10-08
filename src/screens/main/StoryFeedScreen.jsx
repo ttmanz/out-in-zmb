@@ -20,6 +20,7 @@ import {
 import { getSession } from '../../lib/auth';
 import { formatAgo } from '../../utils/format';
 import { useUser } from '../../contexts/UserContext';
+import { subscriptionStatus } from '../../lib/subscription';
 import AdBanner from '../../components/common/AdBanner';
 import BackHeader from '../../components/common/BackHeader';
 import ReportModal from '../../components/common/ReportModal';
@@ -33,8 +34,17 @@ const daysLeft = (createdAt) => {
   return Math.ceil(ms / (1000 * 60 * 60 * 24));
 };
 
-const ExpiryBadge = ({ createdAt }) => {
+const ExpiryBadge = ({ createdAt, memoryUntil, t }) => {
   const days = daysLeft(createdAt);
+  // A story kept in Memory outlives the normal 15 days.
+  const memoryDays = memoryUntil ? Math.ceil((new Date(memoryUntil).getTime() - Date.now()) / (24 * 60 * 60 * 1000)) : 0;
+  if (memoryDays > days) {
+    return (
+      <View style={styles.expiryBadge}>
+        <Text style={styles.expiryText}>{t('stories.memoryLeft', { days: memoryDays })}</Text>
+      </View>
+    );
+  }
   const expiring = days <= 1;
   return (
     <View style={[styles.expiryBadge, expiring && styles.expiryBadgeWarn]}>
@@ -86,7 +96,7 @@ const StoryCard = ({
           </TouchableOpacity>
           <Text style={styles.time}>{formatAgo(item.created_at)}</Text>
         </View>
-        <ExpiryBadge createdAt={item.created_at} />
+        <ExpiryBadge createdAt={item.created_at} memoryUntil={item.memory_until} t={t} />
         {item.user_id !== myId && (
           <TouchableOpacity style={styles.adminDeleteBtn} onPress={() => onReport(item)}>
             <Text style={styles.adminDeleteBtnText}>🚩</Text>
@@ -273,6 +283,12 @@ const StoryFeedScreen = ({ navigation, route }) => {
     const uid = profile?.id;
     if (!uid) return;
     const wasSaved = savedIds.has(story.id);
+    // Saving to Memory is for paid members (the database enforces it too).
+    const askUpgrade = () => Alert.alert(t('stories.memoryTitle'), t('stories.memoryBody'), [
+      { text: t('common.cancel'), style: 'cancel' },
+      { text: t('stories.memoryUpgrade'), onPress: () => navigation.navigate(ROUTES.SUBSCRIPTION) },
+    ]);
+    if (!wasSaved && !subscriptionStatus(profile).isActive) { askUpgrade(); return; }
     setSavedIds((prev) => {
       const next = new Set(prev);
       if (wasSaved) next.delete(story.id); else next.add(story.id);
@@ -285,6 +301,9 @@ const StoryFeedScreen = ({ navigation, route }) => {
         if (wasSaved) next.add(story.id); else next.delete(story.id);
         return next;
       });
+      if (error.message?.includes('memory_requires_subscription')) askUpgrade();
+    } else if (mode === 'saved' && wasSaved) {
+      setStories((prev) => prev.filter((x) => x.id !== story.id));
     }
   };
 
