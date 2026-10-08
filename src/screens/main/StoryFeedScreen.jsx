@@ -191,6 +191,7 @@ const StoryFeedScreen = ({ navigation, route }) => {
   const { profile } = useUser();
   const isAdmin = profile?.is_admin === true;
   const [mode, setMode] = useState('all');
+  const [picking, setPicking] = useState(false); // Memory tab: choose stories to keep
   const [stories, setStories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -210,7 +211,7 @@ const StoryFeedScreen = ({ navigation, route }) => {
     const uid = session?.user?.id ?? null;
     const res = mode === 'friends' && uid
       ? await getFriendStories(uid)
-      : mode === 'saved'
+      : mode === 'saved' && !picking
       ? (uid ? await getSavedStories(uid) : { data: [], error: null })
       : await getStories();
     const data = res.data ?? [];
@@ -234,7 +235,7 @@ const StoryFeedScreen = ({ navigation, route }) => {
       setLikedIds(new Set());
       setSavedIds(new Set());
     }
-  }, [mode]);
+  }, [mode, picking]);
 
   // Initial load + re-load when screen is focused
   useFocusEffect(useCallback(() => { load(); }, [load]));
@@ -244,7 +245,7 @@ const StoryFeedScreen = ({ navigation, route }) => {
     if (firstRender.current) { firstRender.current = false; return; }
     setLoading(true);
     load();
-  }, [mode]);
+  }, [mode, picking]);
 
   useEffect(() => {
     if (!focusItemId || focusedRef.current) return;
@@ -302,7 +303,7 @@ const StoryFeedScreen = ({ navigation, route }) => {
         return next;
       });
       if (error.message?.includes('memory_requires_subscription')) askUpgrade();
-    } else if (mode === 'saved' && wasSaved) {
+    } else if (mode === 'saved' && !picking && wasSaved) {
       setStories((prev) => prev.filter((x) => x.id !== story.id));
     }
   };
@@ -376,7 +377,7 @@ const StoryFeedScreen = ({ navigation, route }) => {
       <View style={styles.toggleBar}>
         <TouchableOpacity
           style={[styles.toggleBtn, mode === 'all' && styles.toggleBtnActive]}
-          onPress={() => setMode('all')}
+          onPress={() => { setMode('all'); setPicking(false); }}
         >
           <Text style={[styles.toggleText, mode === 'all' && styles.toggleTextActive]}>
             {t('stories.seeAll')}
@@ -384,7 +385,7 @@ const StoryFeedScreen = ({ navigation, route }) => {
         </TouchableOpacity>
         <TouchableOpacity
           style={[styles.toggleBtn, mode === 'friends' && styles.toggleBtnActive]}
-          onPress={() => setMode('friends')}
+          onPress={() => { setMode('friends'); setPicking(false); }}
         >
           <Text style={[styles.toggleText, mode === 'friends' && styles.toggleTextActive]}>
             {t('stories.onlyFriends')}
@@ -392,7 +393,7 @@ const StoryFeedScreen = ({ navigation, route }) => {
         </TouchableOpacity>
         <TouchableOpacity
           style={[styles.toggleBtn, mode === 'saved' && styles.toggleBtnActive]}
-          onPress={() => setMode('saved')}
+          onPress={() => { setMode('saved'); setPicking(false); }}
         >
           <Text style={[styles.toggleText, mode === 'saved' && styles.toggleTextActive]}>
             {t('stories.saved')}
@@ -400,6 +401,12 @@ const StoryFeedScreen = ({ navigation, route }) => {
         </TouchableOpacity>
         <LiveTabButton navigation={navigation} createRoute={ROUTES.CREATE_STORY} />
       </View>
+
+      {mode === 'saved' && (
+        <TouchableOpacity style={styles.pickBtn} onPress={() => setPicking((p) => !p)}>
+          <Text style={styles.pickBtnText}>{picking ? 'Done' : '＋ Choose stories for Memory'}</Text>
+        </TouchableOpacity>
+      )}
 
       <FlatList
         ref={flatListRef}
@@ -424,7 +431,8 @@ const StoryFeedScreen = ({ navigation, route }) => {
               : t('stories.noStories')}
           </Text>
         }
-        renderItem={({ item }) => (
+        renderItem={({ item }) => {
+          const card = (
           <StoryCard
             item={item}
             navigation={navigation}
@@ -450,7 +458,19 @@ const StoryFeedScreen = ({ navigation, route }) => {
               contentExcerpt: it.text ?? null,
             })}
           />
-        )}
+          );
+          if (!(mode === 'saved' && picking)) return card;
+          // Choosing for Memory: tap a story to select it (saved straight away), tap again to remove it.
+          const chosen = savedIds.has(item.id);
+          return (
+            <TouchableOpacity activeOpacity={0.85} onPress={() => handleToggleSave(item)}>
+              <View pointerEvents="none">{card}</View>
+              <View style={[styles.pickBadge, chosen && styles.pickBadgeOn]} pointerEvents="none">
+                <Text style={styles.pickBadgeText}>{chosen ? '✓' : ''}</Text>
+              </View>
+            </TouchableOpacity>
+          );
+        }}
       />
 
       <ReportModal target={reportTarget} onClose={() => setReportTarget(null)} />
@@ -479,6 +499,11 @@ const styles = StyleSheet.create({
   toggleBtnActive: { backgroundColor: COLORS.primary },
   toggleText: { fontSize: 13, fontWeight: '700', color: COLORS.textMuted },
   toggleTextActive: { color: COLORS.black },
+  pickBtn: { marginHorizontal: 16, marginTop: 8, paddingVertical: 11, borderRadius: 12, alignItems: 'center', borderWidth: 1, borderColor: COLORS.primary },
+  pickBtnText: { color: COLORS.primary, fontWeight: '800', fontSize: 14 },
+  pickBadge: { position: 'absolute', top: 12, right: 12, width: 30, height: 30, borderRadius: 15, borderWidth: 2, borderColor: COLORS.white, backgroundColor: 'rgba(0,0,0,0.45)', alignItems: 'center', justifyContent: 'center' },
+  pickBadgeOn: { backgroundColor: COLORS.primary, borderColor: COLORS.primary },
+  pickBadgeText: { color: COLORS.black, fontWeight: '900', fontSize: 16 },
   list: { padding: 16, paddingTop: 12, paddingBottom: 100 },
   empty: {
     textAlign: 'center', color: COLORS.textMuted, fontSize: 15,
