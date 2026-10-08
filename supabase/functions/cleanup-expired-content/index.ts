@@ -8,6 +8,7 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 //   Stories                                — shown 15 days  -> deleted after 16 days,
 //     unless a paid member saved it to Memory (stories.memory_until, 3 months from the save)
 //   What's Happening posts                 — deleted after 15 days
+//   Give Away posts                        — hidden after their end time -> deleted 24 hours after it
 //   Events and Activity events             — hidden after their date -> deleted 24 hours after event_date
 //     (events with no date are kept)
 //   At Venue check-in location             — shown 2 hours  -> deleted after 24 hours
@@ -72,6 +73,7 @@ const JOBS: Job[] = [
   { table: 'happenings', timeColumn: 'created_at', cutoff: ago(15 * DAY), mediaColumns: ['photo_url', 'video_url'] },
   { table: 'events', timeColumn: 'event_date', cutoff: ago(1 * DAY), mediaColumns: ['photo_url', 'video_url'] },
   { table: 'activity_events', timeColumn: 'event_date', cutoff: ago(1 * DAY), mediaColumns: ['photo_url', 'video_url'] },
+  { table: 'giveaways', timeColumn: 'ends_at', cutoff: ago(1 * DAY), mediaColumns: ['photo_url', 'video_url'] },
   { table: 'member_checkins', timeColumn: 'updated_at', cutoff: ago(1 * DAY), mediaColumns: [] },
   { table: 'daily_clips', timeColumn: 'created_at', cutoff: lastMondayPurge, mediaColumns: ['video_url'], onlyWhere: { is_approved: false } },
 ];

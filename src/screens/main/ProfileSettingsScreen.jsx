@@ -227,6 +227,21 @@ const ProfileSettingsScreen = ({ navigation }) => {
           </TouchableOpacity>
         )}
 
+        {myProfile?.account_type === 'venue_owner' && (
+          <TouchableOpacity
+            style={styles.editProfileBtn}
+            onPress={() => navigation.navigate(ROUTES.CREATE_GIVEAWAY)}
+            activeOpacity={0.8}
+          >
+            <Text style={styles.editProfileEmoji}>🎁</Text>
+            <View style={styles.editProfileText}>
+              <Text style={styles.editProfileLabel}>Post a Giveaway</Text>
+              <Text style={styles.editProfileDesc}>Offer something free — members see it in the Give Away tab</Text>
+            </View>
+            <Text style={styles.editProfileChevron}>›</Text>
+          </TouchableOpacity>
+        )}
+
         {myProfile?.account_type === 'venue_owner' ? (
           <TouchableOpacity
             style={styles.editProfileBtn}

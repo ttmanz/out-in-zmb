@@ -45,6 +45,8 @@ import FriendsListScreen from '../screens/main/FriendsListScreen';
 import PendingRequestsScreen from '../screens/main/PendingRequestsScreen';
 import SearchUsersScreen from '../screens/main/SearchUsersScreen';
 import MessagesScreen from '../screens/main/MessagesScreen';
+import GiveawaysScreen from '../screens/main/GiveawaysScreen';
+import CreateGiveawayScreen from '../screens/main/CreateGiveawayScreen';
 import ChatScreen from '../screens/main/ChatScreen';
 import NotificationsScreen from '../screens/main/NotificationsScreen';
 import AdminScreen from '../screens/main/AdminScreen';
@@ -79,6 +81,7 @@ import AdminFlaggedMembersScreen from '../screens/main/AdminFlaggedMembersScreen
 const Tab = createBottomTabNavigator();
 const HomeStack = createNativeStackNavigator();
 const MessagesStack = createNativeStackNavigator();
+const GiveawaysStack = createNativeStackNavigator();
 const NotificationsStack = createNativeStackNavigator();
 const AdminStack = createNativeStackNavigator();
 
@@ -133,7 +136,15 @@ const HomeStackNavigator = () => (
     <HomeStack.Screen name={ROUTES.CREATE_MARKET_LISTING}   component={CreateMarketListingScreen} />
     <HomeStack.Screen name={ROUTES.OPEN_GROUPS}             component={OpenGroupsScreen} />
     <HomeStack.Screen name={ROUTES.GROUP_DETAIL}            component={GroupDetailScreen} />
+    <HomeStack.Screen name={ROUTES.CREATE_GIVEAWAY}         component={CreateGiveawayScreen} />
   </HomeStack.Navigator>
+);
+
+const GiveawaysStackNavigator = () => (
+  <GiveawaysStack.Navigator screenOptions={{ headerShown: false }}>
+    <GiveawaysStack.Screen name={ROUTES.GIVEAWAYS} component={GiveawaysScreen} />
+    <GiveawaysStack.Screen name={ROUTES.CREATE_GIVEAWAY} component={CreateGiveawayScreen} />
+  </GiveawaysStack.Navigator>
 );
 
 const MessagesStackNavigator = () => (
@@ -172,7 +183,7 @@ const MainNavigator = () => {
   const [notifCount, setNotifCount] = useState(0);
   const [msgCount, setMsgCount] = useState(0);
   const insets = useSafeAreaInsets();
-  const { profile } = useUser();
+  const { profile, isFeatureEnabled } = useUser();
 
   const isRestricted = profile?.status === 'restricted';
   const isAdmin = profile?.is_admin === true;
@@ -253,6 +264,19 @@ const MainNavigator = () => {
           ),
         }}
       />
+
+      {!isRestricted && isFeatureEnabled('giveaways') !== false && (
+        <Tab.Screen
+          name="GiveawaysTab"
+          component={GiveawaysStackNavigator}
+          options={{
+            tabBarLabel: 'Give Away',
+            tabBarIcon: ({ color, focused }) => (
+              <Ionicons name={focused ? 'gift' : 'gift-outline'} size={24} color={color} />
+            ),
+          }}
+        />
+      )}
 
       {!isRestricted && (
         <Tab.Screen

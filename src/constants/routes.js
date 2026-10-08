@@ -35,6 +35,8 @@ export const ROUTES = {
   CREATE_ACTIVITY_EVENT: 'CreateActivityEvent',
   EVENTS: 'Events',
   EVENT_FEED: 'EventFeed',
+  GIVEAWAYS: 'Giveaways',
+  CREATE_GIVEAWAY: 'CreateGiveaway',
   CREATE_EVENT: 'CreateEvent',
   STORY_FEED: 'StoryFeed',
   CREATE_STORY: 'CreateStory',
