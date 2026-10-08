@@ -1,6 +1,6 @@
 import { supabase } from './supabase';
 
-export const STORY_EXPIRY_DAYS = 5;
+export const STORY_EXPIRY_DAYS = 15;
 
 const expiryThreshold = () =>
   new Date(Date.now() - STORY_EXPIRY_DAYS * 24 * 60 * 60 * 1000).toISOString();

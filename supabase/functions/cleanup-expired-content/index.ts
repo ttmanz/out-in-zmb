@@ -5,13 +5,16 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 // (see supabase/migrations/20261001010000_cleanup_schedule.sql).
 //
 //   Open Chat and Spur of the Moment posts — shown 3 hours  -> deleted after 24 hours
-//   Stories                                — shown 5 days   -> deleted after 6 days
+//   Stories                                — shown 15 days  -> deleted after 16 days
+//   What's Happening posts                 — deleted after 15 days
+//   Events and Activity events             — hidden after their date -> deleted 24 hours after event_date
+//     (events with no date are kept)
 //   At Venue check-in location             — shown 2 hours  -> deleted after 24 hours
 //   Clip of the Day (not approved by an admin) -> deleted every Monday 03:00 UTC, video file included
 //     (this replaces the old SQL job 'purge-unapproved-clips', which deleted the rows but left
 //      the video files in storage — see 20261001030000_clip_purge_with_files.sql)
 //
-// Nothing else is touched: What's Happening posts, Market listings, approved Clips and
+// Nothing else is touched: Market listings, approved Clips and
 // everything a member owns are kept until the member deletes them or their account.
 // Replies, likes and saves go with their post (ON DELETE CASCADE).
 //
@@ -62,7 +65,10 @@ const ago = (ms: number) => () => new Date(Date.now() - ms).toISOString();
 const JOBS: Job[] = [
   { table: 'open_chat_posts', timeColumn: 'created_at', cutoff: ago(1 * DAY), mediaColumns: ['photo_url'] },
   { table: 'spur_posts', timeColumn: 'created_at', cutoff: ago(1 * DAY), mediaColumns: ['photo_url', 'video_url'] },
-  { table: 'stories', timeColumn: 'created_at', cutoff: ago(6 * DAY), mediaColumns: ['photo_url', 'video_url'] },
+  { table: 'stories', timeColumn: 'created_at', cutoff: ago(16 * DAY), mediaColumns: ['photo_url', 'video_url'] },
+  { table: 'happenings', timeColumn: 'created_at', cutoff: ago(15 * DAY), mediaColumns: ['photo_url', 'video_url'] },
+  { table: 'events', timeColumn: 'event_date', cutoff: ago(1 * DAY), mediaColumns: ['photo_url', 'video_url'] },
+  { table: 'activity_events', timeColumn: 'event_date', cutoff: ago(1 * DAY), mediaColumns: ['photo_url', 'video_url'] },
   { table: 'member_checkins', timeColumn: 'updated_at', cutoff: ago(1 * DAY), mediaColumns: [] },
   { table: 'daily_clips', timeColumn: 'created_at', cutoff: lastMondayPurge, mediaColumns: ['video_url'], onlyWhere: { is_approved: false } },
 ];
